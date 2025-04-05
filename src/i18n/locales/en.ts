@@ -1,7 +1,6 @@
-
 export default {
   common: {
-    appName: "Oasis Bazaar",
+    appName: "Arabesque",
     loading: "Loading...",
     error: "An error occurred",
     language: "Language",
@@ -16,7 +15,9 @@ export default {
     signIn: "Sign In",
     signUp: "Sign Up",
     signOut: "Sign Out",
-    checkout: "Checkout"
+    checkout: "Checkout",
+    viewAll: "View All",
+    contact: "Contact"
   },
   auth: {
     email: "Email",
@@ -40,9 +41,15 @@ export default {
     categories: "Shop by Category",
     trending: "Trending Items",
     newArrivals: "New Arrivals",
-    sale: "Special Offers"
+    sale: "Special Offers",
+    testimonials: "What Our Customers Say",
+    stayUpdated: "Stay Updated"
   },
   product: {
+    product: "Product",
+    price: "Price",
+    quantity: "Quantity",
+    total: "Total",
     inStock: "In Stock",
     outOfStock: "Out of Stock",
     addToCart: "Add to Cart",
@@ -51,7 +58,6 @@ export default {
     specifications: "Specifications",
     reviews: "Reviews",
     relatedProducts: "You May Also Like",
-    quantity: "Quantity",
     sku: "SKU",
     category: "Category",
     tags: "Tags",
@@ -60,7 +66,9 @@ export default {
     sale: "Sale"
   },
   cart: {
+    title: "Shopping Cart",
     empty: "Your cart is empty",
+    emptyMessage: "Looks like you haven't added anything to your cart yet. Browse our products and find something you'll love.",
     startShopping: "Start Shopping",
     subtotal: "Subtotal",
     shipping: "Shipping",
@@ -71,7 +79,11 @@ export default {
     remove: "Remove",
     clearCart: "Clear Cart",
     items: "items",
-    item: "item"
+    item: "item",
+    itemRemoved: "Item Removed",
+    itemRemovedDesc: "The item has been removed from your cart",
+    fetchError: "Couldn't fetch cart items. Please try again.",
+    orderSummary: "Order Summary"
   },
   checkout: {
     shippingAddress: "Shipping Address",
@@ -100,5 +112,14 @@ export default {
     addresses: "Addresses",
     wishlist: "Wishlist",
     settings: "Settings"
+  },
+  newsletter: {
+    emailPlaceholder: "Your email address",
+    subscribe: "Subscribe"
+  },
+  footer: {
+    allRightsReserved: "All Rights Reserved",
+    madeWith: "Made with",
+    forYou: "for you"
   }
 };

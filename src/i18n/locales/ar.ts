@@ -1,7 +1,6 @@
-
 export default {
   common: {
-    appName: "واحة البازار",
+    appName: "أرابيسك",
     loading: "جار التحميل...",
     error: "حدث خطأ",
     language: "اللغة",
@@ -16,7 +15,9 @@ export default {
     signIn: "تسجيل الدخول",
     signUp: "إنشاء حساب",
     signOut: "تسجيل الخروج",
-    checkout: "إتمام الشراء"
+    checkout: "إتمام الشراء",
+    viewAll: "عرض الكل",
+    contact: "اتصل بنا"
   },
   auth: {
     email: "البريد الإلكتروني",
@@ -40,9 +41,15 @@ export default {
     categories: "تسوق حسب الفئة",
     trending: "المنتجات الرائجة",
     newArrivals: "وصل حديثًا",
-    sale: "عروض خاصة"
+    sale: "عروض خاصة",
+    testimonials: "ماذا يقول عملاؤنا",
+    stayUpdated: "ابق على اطلاع"
   },
   product: {
+    product: "المنتج",
+    price: "السعر",
+    quantity: "الكمية",
+    total: "المجموع",
     inStock: "متوفر",
     outOfStock: "غير متوفر",
     addToCart: "أضف إلى السلة",
@@ -51,7 +58,6 @@ export default {
     specifications: "المواصفات",
     reviews: "التقييمات",
     relatedProducts: "قد يعجبك أيضًا",
-    quantity: "الكمية",
     sku: "رمز المنتج",
     category: "الفئة",
     tags: "الوسوم",
@@ -60,7 +66,9 @@ export default {
     sale: "تخفيض"
   },
   cart: {
+    title: "سلة التسوق",
     empty: "سلة التسوق فارغة",
+    emptyMessage: "يبدو أنك لم تضف أي شيء إلى سلة التسوق بعد. تصفح منتجاتنا واكتشف شيئًا تحبه.",
     startShopping: "ابدأ التسوق",
     subtotal: "المجموع الفرعي",
     shipping: "الشحن",
@@ -71,7 +79,11 @@ export default {
     remove: "إزالة",
     clearCart: "تفريغ السلة",
     items: "منتجات",
-    item: "منتج"
+    item: "منتج",
+    itemRemoved: "تمت إزالة المنتج",
+    itemRemovedDesc: "تمت إزالة المنتج من سلة التسوق",
+    fetchError: "تعذر جلب عناصر سلة التسوق. يرجى المحاولة مرة أخرى.",
+    orderSummary: "ملخص الطلب"
   },
   checkout: {
     shippingAddress: "عنوان الشحن",
@@ -100,5 +112,14 @@ export default {
     addresses: "العناوين",
     wishlist: "قائمة الرغبات",
     settings: "الإعدادات"
+  },
+  newsletter: {
+    emailPlaceholder: "عنوان البريد الإلكتروني",
+    subscribe: "اشترك"
+  },
+  footer: {
+    allRightsReserved: "جميع الحقوق محفوظة",
+    madeWith: "صنع بـ",
+    forYou: "من أجلك"
   }
 };
