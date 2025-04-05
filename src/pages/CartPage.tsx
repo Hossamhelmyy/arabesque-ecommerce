@@ -18,7 +18,7 @@ type CartItem = {
     name: string;
     name_ar?: string;
     price: number;
-    image_url: string;
+    image: string;
     sale_price?: number;
   };
 };
@@ -27,7 +27,7 @@ const CartPage = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { isRTL } = useLanguage();
-  const { cartItems, removeItem, updateQuantity } = useCart();
+  const { cartItems, removeFromCart, updateCartItemQuantity } = useCart();
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<CartItem[]>([]);
 
@@ -45,7 +45,7 @@ const CartPage = () => {
         const productIds = cartItems.map(item => item.product_id);
         const { data: products, error } = await supabase
           .from('products')
-          .select('id, name, name_ar, price, image_url, sale_price')
+          .select('id, name, name_ar, price, image, sale_price')
           .in('id', productIds);
 
         if (error) throw error;
@@ -72,7 +72,7 @@ const CartPage = () => {
   }, [cartItems, t, toast]);
 
   const handleRemoveItem = (id: string) => {
-    removeItem(id);
+    removeFromCart(id);
     toast({
       title: t('cart.itemRemoved'),
       description: t('cart.itemRemovedDesc')
@@ -81,7 +81,7 @@ const CartPage = () => {
 
   const handleQuantityChange = (id: string, quantity: number) => {
     if (quantity < 1) return;
-    updateQuantity(id, quantity);
+    updateCartItemQuantity(id, quantity);
   };
 
   const calculateSubtotal = () => {
@@ -133,9 +133,9 @@ const CartPage = () => {
                         <td className="p-4">
                           <div className="flex items-center gap-3">
                             <div className="h-16 w-16 rounded overflow-hidden bg-muted flex-shrink-0">
-                              {item.product?.image_url ? (
+                              {item.product?.image ? (
                                 <img 
-                                  src={item.product.image_url} 
+                                  src={item.product.image} 
                                   alt={isRTL && item.product.name_ar ? item.product.name_ar : item.product.name}
                                   className="h-full w-full object-cover"
                                   onError={(e) => {

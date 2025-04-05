@@ -11,11 +11,23 @@ import {
 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
+import { useIsMobile } from '@/hooks/use-mobile';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
+import { cn } from '@/lib/utils';
 
 const Header = () => {
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage, isRTL } = useLanguage();
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const isMobile = useIsMobile();
   
   // Mock cart count - will be replaced with actual count from cart context
   const cartCount = 3;
@@ -65,17 +77,91 @@ const Header = () => {
           </Link>
         </div>
 
-        <nav className="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
-          <Link to="/" className="text-foreground/70 hover:text-foreground">
-            {t('common.home')}
-          </Link>
-          <Link to="/products" className="text-foreground/70 hover:text-foreground">
-            {t('common.products')}
-          </Link>
-          <Link to="/categories" className="text-foreground/70 hover:text-foreground">
-            {t('common.categories')}
-          </Link>
-        </nav>
+        {!isMobile && (
+          <NavigationMenu className="hidden md:flex">
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <Link to="/">
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    {t('common.home')}
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>{t('common.products')}</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="grid gap-3 p-4 w-[400px] md:w-[500px] lg:w-[600px] lg:grid-cols-[.75fr_1fr]">
+                    <div className="row-span-3">
+                      <div className="relative aspect-square overflow-hidden rounded-md">
+                        <img
+                          src="https://images.unsplash.com/photo-1596025959570-be1f91c9ebba"
+                          alt="Featured product"
+                          className="object-cover w-full h-full"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder.svg';
+                          }}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <Link
+                        to="/products"
+                        className={cn(
+                          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        )}
+                      >
+                        <div className="text-sm font-medium leading-none">{t('home.featured')}</div>
+                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                          Discover our featured products
+                        </p>
+                      </Link>
+                      <Link
+                        to="/products?filter=new"
+                        className={cn(
+                          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        )}
+                      >
+                        <div className="text-sm font-medium leading-none">{t('home.newArrivals')}</div>
+                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                          Our latest additions
+                        </p>
+                      </Link>
+                      <Link
+                        to="/products?filter=sale"
+                        className={cn(
+                          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        )}
+                      >
+                        <div className="text-sm font-medium leading-none">{t('home.sale')}</div>
+                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                          Limited time offers
+                        </p>
+                      </Link>
+                      <Link
+                        to="/products?filter=trending"
+                        className={cn(
+                          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                        )}
+                      >
+                        <div className="text-sm font-medium leading-none">{t('home.trending')}</div>
+                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                          Popular right now
+                        </p>
+                      </Link>
+                    </div>
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <Link to="/categories">
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    {t('common.categories')}
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        )}
 
         <div className="flex items-center gap-2">
           <div className="hidden sm:flex relative mx-2">
@@ -83,13 +169,13 @@ const Header = () => {
             <Input 
               type="search" 
               placeholder={t('common.search')} 
-              className="w-[200px] pl-8 rtl:pl-3 rtl:pr-8" 
+              className="w-[150px] md:w-[200px] pl-8 rtl:pl-3 rtl:pr-8" 
             />
           </div>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" className="hidden sm:flex">
                 <Globe className="h-5 w-5" />
                 <span className="sr-only">{t('common.language')}</span>
               </Button>
@@ -104,12 +190,12 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" onClick={toggleTheme}>
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="hidden sm:flex">
             {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             <span className="sr-only">Toggle theme</span>
           </Button>
 
-          <Link to="/favorites">
+          <Link to="/favorites" className="hidden sm:block">
             <Button variant="ghost" size="icon">
               <Heart className="h-5 w-5" />
               <span className="sr-only">{t('common.favorites')}</span>
