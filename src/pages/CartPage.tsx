@@ -1,4 +1,3 @@
-
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -13,14 +12,20 @@ type CartItem = {
   id: string;
   product_id: string;
   quantity: number;
-  product?: {
-    id: string;
-    name: string;
-    name_ar?: string;
-    price: number;
-    image: string;
-    sale_price?: number;
-  };
+  name: string;
+  name_ar: string;
+  price: number;
+  image: string;
+  sale_price?: number;
+};
+
+type ProductDetails = {
+  id: string;
+  name: string;
+  name_ar?: string;
+  price: number;
+  image: string;
+  original_price?: number;
 };
 
 const CartPage = () => {
@@ -45,17 +50,22 @@ const CartPage = () => {
         const productIds = cartItems.map(item => item.product_id);
         const { data: products, error } = await supabase
           .from('products')
-          .select('id, name, name_ar, price, image, sale_price')
+          .select('id, name, name_ar, price, image, original_price')
           .in('id', productIds);
 
         if (error) throw error;
 
-        const itemsWithDetails = cartItems.map(item => ({
-          ...item,
-          product: products?.find(p => p.id === item.product_id)
-        }));
-
-        setItems(itemsWithDetails as CartItem[]);
+        if (products) {
+          const itemsWithDetails = cartItems.map(item => {
+            const productDetail = products.find(p => p.id === item.product_id);
+            return {
+              ...item,
+              sale_price: productDetail?.original_price ? productDetail.price : undefined
+            };
+          });
+          
+          setItems(itemsWithDetails);
+        }
       } catch (error) {
         console.error('Error fetching cart items:', error);
         toast({
@@ -86,7 +96,7 @@ const CartPage = () => {
 
   const calculateSubtotal = () => {
     return items.reduce((total, item) => {
-      const price = item.product?.sale_price || item.product?.price || 0;
+      const price = item.sale_price || item.price || 0;
       return total + (price * item.quantity);
     }, 0);
   };
@@ -133,10 +143,10 @@ const CartPage = () => {
                         <td className="p-4">
                           <div className="flex items-center gap-3">
                             <div className="h-16 w-16 rounded overflow-hidden bg-muted flex-shrink-0">
-                              {item.product?.image ? (
+                              {item.image ? (
                                 <img 
-                                  src={item.product.image} 
-                                  alt={isRTL && item.product.name_ar ? item.product.name_ar : item.product.name}
+                                  src={item.image} 
+                                  alt={isRTL && item.name_ar ? item.name_ar : item.name}
                                   className="h-full w-full object-cover"
                                   onError={(e) => {
                                     (e.target as HTMLImageElement).src = '/placeholder.svg';
@@ -150,33 +160,33 @@ const CartPage = () => {
                             </div>
                             <div>
                               <h3 className="font-medium">
-                                {isRTL && item.product?.name_ar ? item.product.name_ar : item.product?.name}
+                                {isRTL && item.name_ar ? item.name_ar : item.name}
                               </h3>
                               <p className="text-sm text-muted-foreground md:hidden">
-                                ${(item.product?.sale_price || item.product?.price || 0).toFixed(2)}
+                                ${(item.sale_price || item.price || 0).toFixed(2)}
                               </p>
                             </div>
                           </div>
                         </td>
                         <td className="p-4 text-center hidden md:table-cell">
-                          {item.product?.sale_price ? (
+                          {item.sale_price ? (
                             <div>
                               <span className="text-destructive font-medium">
-                                ${item.product.sale_price.toFixed(2)}
+                                ${item.sale_price.toFixed(2)}
                               </span>
-                              <span className="text-muted-foreground line-through ml-2">
-                                ${item.product.price.toFixed(2)}
+                              <span className="text-muted-foreground line-through ml-2 rtl:mr-2 rtl:ml-0">
+                                ${item.price.toFixed(2)}
                               </span>
                             </div>
                           ) : (
-                            <span>${(item.product?.price || 0).toFixed(2)}</span>
+                            <span>${(item.price || 0).toFixed(2)}</span>
                           )}
                         </td>
                         <td className="p-4">
                           <div className="flex items-center justify-center">
                             <button 
                               className="h-8 w-8 flex items-center justify-center rounded border"
-                              onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                              onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}
                               disabled={item.quantity <= 1}
                             >
                               -
@@ -184,18 +194,18 @@ const CartPage = () => {
                             <span className="w-12 text-center">{item.quantity}</span>
                             <button 
                               className="h-8 w-8 flex items-center justify-center rounded border"
-                              onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                              onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}
                             >
                               +
                             </button>
                           </div>
                         </td>
                         <td className="p-4 text-right font-medium">
-                          ${((item.product?.sale_price || item.product?.price || 0) * item.quantity).toFixed(2)}
+                          ${((item.sale_price || item.price || 0) * item.quantity).toFixed(2)}
                         </td>
                         <td className="p-4 text-center">
                           <button 
-                            onClick={() => handleRemoveItem(item.id)}
+                            onClick={() => handleRemoveItem(item.product_id)}
                             className="text-muted-foreground hover:text-destructive transition-colors"
                             aria-label={t('cart.remove')}
                           >

@@ -41,7 +41,7 @@ const Hero = () => {
             <div className="rounded-2xl overflow-hidden shadow-lg">
               <AspectRatio ratio={1/1}>
                 <img 
-                  src="https://images.unsplash.com/photo-1596025959570-be1f91c9ebba?q=80&w=800&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1600&auto=format&fit=crop" 
                   alt="Elegant Arabic-inspired home decor items" 
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -51,10 +51,10 @@ const Hero = () => {
               </AspectRatio>
             </div>
             
-            <div className="absolute -bottom-6 -right-6 w-2/3 rounded-2xl overflow-hidden border-4 border-background shadow-xl">
+            <div className="absolute -bottom-6 -right-6 md:-bottom-8 md:-right-8 w-2/3 rounded-2xl overflow-hidden border-4 border-background shadow-xl hidden sm:block">
               <AspectRatio ratio={16/9}>
                 <img 
-                  src="https://images.unsplash.com/photo-1596025959428-0bd5c6a5454c?q=80&w=800&auto=format&fit=crop" 
+                  src="https://images.unsplash.com/photo-1567016526105-22da7c13161a?q=80&w=1600&auto=format&fit=crop" 
                   alt="Traditional Arabic pottery" 
                   className="w-full h-full object-cover"
                   onError={(e) => {
