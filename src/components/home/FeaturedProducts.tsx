@@ -27,12 +27,13 @@ type Product = {
 	name: string;
 	name_ar: string;
 	price: number;
-	original_price: number | null;
+	original_price: number;
 	image: string;
+	images?: string[];
 	slug: string;
-	is_featured: boolean;
-	is_new: boolean;
-	is_on_sale: boolean;
+	is_new?: boolean;
+	is_on_sale?: boolean;
+	category_id?: string;
 };
 
 const FeaturedProducts = () => {
@@ -225,7 +226,6 @@ const FeaturedProducts = () => {
 								product={product}
 								onAddToCart={() => {
 									addToCart({
-										id: product.id,
 										product_id: product.id,
 										quantity: 1,
 										name: product.name,

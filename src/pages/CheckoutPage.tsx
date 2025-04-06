@@ -34,6 +34,23 @@ import {
 } from '@/components/ui/card';
 import { Loader2, CreditCard, Banknote } from 'lucide-react';
 
+// Define interface for Profile with typed address
+interface UserProfile {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  phone: string | null;
+  address: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+  } | null;
+  avatar_url: string | null;
+}
+
 // Define form schema
 const checkoutFormSchema = z.object({
   fullName: z.string().min(2, { message: "Full name is required" }),
@@ -58,7 +75,8 @@ const CheckoutPage = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
   // Initialize form with default values
@@ -107,21 +125,25 @@ const CheckoutPage = () => {
 
         if (error) throw error;
 
-        setUserProfile(data);
+        // Type the data correctly
+        const profileData = data as UserProfile;
+        setUserProfile(profileData);
         
         // Pre-fill form with user data if available
-        if (data) {
-          const fullName = `${data.first_name || ''} ${data.last_name || ''}`.trim();
-          const address = data.address ? (typeof data.address === 'string' ? data.address : data.address.street || '') : '';
+        if (profileData) {
+          const fullName = `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim();
           
           form.setValue('fullName', fullName || '');
           form.setValue('email', user.email || '');
-          form.setValue('phone', data.phone || '');
-          form.setValue('address', address);
-          form.setValue('city', data.address?.city || '');
-          form.setValue('state', data.address?.state || '');
-          form.setValue('zipCode', data.address?.zipCode || '');
-          form.setValue('country', data.address?.country || '');
+          form.setValue('phone', profileData.phone || '');
+          
+          if (profileData.address) {
+            form.setValue('address', profileData.address.street || '');
+            form.setValue('city', profileData.address.city || '');
+            form.setValue('state', profileData.address.state || '');
+            form.setValue('zipCode', profileData.address.zipCode || '');
+            form.setValue('country', profileData.address.country || '');
+          }
         }
       } catch (error) {
         console.error('Error fetching user profile:', error);
@@ -153,6 +175,28 @@ const CheckoutPage = () => {
   const taxAmount = calculateSubtotal() * taxRate;
   const totalAmount = calculateSubtotal() + shippingCost + taxAmount;
 
+  // Simulate payment processing
+  const processPayment = async (paymentMethod: string): Promise<boolean> => {
+    setIsProcessingPayment(true);
+    
+    try {
+      // Simulate API call to payment processor
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // For demo purposes: credit_card always succeeds, cash_on_delivery has 80% success rate
+      if (paymentMethod === 'credit_card' || Math.random() > 0.2) {
+        return true;
+      } else {
+        throw new Error("Payment processing failed");
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      return false;
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
   const onSubmit = async (values: CheckoutFormValues) => {
     if (!user) {
       toast({
@@ -167,6 +211,20 @@ const CheckoutPage = () => {
     setIsSubmitting(true);
 
     try {
+      // Process payment first
+      if (values.paymentMethod === 'credit_card') {
+        const paymentSuccessful = await processPayment(values.paymentMethod);
+        if (!paymentSuccessful) {
+          toast({
+            title: t('checkout.paymentFailed'),
+            description: t('checkout.tryAgainLater'),
+            variant: "destructive"
+          });
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // Create address object
       const shippingAddress = {
         fullName: values.fullName,
@@ -187,7 +245,7 @@ const CheckoutPage = () => {
           total: totalAmount,
           shipping_address: shippingAddress,
           payment_method: values.paymentMethod,
-          status: 'pending'
+          status: values.paymentMethod === 'cash_on_delivery' ? 'pending' : 'paid'
         })
         .select()
         .single();
@@ -215,7 +273,6 @@ const CheckoutPage = () => {
           .update({
             phone: values.phone || userProfile.phone,
             address: {
-              ...userProfile.address,
               street: values.address,
               city: values.city,
               state: values.state,
@@ -452,11 +509,11 @@ const CheckoutPage = () => {
                   />
 
                   <div className="lg:hidden">
-                    <Button type="submit" className="w-full" disabled={isSubmitting}>
-                      {isSubmitting ? (
+                    <Button type="submit" className="w-full" disabled={isSubmitting || isProcessingPayment}>
+                      {isSubmitting || isProcessingPayment ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          {t('common.processing')}
+                          {isProcessingPayment ? t('checkout.processing') : t('common.processing')}
                         </>
                       ) : (
                         t('checkout.placeOrder')
@@ -512,11 +569,11 @@ const CheckoutPage = () => {
                 <span>${totalAmount.toFixed(2)}</span>
               </div>
               
-              <Button type="submit" className="w-full" onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
-                {isSubmitting ? (
+              <Button type="submit" className="w-full" onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting || isProcessingPayment}>
+                {isSubmitting || isProcessingPayment ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t('common.processing')}
+                    {isProcessingPayment ? t('checkout.processingPayment') : t('common.processing')}
                   </>
                 ) : (
                   t('checkout.placeOrder')

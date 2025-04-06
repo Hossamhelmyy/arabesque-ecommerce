@@ -16,7 +16,7 @@ type CartItem = {
 
 type CartContextType = {
   cartItems: CartItem[];
-  addToCart: (item: CartItem) => Promise<void>;
+  addToCart: (item: Omit<CartItem, 'id'>) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   updateCartItemQuantity: (productId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -108,18 +108,19 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         await updateCartItemQuantity(product.product_id, existingItem.quantity + product.quantity);
       } else {
         // Add new item
-        const { error } = await supabase
+        const { error, data } = await supabase
           .from('cart')
           .insert({
             user_id: user.id,
             product_id: product.product_id,
             quantity: product.quantity
-          });
+          })
+          .select();
         
         if (error) throw error;
         
         // Refresh cart items
-        fetchCartItems();
+        await fetchCartItems();
         
         toast({
           title: "Added to cart",
@@ -191,6 +192,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setCartItems(cartItems.map(item => 
         item.product_id === productId ? { ...item, quantity } : item
       ));
+      
+      toast({
+        title: "Cart updated",
+        description: "Item quantity has been updated"
+      });
     } catch (error) {
       console.error('Error updating cart:', error);
       toast({

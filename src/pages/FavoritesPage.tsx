@@ -217,7 +217,6 @@ const FavoritesPage = () => {
 		product: FavoriteProduct["products"],
 	) => {
 		addToCart({
-			id: product.id,
 			product_id: product.id,
 			quantity: 1,
 			name: product.name,
@@ -255,7 +254,6 @@ const FavoritesPage = () => {
 			favorites.forEach((favorite) => {
 				const product = favorite.products;
 				addToCart({
-					id: product.id,
 					product_id: product.id,
 					quantity: 1,
 					name: product.name,

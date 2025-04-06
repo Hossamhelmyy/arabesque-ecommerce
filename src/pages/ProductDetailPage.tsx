@@ -148,22 +148,14 @@ const ProductDetailPage = () => {
 
 			const { data, error } = await supabase
 				.from("wish_list")
-				.insert({
-					user_id: user.id,
-					product_id: product.id,
-					name: product.name,
-					name_ar: product.name_ar,
-					price: product.price,
-					image: product.image,
-					category_id: product.category_id,
-				})
-				.select()
-				.single();
+				.insert([
+					{ user_id: user.id, product_id: product.id },
+				]);
 
 			if (error) throw error;
-			return data;
+			return { data, productId: product.id };
 		},
-		onSuccess: () => {
+		onSuccess: (result) => {
 			queryClient.invalidateQueries({
 				queryKey: ["wishlist", user?.id, product?.id],
 			});
@@ -283,7 +275,6 @@ const ProductDetailPage = () => {
 		if (!product) return;
 
 		addToCart({
-			id: product.id,
 			product_id: product.id,
 			quantity,
 			name: product.name,

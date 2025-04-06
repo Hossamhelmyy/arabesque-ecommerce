@@ -414,7 +414,6 @@ const ProductsPage = () => {
 
 	const handleAddToCart = (product: Product) => {
 		addToCart({
-			id: product.id,
 			product_id: product.id,
 			quantity: 1,
 			name: product.name,
@@ -781,377 +780,384 @@ const ProductsPage = () => {
 			</h1>
 
 			<div className="flex flex-col md:flex-row gap-6">
-				<div className="hidden md:block w-64 flex-shrink-0">
-					<div className="sticky top-20 space-y-6">
-						<div>
-							<h3 className="font-medium mb-3">
-								{t("products.categories")}
-							</h3>
-							<div className="space-y-2">
-								<div className="flex items-center">
-									<Button
-										variant="ghost"
-										className={`w-full justify-start px-2 ${
-											!filters.category
-												? "font-bold text-primary"
-												: ""
-										}`}
-										onClick={() =>
-											handleFilterChange("category", "")
-										}>
-										{t("products.allCategories")}
-									</Button>
-								</div>
-								{categories?.map((category) => (
-									<div
-										key={category.id}
-										className="flex items-center">
-										<Button
-											variant="ghost"
-											className={`w-full justify-start px-2 ${
-												filters.category === category.slug
-													? "font-bold text-primary"
-													: ""
-											}`}
-											onClick={() =>
-												handleFilterChange(
-													"category",
-													category.slug,
-												)
-											}>
-											{i18n.language === "ar"
-												? category.name_ar
-												: category.name}
-										</Button>
-									</div>
-								))}
-							</div>
-						</div>
-
-						<Separator />
-
-						<div>
-							<h3 className="font-medium mb-3">
-								{t("filters.priceRange")}
-							</h3>
-							<div className="space-y-4">
-								<Slider
-									defaultValue={[
-										filters.minPrice,
-										filters.maxPrice,
-									]}
-									max={1000}
-									min={0}
-									step={10}
-									value={[
-										filters.minPrice,
-										filters.maxPrice,
-									]}
-									onValueChange={handlePriceChange}
-									className="mb-6"
-								/>
-								<div className="flex items-center justify-between">
-									<span className="text-sm">
-										${filters.minPrice}
-									</span>
-									<span className="text-sm">
-										${filters.maxPrice}
-									</span>
-								</div>
-							</div>
-						</div>
-
-						<Separator />
-
-						<div>
-							<h3 className="font-medium mb-3">
-								{t("filters.productState")}
-							</h3>
-							<div className="space-y-3">
-								<div className="flex items-center space-x-2 rtl:space-x-reverse">
-									<Checkbox
-										id="filter-new"
-										checked={filters.isNew}
-										onCheckedChange={(checked) =>
-											handleFilterChange(
-												"isNew",
-												checked === true,
-											)
-										}
-									/>
-									<label
-										htmlFor="filter-new"
-										className="text-sm cursor-pointer">
-										{t("product.new")}
-									</label>
-								</div>
-								<div className="flex items-center space-x-2 rtl:space-x-reverse">
-									<Checkbox
-										id="filter-sale"
-										checked={filters.isOnSale}
-										onCheckedChange={(checked) =>
-											handleFilterChange(
-												"isOnSale",
-												checked === true,
-											)
-										}
-									/>
-									<label
-										htmlFor="filter-sale"
-										className="text-sm cursor-pointer">
-										{t("product.sale")}
-									</label>
-								</div>
-								<div className="flex items-center space-x-2 rtl:space-x-reverse">
-									<Checkbox
-										id="filter-featured"
-										checked={filters.isFeatured}
-										onCheckedChange={(checked) =>
-											handleFilterChange(
-												"isFeatured",
-												checked === true,
-											)
-										}
-									/>
-									<label
-										htmlFor="filter-featured"
-										className="text-sm cursor-pointer">
-										{t("home.featured")}
-									</label>
-								</div>
-							</div>
-						</div>
-
-						<div>
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={clearFilters}
-								disabled={countActiveFilters() === 0}
-								className="w-full">
-								<X className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
-								{t("filters.clearAll")}
-							</Button>
-						</div>
-					</div>
-				</div>
-
 				<div className="flex-1">
-					<div className="flex flex-col gap-4 mb-6">
-						<div className="flex items-center justify-between">
-							<div className="flex space-x-2 rtl:space-x-reverse items-center">
-								<Button
-									variant="outline"
-									size="icon"
-									className="md:hidden"
-									onClick={() => setFilterOpen(true)}>
-									<SlidersHorizontal className="h-4 w-4" />
-									{countActiveFilters() > 0 && (
-										<Badge
-											variant="secondary"
-											className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center">
-											{countActiveFilters()}
-										</Badge>
-									)}
-								</Button>
-							</div>
+					<div className="flex flex-col md:flex-row gap-6">
+						<div className="flex-1">
+							<div className="flex flex-col gap-4 mb-6">
+								<div className="flex items-center gap-4">
+									<form
+										onSubmit={handleQuickSearch}
+										className="flex-1">
+										<div className="relative">
+											<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+											<Input
+												placeholder={t(
+													"products.searchPlaceholder",
+												)}
+												value={filters.search}
+												onChange={(e) =>
+													handleFilterChange(
+														"search",
+														e.target.value,
+													)
+												}
+												className="pl-9"
+											/>
+										</div>
+									</form>
 
-							<div className="flex gap-2 items-center ms-auto">
-								<span className="text-sm text-muted-foreground hidden md:inline-block">
-									{products ? products.length : 0}{" "}
-									{t("products.count")}
-								</span>
+									<Sheet
+										open={filterOpen}
+										onOpenChange={setFilterOpen}>
+										<SheetTrigger asChild>
+											<Button
+												variant="outline"
+												size="icon"
+												className="h-10 w-10">
+												<SlidersHorizontal className="h-4 w-4" />
+												<span className="sr-only">
+													{t("filters.title")}
+												</span>
+											</Button>
+										</SheetTrigger>
+										<SheetContent
+											side={isRTL ? "right" : "left"}
+											className="overflow-y-auto">
+											<SheetHeader>
+												<SheetTitle>
+													{t("filters.title")}
+												</SheetTitle>
+											</SheetHeader>
 
-								<Select
-									defaultValue={sort}
-									onValueChange={(value) =>
-										setSort(value as SortOptions)
-									}>
-									<SelectTrigger className="w-[180px]">
-										<SelectValue
-											placeholder={t("products.sort")}
-										/>
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="newest">
-											{t("products.sortNewest")}
-										</SelectItem>
-										<SelectItem value="oldest">
-											{t("products.sortOldest")}
-										</SelectItem>
-										<SelectItem value="price_asc">
-											{t("products.sortPriceAsc")}
-										</SelectItem>
-										<SelectItem value="price_desc">
-											{t("products.sortPriceDesc")}
-										</SelectItem>
-									</SelectContent>
-								</Select>
+											<div className="py-6 space-y-6">
+												{/* Categories */}
+												<div className="space-y-3">
+													<h3 className="text-sm font-medium">
+														{t("products.categories")}
+													</h3>
+													<div className="space-y-3 pl-2">
+														<div className="flex items-center">
+															<Button
+																variant="ghost"
+																className={`w-full justify-start px-2 ${
+																	!filters.category
+																		? "font-bold text-primary"
+																		: ""
+																}`}
+																onClick={() => {
+																	handleFilterChange(
+																		"category",
+																		"",
+																	);
+																	setFilterOpen(false);
+																}}>
+																{t(
+																	"products.allCategories",
+																)}
+															</Button>
+														</div>
+														{categories?.map((category) => (
+															<div
+																key={category.id}
+																className="flex items-center">
+																<Button
+																	variant="ghost"
+																	className={`w-full justify-start px-2 ${
+																		filters.category ===
+																		category.slug
+																			? "font-bold text-primary"
+																			: ""
+																	}`}
+																	onClick={() => {
+																		handleFilterChange(
+																			"category",
+																			category.slug,
+																		);
+																		setFilterOpen(false);
+																	}}>
+																	{i18n.language === "ar"
+																		? category.name_ar
+																		: category.name}
+																</Button>
+															</div>
+														))}
+													</div>
+												</div>
+
+												<Separator />
+
+												{/* Price Range */}
+												<div className="space-y-3">
+													<h3 className="text-sm font-medium">
+														{t("filters.priceRange")}
+													</h3>
+													<div className="space-y-5 px-2">
+														<Slider
+															defaultValue={[
+																filters.minPrice,
+																filters.maxPrice,
+															]}
+															max={1000}
+															min={0}
+															step={10}
+															value={[
+																filters.minPrice,
+																filters.maxPrice,
+															]}
+															onValueChange={
+																handlePriceChange
+															}
+															className="mb-6"
+														/>
+														<div className="flex items-center justify-between">
+															<div className="border rounded-md p-2 w-20">
+																<p className="text-[10px] text-muted-foreground">
+																	Min
+																</p>
+																<p className="font-medium">
+																	${filters.minPrice}
+																</p>
+															</div>
+															<div className="border rounded-md p-2 w-20">
+																<p className="text-[10px] text-muted-foreground">
+																	Max
+																</p>
+																<p className="font-medium">
+																	${filters.maxPrice}
+																</p>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												<Separator />
+
+												{/* Product State */}
+												<div className="space-y-3">
+													<h3 className="text-sm font-medium">
+														{t("filters.productState")}
+													</h3>
+													<div className="space-y-3 px-2">
+														<div className="flex items-center space-x-2 rtl:space-x-reverse">
+															<Checkbox
+																id="mobile-filter-new"
+																checked={filters.isNew}
+																onCheckedChange={(
+																	checked,
+																) =>
+																	handleFilterChange(
+																		"isNew",
+																		checked === true,
+																	)
+																}
+															/>
+															<label
+																htmlFor="mobile-filter-new"
+																className="text-sm cursor-pointer">
+																{t("product.new")}
+															</label>
+														</div>
+														<div className="flex items-center space-x-2 rtl:space-x-reverse">
+															<Checkbox
+																id="mobile-filter-sale"
+																checked={filters.isOnSale}
+																onCheckedChange={(
+																	checked,
+																) =>
+																	handleFilterChange(
+																		"isOnSale",
+																		checked === true,
+																	)
+																}
+															/>
+															<label
+																htmlFor="mobile-filter-sale"
+																className="text-sm cursor-pointer">
+																{t("product.sale")}
+															</label>
+														</div>
+														<div className="flex items-center space-x-2 rtl:space-x-reverse">
+															<Checkbox
+																id="mobile-filter-featured"
+																checked={filters.isFeatured}
+																onCheckedChange={(
+																	checked,
+																) =>
+																	handleFilterChange(
+																		"isFeatured",
+																		checked === true,
+																	)
+																}
+															/>
+															<label
+																htmlFor="mobile-filter-featured"
+																className="text-sm cursor-pointer">
+																{t("home.featured")}
+															</label>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<SheetFooter className="absolute bottom-0 left-0 right-0 p-4 border-t bg-background">
+												<div className="flex justify-between w-full gap-4">
+													<Button
+														variant="outline"
+														className="flex-1"
+														onClick={clearFilters}
+														disabled={
+															countActiveFilters() === 0
+														}>
+														<X className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
+														{t("filters.clearAll")}
+													</Button>
+													<SheetClose asChild>
+														<Button className="flex-1">
+															{t("filters.apply")} (
+															{countActiveFilters()})
+														</Button>
+													</SheetClose>
+												</div>
+											</SheetFooter>
+										</SheetContent>
+									</Sheet>
+								</div>
+
+								{/* Active filters */}
+								{hasActiveFilters && (
+									<div className="flex flex-wrap gap-2">
+										{filters.search && (
+											<Badge
+												variant="secondary"
+												className="gap-1">
+												{t("products.search")}:{" "}
+												{filters.search}
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-4 w-4 p-0 hover:bg-transparent"
+													onClick={() =>
+														handleFilterChange("search", "")
+													}>
+													<X className="h-3 w-3" />
+												</Button>
+											</Badge>
+										)}
+										{filters.category && (
+											<Badge
+												variant="secondary"
+												className="gap-1">
+												{t("products.category")}:{" "}
+												{i18n.language === "ar"
+													? categories?.find(
+															(c) =>
+																c.slug === filters.category,
+													  )?.name_ar
+													: categories?.find(
+															(c) =>
+																c.slug === filters.category,
+													  )?.name}
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-4 w-4 p-0 hover:bg-transparent"
+													onClick={() =>
+														handleFilterChange(
+															"category",
+															"",
+														)
+													}>
+													<X className="h-3 w-3" />
+												</Button>
+											</Badge>
+										)}
+										{(filters.minPrice > 0 ||
+											filters.maxPrice < 1000) && (
+											<Badge
+												variant="secondary"
+												className="gap-1">
+												{t("filters.priceRange")}: $
+												{filters.minPrice} - $
+												{filters.maxPrice}
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-4 w-4 p-0 hover:bg-transparent"
+													onClick={() =>
+														handleFilterChange(
+															"minPrice",
+															0,
+														)
+													}>
+													<X className="h-3 w-3" />
+												</Button>
+											</Badge>
+										)}
+										{filters.isNew && (
+											<Badge
+												variant="secondary"
+												className="gap-1">
+												{t("product.new")}
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-4 w-4 p-0 hover:bg-transparent"
+													onClick={() =>
+														handleFilterChange(
+															"isNew",
+															false,
+														)
+													}>
+													<X className="h-3 w-3" />
+												</Button>
+											</Badge>
+										)}
+										{filters.isOnSale && (
+											<Badge
+												variant="secondary"
+												className="gap-1">
+												{t("product.sale")}
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-4 w-4 p-0 hover:bg-transparent"
+													onClick={() =>
+														handleFilterChange(
+															"isOnSale",
+															false,
+														)
+													}>
+													<X className="h-3 w-3" />
+												</Button>
+											</Badge>
+										)}
+										{filters.isFeatured && (
+											<Badge
+												variant="secondary"
+												className="gap-1">
+												{t("home.featured")}
+												<Button
+													variant="ghost"
+													size="icon"
+													className="h-4 w-4 p-0 hover:bg-transparent"
+													onClick={() =>
+														handleFilterChange(
+															"isFeatured",
+															false,
+														)
+													}>
+													<X className="h-3 w-3" />
+												</Button>
+											</Badge>
+										)}
+									</div>
+								)}
 							</div>
+							{content}
 						</div>
-
-						<form
-							onSubmit={handleQuickSearch}
-							className="relative w-full">
-							<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:left-auto rtl:right-3" />
-							<Input
-								type="search"
-								placeholder={t("search.placeholder")}
-								className="w-full pl-10 rtl:pl-4 rtl:pr-10"
-								value={filters.search}
-								onChange={(e) =>
-									handleFilterChange(
-										"search",
-										e.target.value,
-									)
-								}
-							/>
-						</form>
 					</div>
-
-					{/* Active filters */}
-					{hasActiveFilters && (
-						<div className="flex flex-wrap gap-2 mb-6">
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={clearFilters}
-								className="flex items-center gap-1">
-								<X className="w-3.5 h-3.5" />
-								{t("filters.clearAll")}
-							</Button>
-
-							{filters.search && (
-								<Badge
-									variant="secondary"
-									className="flex items-center gap-1">
-									<span>
-										{t("search.label")}: {filters.search}
-									</span>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="h-4 w-4 p-0 hover:bg-transparent"
-										onClick={() =>
-											handleFilterChange("search", "")
-										}>
-										<X className="h-3 w-3" />
-									</Button>
-								</Badge>
-							)}
-
-							{filters.category && (
-								<Badge
-									variant="secondary"
-									className="flex items-center gap-1">
-									<span>
-										{t("products.category")}:{" "}
-										{i18n.language === "ar"
-											? categories?.find(
-													(c) =>
-														c.slug === filters.category,
-											  )?.name_ar
-											: categories?.find(
-													(c) =>
-														c.slug === filters.category,
-											  )?.name}
-									</span>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="h-4 w-4 p-0 hover:bg-transparent"
-										onClick={() =>
-											handleFilterChange("category", "")
-										}>
-										<X className="h-3 w-3" />
-									</Button>
-								</Badge>
-							)}
-
-							{(filters.minPrice > 0 ||
-								filters.maxPrice < 1000) && (
-								<Badge
-									variant="secondary"
-									className="flex items-center gap-1">
-									<span>
-										{t("filters.priceRange")}: $
-										{filters.minPrice} - ${filters.maxPrice}
-									</span>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="h-4 w-4 p-0 hover:bg-transparent"
-										onClick={() => {
-											handleFilterChange("minPrice", 0);
-											handleFilterChange("maxPrice", 1000);
-										}}>
-										<X className="h-3 w-3" />
-									</Button>
-								</Badge>
-							)}
-
-							{filters.isNew && (
-								<Badge
-									variant="secondary"
-									className="flex items-center gap-1">
-									<span>{t("product.new")}</span>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="h-4 w-4 p-0 hover:bg-transparent"
-										onClick={() =>
-											handleFilterChange("isNew", false)
-										}>
-										<X className="h-3 w-3" />
-									</Button>
-								</Badge>
-							)}
-
-							{filters.isOnSale && (
-								<Badge
-									variant="secondary"
-									className="flex items-center gap-1">
-									<span>{t("product.sale")}</span>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="h-4 w-4 p-0 hover:bg-transparent"
-										onClick={() =>
-											handleFilterChange("isOnSale", false)
-										}>
-										<X className="h-3 w-3" />
-									</Button>
-								</Badge>
-							)}
-
-							{filters.isFeatured && (
-								<Badge
-									variant="secondary"
-									className="flex items-center gap-1">
-									<span>{t("home.featured")}</span>
-									<Button
-										variant="ghost"
-										size="icon"
-										className="h-4 w-4 p-0 hover:bg-transparent"
-										onClick={() =>
-											handleFilterChange(
-												"isFeatured",
-												false,
-											)
-										}>
-										<X className="h-3 w-3" />
-									</Button>
-								</Badge>
-							)}
-						</div>
-					)}
-
-					{/* Main content */}
-					{content}
 				</div>
 			</div>
-
-			<FilterSheet />
 		</div>
 	);
 };

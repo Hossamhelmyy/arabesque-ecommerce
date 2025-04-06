@@ -255,7 +255,6 @@ const CategoryPage = () => {
 
 	const handleAddToCart = (product: Product) => {
 		addToCart({
-			id: product.id,
 			product_id: product.id,
 			quantity: 1,
 			name: product.name,
