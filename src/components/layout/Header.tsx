@@ -258,15 +258,6 @@ const Header = () => {
 				)}
 
 				<div className="flex items-center gap-2">
-					<div className="hidden sm:flex relative mx-2">
-						<Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground rtl:left-auto rtl:right-2.5" />
-						<Input
-							type="search"
-							placeholder={t("common.search")}
-							className="w-[150px] md:w-[200px] pl-8 rtl:pl-3 rtl:pr-8"
-						/>
-					</div>
-
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>
 							<Button

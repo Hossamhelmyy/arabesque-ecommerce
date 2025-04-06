@@ -1,42 +1,59 @@
+import React, {
+	createContext,
+	useContext,
+	useState,
+	useEffect,
+} from "react";
+import { useTranslation } from "react-i18next";
+import type { LanguageContextType } from "@/features/i18n/types";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+const LanguageContext = createContext<
+	LanguageContextType | undefined
+>(undefined);
 
-type LanguageContextType = {
-  currentLanguage: string;
-  changeLanguage: (lang: string) => void;
-  isRTL: boolean;
+export const LanguageProvider: React.FC<{
+	children: React.ReactNode;
+}> = ({ children }) => {
+	const { i18n } = useTranslation();
+	const [isRTL, setIsRTL] = useState(
+		i18n.language === "ar",
+	);
+
+	useEffect(() => {
+		setIsRTL(i18n.language === "ar");
+		document.documentElement.dir = isRTL ? "rtl" : "ltr";
+		document.documentElement.lang = i18n.language;
+	}, [i18n.language, isRTL]);
+
+	// Toggle between English and Arabic
+	const toggleLanguage = () => {
+		const newLang = i18n.language === "en" ? "ar" : "en";
+		i18n.changeLanguage(newLang);
+	};
+
+	// Change to a specific language
+	const changeLanguage = (language: string) => {
+		i18n.changeLanguage(language);
+	};
+
+	return (
+		<LanguageContext.Provider
+			value={{
+				isRTL,
+				toggleLanguage,
+				changeLanguage,
+				currentLanguage: i18n.language,
+			}}>
+			{children}
+		</LanguageContext.Provider>
+	);
 };
-
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
-
-export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-  const { i18n } = useTranslation();
-  const [currentLanguage, setCurrentLanguage] = useState(i18n.language || 'en');
-  const [isRTL, setIsRTL] = useState(i18n.language === 'ar');
-
-  const changeLanguage = (lang: string) => {
-    i18n.changeLanguage(lang);
-    setCurrentLanguage(lang);
-    setIsRTL(lang === 'ar');
-  };
-
-  useEffect(() => {
-    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-    document.documentElement.lang = currentLanguage;
-  }, [isRTL, currentLanguage]);
-
-  return (
-    <LanguageContext.Provider value={{ currentLanguage, changeLanguage, isRTL }}>
-      {children}
-    </LanguageContext.Provider>
-  );
-};
-
 export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
-  return context;
+	const context = useContext(LanguageContext);
+	if (context === undefined) {
+		throw new Error(
+			"useLanguage must be used within a LanguageProvider",
+		);
+	}
+	return context;
 };
