@@ -1,3 +1,4 @@
+
 export default {
   common: {
     appName: "أرابيسك",
@@ -17,7 +18,8 @@ export default {
     signOut: "تسجيل الخروج",
     checkout: "إتمام الشراء",
     viewAll: "عرض الكل",
-    contact: "اتصل بنا"
+    contact: "اتصل بنا",
+    backToCategories: "العودة إلى الفئات"
   },
   auth: {
     email: "البريد الإلكتروني",
@@ -63,7 +65,14 @@ export default {
     tags: "الوسوم",
     viewDetails: "عرض التفاصيل",
     freeShipping: "شحن مجاني",
-    sale: "تخفيض"
+    sale: "تخفيض",
+    new: "جديد",
+    addedToCart: "تمت الإضافة إلى السلة",
+    addedToCartDescription: "تمت إضافة العنصر إلى سلة التسوق الخاصة بك",
+    addedToFavorites: "تمت الإضافة إلى المفضلة",
+    addedToFavoritesDescription: "تمت إضافة العنصر إلى قائمة المفضلات",
+    removedFromFavorites: "تمت الإزالة من المفضلة",
+    removedFromFavoritesDescription: "تمت إزالة العنصر من قائمة المفضلات"
   },
   cart: {
     title: "سلة التسوق",
@@ -86,6 +95,7 @@ export default {
     orderSummary: "ملخص الطلب"
   },
   checkout: {
+    title: "إتمام الشراء",
     shippingAddress: "عنوان الشحن",
     billingAddress: "عنوان الفوترة",
     sameAsShipping: "نفس عنوان الشحن",
@@ -100,18 +110,83 @@ export default {
     firstName: "الاسم الأول",
     lastName: "اسم العائلة",
     address: "العنوان",
+    addressLine1: "سطر العنوان 1",
+    addressLine2: "سطر العنوان 2 (اختياري)",
     city: "المدينة",
     state: "المحافظة/المنطقة",
     postalCode: "الرمز البريدي",
     country: "الدولة",
-    phone: "رقم الهاتف"
+    phone: "رقم الهاتف",
+    orderSuccess: "تم تأكيد الطلب بنجاح",
+    orderSuccessMessage: "شكرًا لطلبك! لقد أرسلنا تأكيدًا إلى بريدك الإلكتروني.",
+    returnToHome: "العودة إلى الصفحة الرئيسية",
+    paymentOptions: "خيارات الدفع",
+    creditCard: "بطاقة ائتمان",
+    paypal: "باي بال",
+    applePay: "آبل باي",
+    shippingOptions: "خيارات الشحن",
+    standardShipping: "الشحن القياسي (3-5 أيام عمل)",
+    expressShipping: "الشحن السريع (1-2 يوم عمل)",
+    orderConfirmation: "تأكيد الطلب",
+    itemsInOrder: "العناصر في طلبك",
+    shippingCost: "تكلفة الشحن",
+    taxAmount: "مبلغ الضريبة",
+    orderTotal: "إجمالي الطلب"
+  },
+  categories: {
+    title: "فئات المنتجات",
+    description: "اكتشف مجموعتنا المتنوعة من المنتجات الأصيلة عبر مختلف الفئات",
+    featured: "الفئات المميزة",
+    browseAll: "تصفح جميع الفئات",
+    viewProducts: "عرض المنتجات",
+    itemCount: "{{count}} عنصر",
+    browseCategory: "تصفح الفئة",
+    productsCount: "{{count}} منتج",
+    noProducts: "لا توجد منتجات في هذه الفئة حتى الآن",
+    noProductsDescription: "سنضيف منتجات إلى هذه الفئة قريبًا. تحقق لاحقًا أو تصفح فئاتنا الأخرى.",
+    browseAllProducts: "تصفح جميع المنتجات",
+    notFound: "الفئة غير موجودة",
+    notFoundDescription: "الفئة التي تبحث عنها غير موجودة أو تمت إزالتها."
+  },
+  favorites: {
+    title: "المفضلة",
+    empty: "قائمة المفضلات فارغة",
+    emptyMessage: "لم تقم بإضافة أي عناصر إلى المفضلة بعد. تصفح منتجاتنا وانقر على أيقونة القلب لحفظ العناصر التي تحبها.",
+    startBrowsing: "ابدأ التصفح",
+    removeAll: "إزالة الكل",
+    saveForLater: "حفظ لوقت لاحق",
+    moveToCart: "نقل إلى السلة"
   },
   profile: {
+    title: "الملف الشخصي",
     myOrders: "طلباتي",
     accountDetails: "تفاصيل الحساب",
-    addresses: "العناوين",
+    personalInfo: "المعلومات الشخصية",
+    updateProfile: "تحديث الملف الشخصي",
+    addresses: "عناويني",
+    addAddress: "إضافة عنوان جديد",
+    defaultAddress: "العنوان الافتراضي",
     wishlist: "قائمة الرغبات",
-    settings: "الإعدادات"
+    passwordSecurity: "كلمة المرور والأمان",
+    changePassword: "تغيير كلمة المرور",
+    notLoggedIn: "لم تقم بتسجيل الدخول",
+    notLoggedInMessage: "يرجى تسجيل الدخول لعرض ملفك الشخصي",
+    orderHistory: "سجل الطلبات",
+    noOrders: "لا توجد طلبات حتى الآن",
+    signInButton: "تسجيل الدخول",
+    createAccountButton: "إنشاء حساب",
+    orderId: "رقم الطلب",
+    orderDate: "تاريخ الطلب",
+    orderStatus: "الحالة",
+    orderAmount: "المبلغ",
+    viewOrder: "عرض الطلب",
+    settings: "إعدادات الحساب",
+    language: "تفضيل اللغة",
+    notifications: "إعدادات الإشعارات",
+    deleteAccount: "حذف الحساب",
+    emailPreferences: "تفضيلات البريد الإلكتروني",
+    subscribeNewsletter: "الاشتراك في النشرة الإخبارية",
+    promotionalEmails: "استلام رسائل البريد الإلكتروني الترويجية"
   },
   newsletter: {
     emailPlaceholder: "عنوان البريد الإلكتروني",

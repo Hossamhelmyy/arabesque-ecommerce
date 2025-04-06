@@ -1,3 +1,4 @@
+
 export default {
   common: {
     appName: "Arabesque",
@@ -17,7 +18,8 @@ export default {
     signOut: "Sign Out",
     checkout: "Checkout",
     viewAll: "View All",
-    contact: "Contact"
+    contact: "Contact",
+    backToCategories: "Back to Categories"
   },
   auth: {
     email: "Email",
@@ -63,7 +65,14 @@ export default {
     tags: "Tags",
     viewDetails: "View Details",
     freeShipping: "Free Shipping",
-    sale: "Sale"
+    sale: "Sale",
+    new: "New",
+    addedToCart: "Added to cart",
+    addedToCartDescription: "Item has been added to your cart",
+    addedToFavorites: "Added to favorites",
+    addedToFavoritesDescription: "Item has been added to your favorites",
+    removedFromFavorites: "Removed from favorites",
+    removedFromFavoritesDescription: "Item has been removed from your favorites"
   },
   cart: {
     title: "Shopping Cart",
@@ -86,6 +95,7 @@ export default {
     orderSummary: "Order Summary"
   },
   checkout: {
+    title: "Checkout",
     shippingAddress: "Shipping Address",
     billingAddress: "Billing Address",
     sameAsShipping: "Same as shipping address",
@@ -100,18 +110,83 @@ export default {
     firstName: "First Name",
     lastName: "Last Name",
     address: "Address",
+    addressLine1: "Address Line 1",
+    addressLine2: "Address Line 2 (Optional)",
     city: "City",
     state: "State/Province",
     postalCode: "Postal Code",
     country: "Country",
-    phone: "Phone"
+    phone: "Phone",
+    orderSuccess: "Order Placed Successfully",
+    orderSuccessMessage: "Thank you for your order! We've sent a confirmation to your email.",
+    returnToHome: "Return to Home",
+    paymentOptions: "Payment Options",
+    creditCard: "Credit Card",
+    paypal: "PayPal",
+    applePay: "Apple Pay",
+    shippingOptions: "Shipping Options",
+    standardShipping: "Standard Shipping (3-5 business days)",
+    expressShipping: "Express Shipping (1-2 business days)",
+    orderConfirmation: "Order Confirmation",
+    itemsInOrder: "Items in your order",
+    shippingCost: "Shipping Cost",
+    taxAmount: "Tax Amount",
+    orderTotal: "Order Total"
+  },
+  categories: {
+    title: "Product Categories",
+    description: "Explore our diverse range of authentic products across various categories",
+    featured: "Featured Categories",
+    browseAll: "Browse All Categories",
+    viewProducts: "View Products",
+    itemCount: "{{count}} items",
+    browseCategory: "Browse Category",
+    productsCount: "{{count}} products",
+    noProducts: "No products in this category yet",
+    noProductsDescription: "We'll be adding products to this category soon. Check back later or browse our other categories.",
+    browseAllProducts: "Browse All Products",
+    notFound: "Category Not Found",
+    notFoundDescription: "The category you're looking for doesn't exist or has been removed."
+  },
+  favorites: {
+    title: "My Favorites",
+    empty: "Your favorites list is empty",
+    emptyMessage: "You haven't added any items to your favorites yet. Browse our products and click the heart icon to save items you love.",
+    startBrowsing: "Start Browsing",
+    removeAll: "Remove All",
+    saveForLater: "Save for later",
+    moveToCart: "Move to Cart"
   },
   profile: {
+    title: "My Profile",
     myOrders: "My Orders",
     accountDetails: "Account Details",
-    addresses: "Addresses",
-    wishlist: "Wishlist",
-    settings: "Settings"
+    personalInfo: "Personal Information",
+    updateProfile: "Update Profile",
+    addresses: "My Addresses",
+    addAddress: "Add New Address",
+    defaultAddress: "Default Address",
+    wishlist: "My Wishlist",
+    passwordSecurity: "Password & Security",
+    changePassword: "Change Password",
+    notLoggedIn: "Not Logged In",
+    notLoggedInMessage: "Please sign in to view your profile",
+    orderHistory: "Order History",
+    noOrders: "No orders yet",
+    signInButton: "Sign In",
+    createAccountButton: "Create Account",
+    orderId: "Order ID",
+    orderDate: "Order Date",
+    orderStatus: "Status",
+    orderAmount: "Amount",
+    viewOrder: "View Order",
+    settings: "Account Settings",
+    language: "Language Preference",
+    notifications: "Notification Settings",
+    deleteAccount: "Delete Account",
+    emailPreferences: "Email Preferences",
+    subscribeNewsletter: "Subscribe to newsletter",
+    promotionalEmails: "Receive promotional emails"
   },
   newsletter: {
     emailPlaceholder: "Your email address",

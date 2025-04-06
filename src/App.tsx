@@ -19,7 +19,7 @@ import ProfilePage from "./pages/ProfilePage";
 import FavoritesPage from "./pages/FavoritesPage";
 import CartPage from "./pages/CartPage";
 import AuthPage from "./pages/AuthPage";
-import "./i18n/i18n"; // Ensure the import is here too
+import "./i18n/i18n"; // Import i18n configuration
 
 const queryClient = new QueryClient({
   defaultOptions: {
