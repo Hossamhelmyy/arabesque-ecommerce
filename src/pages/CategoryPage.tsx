@@ -82,6 +82,7 @@ const CategoryPage = () => {
 
   const handleAddToCart = (product: Product) => {
     addToCart({
+      id: product.id, // Add the id property here
       product_id: product.id,
       quantity: 1,
       name: product.name,

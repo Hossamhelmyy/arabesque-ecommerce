@@ -92,6 +92,7 @@ const ProductDetailPage = () => {
     if (!product) return;
     
     addToCart({
+      id: product.id, // Add the id property here
       product_id: product.id,
       quantity,
       name: product.name,

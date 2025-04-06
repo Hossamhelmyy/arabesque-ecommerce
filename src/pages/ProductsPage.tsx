@@ -1,4 +1,3 @@
-
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
@@ -54,7 +53,6 @@ const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
   
-  // Initialize filters from URL parameters
   const initialSearch = searchParams.get('search') || '';
   const initialCategory = searchParams.get('category') || '';
   const initialFilters = searchParams.get('filter') || '';
@@ -70,7 +68,6 @@ const ProductsPage = () => {
 
   const [sort, setSort] = useState(searchParams.get('sort') || 'newest');
   
-  // Fetch categories for filter
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
@@ -84,7 +81,6 @@ const ProductsPage = () => {
     }
   });
   
-  // Fetch products with filters
   const { data: products, isLoading, error } = useQuery({
     queryKey: ['products', filters, sort],
     queryFn: async () => {
@@ -92,7 +88,6 @@ const ProductsPage = () => {
         .from('products')
         .select('*');
       
-      // Apply filters
       if (filters.search) {
         query = query.or(`name.ilike.%${filters.search}%,name_ar.ilike.%${filters.search}%`);
       }
@@ -116,10 +111,8 @@ const ProductsPage = () => {
         query = query.eq('is_featured', true);
       }
       
-      // Apply price range filter
       query = query.gte('price', filters.priceRange[0]).lte('price', filters.priceRange[1]);
       
-      // Apply sorting
       switch (sort) {
         case 'price_asc':
           query = query.order('price', { ascending: true });
@@ -153,7 +146,6 @@ const ProductsPage = () => {
     enabled: !!categories
   });
   
-  // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
     
@@ -182,7 +174,6 @@ const ProductsPage = () => {
   
   const handleQuickSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // The search input updates filters.search directly
   };
   
   const clearFilters = () => {
@@ -199,6 +190,7 @@ const ProductsPage = () => {
   
   const handleAddToCart = (product: Product) => {
     addToCart({
+      id: product.id,
       product_id: product.id,
       quantity: 1,
       name: product.name,
@@ -228,7 +220,6 @@ const ProductsPage = () => {
       <h1 className="text-3xl font-bold mb-8">{t('products.title')}</h1>
       
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Filters - Desktop */}
         <div className="hidden md:block w-64 flex-shrink-0">
           <div className="sticky top-20 space-y-6">
             <div>
@@ -365,7 +356,6 @@ const ProductsPage = () => {
               </div>
             </div>
             
-            {/* Mobile Filters */}
             {showFilters && (
               <div className="md:hidden border rounded-md p-4 space-y-4">
                 <div>
@@ -378,7 +368,7 @@ const ProductsPage = () => {
                       <SelectValue placeholder={t('products.allCategories')} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">{t('products.allCategories')}</SelectItem>
+                      <SelectItem value="all">{t('products.allCategories')}</SelectItem>
                       {categories?.map((category) => (
                         <SelectItem key={category.id} value={category.slug}>
                           {i18n.language === 'ar' ? category.name_ar : category.name}
@@ -451,7 +441,6 @@ const ProductsPage = () => {
               </div>
             )}
             
-            {/* Active filters display */}
             {countActiveFilters() > 0 && (
               <div className="flex flex-wrap gap-2 items-center text-sm">
                 <span className="text-muted-foreground">{t('products.activeFilters')}:</span>

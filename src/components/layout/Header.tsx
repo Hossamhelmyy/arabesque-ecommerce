@@ -16,7 +16,6 @@ import {
   NavigationMenu,
   NavigationMenuContent,
   NavigationMenuItem,
-  NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
@@ -81,12 +80,18 @@ const Header = () => {
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link to="/">
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    {t('common.home')}
-                  </NavigationMenuLink>
-                </Link>
+                <NavigationMenuTrigger className={navigationMenuTriggerStyle()}>
+                  {t('common.home')}
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="p-2">
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link to="/">{t('common.home')}</Link>
+                    </Button>
+                  </div>
+                </NavigationMenuContent>
               </NavigationMenuItem>
+
               <NavigationMenuItem>
                 <NavigationMenuTrigger>{t('common.products')}</NavigationMenuTrigger>
                 <NavigationMenuContent>
@@ -104,60 +109,77 @@ const Header = () => {
                       </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      <Link
-                        to="/products"
-                        className={cn(
-                          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                        )}
-                      >
-                        <div className="text-sm font-medium leading-none">{t('home.featured')}</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Discover our featured products
-                        </p>
-                      </Link>
-                      <Link
-                        to="/products?filter=new"
-                        className={cn(
-                          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                        )}
-                      >
-                        <div className="text-sm font-medium leading-none">{t('home.newArrivals')}</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Our latest additions
-                        </p>
-                      </Link>
-                      <Link
-                        to="/products?filter=sale"
-                        className={cn(
-                          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                        )}
-                      >
-                        <div className="text-sm font-medium leading-none">{t('home.sale')}</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Limited time offers
-                        </p>
-                      </Link>
-                      <Link
-                        to="/products?filter=trending"
-                        className={cn(
-                          "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
-                        )}
-                      >
-                        <div className="text-sm font-medium leading-none">{t('home.trending')}</div>
-                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                          Popular right now
-                        </p>
-                      </Link>
+                      <Button variant="ghost" asChild className="justify-start h-auto py-2 px-3">
+                        <Link
+                          to="/products"
+                          className={cn(
+                            "block select-none space-y-1 rounded-md leading-none no-underline outline-none"
+                          )}
+                        >
+                          <div className="text-sm font-medium leading-none">{t('home.featured')}</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Discover our featured products
+                          </p>
+                        </Link>
+                      </Button>
+                      
+                      <Button variant="ghost" asChild className="justify-start h-auto py-2 px-3">
+                        <Link
+                          to="/products?filter=new"
+                          className={cn(
+                            "block select-none space-y-1 rounded-md leading-none no-underline outline-none"
+                          )}
+                        >
+                          <div className="text-sm font-medium leading-none">{t('home.newArrivals')}</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Our latest additions
+                          </p>
+                        </Link>
+                      </Button>
+                      
+                      <Button variant="ghost" asChild className="justify-start h-auto py-2 px-3">
+                        <Link
+                          to="/products?filter=sale"
+                          className={cn(
+                            "block select-none space-y-1 rounded-md leading-none no-underline outline-none"
+                          )}
+                        >
+                          <div className="text-sm font-medium leading-none">{t('home.sale')}</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Limited time offers
+                          </p>
+                        </Link>
+                      </Button>
+                      
+                      <Button variant="ghost" asChild className="justify-start h-auto py-2 px-3">
+                        <Link
+                          to="/products?filter=trending"
+                          className={cn(
+                            "block select-none space-y-1 rounded-md leading-none no-underline outline-none"
+                          )}
+                        >
+                          <div className="text-sm font-medium leading-none">{t('home.trending')}</div>
+                          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                            Popular right now
+                          </p>
+                        </Link>
+                      </Button>
                     </div>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
+              
               <NavigationMenuItem>
-                <Link to="/categories">
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    {t('common.categories')}
-                  </NavigationMenuLink>
-                </Link>
+                <NavigationMenuTrigger className={navigationMenuTriggerStyle()}>
+                  {t('common.categories')}
+                </NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <div className="p-2">
+                    <Button asChild variant="ghost" className="w-full justify-start">
+                      <Link to="/categories">{t('common.categories')}</Link>
+                    </Button>
+                  </div>
+                </NavigationMenuContent>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
