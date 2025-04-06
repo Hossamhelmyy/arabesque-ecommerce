@@ -1,85 +1,33 @@
+
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
+import { Trash2, ShoppingBag, ArrowRight, Loader2 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useLanguage } from '@/context/LanguageContext';
-
-type CartItem = {
-  id: string;
-  product_id: string;
-  quantity: number;
-  name: string;
-  name_ar: string;
-  price: number;
-  image: string;
-  sale_price?: number;
-};
-
-type ProductDetails = {
-  id: string;
-  name: string;
-  name_ar?: string;
-  price: number;
-  image: string;
-  original_price?: number;
-};
+import { useAuth } from '@/context/AuthContext';
 
 const CartPage = () => {
   const { t } = useTranslation();
   const { toast } = useToast();
   const { isRTL } = useLanguage();
-  const { cartItems, removeFromCart, updateCartItemQuantity } = useCart();
-  const [loading, setLoading] = useState(true);
-  const [items, setItems] = useState<CartItem[]>([]);
+  const { cartItems, removeFromCart, updateCartItemQuantity, isLoading: cartLoading } = useCart();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  // Fetch product details for cart items
   useEffect(() => {
-    const fetchCartItems = async () => {
-      setLoading(true);
-      try {
-        if (cartItems.length === 0) {
-          setItems([]);
-          setLoading(false);
-          return;
-        }
-
-        const productIds = cartItems.map(item => item.product_id);
-        const { data: products, error } = await supabase
-          .from('products')
-          .select('id, name, name_ar, price, image, original_price')
-          .in('id', productIds);
-
-        if (error) throw error;
-
-        if (products) {
-          const itemsWithDetails = cartItems.map(item => {
-            const productDetail = products.find(p => p.id === item.product_id);
-            return {
-              ...item,
-              sale_price: productDetail?.original_price ? productDetail.price : undefined
-            };
-          });
-          
-          setItems(itemsWithDetails);
-        }
-      } catch (error) {
-        console.error('Error fetching cart items:', error);
-        toast({
-          variant: "destructive",
-          title: t('common.error'),
-          description: t('cart.fetchError')
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCartItems();
-  }, [cartItems, t, toast]);
+    // If user is not logged in, redirect to auth page
+    if (!user && !cartLoading) {
+      toast({
+        title: t('common.authRequired'),
+        description: t('cart.loginToView'),
+        variant: "destructive"
+      });
+      navigate('/auth');
+    }
+  }, [user, cartLoading, navigate, toast, t]);
 
   const handleRemoveItem = (id: string) => {
     removeFromCart(id);
@@ -95,14 +43,13 @@ const CartPage = () => {
   };
 
   const calculateSubtotal = () => {
-    return items.reduce((total, item) => {
-      const price = item.sale_price || item.price || 0;
-      return total + (price * item.quantity);
+    return cartItems.reduce((total, item) => {
+      return total + (item.price * item.quantity);
     }, 0);
   };
 
   // Shipping cost calculation (simplified for example)
-  const shippingCost = items.length > 0 ? 10 : 0;
+  const shippingCost = cartItems.length > 0 ? 10 : 0;
   
   // Tax calculation (simplified for example)
   const taxRate = 0.05; // 5% tax
@@ -111,18 +58,24 @@ const CartPage = () => {
   // Total calculation
   const totalAmount = calculateSubtotal() + shippingCost + taxAmount;
 
+  if (cartLoading) {
+    return (
+      <div className="container py-16 flex flex-col items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground">{t('common.loading')}</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null; // Redirect handled in useEffect
+  }
+
   return (
     <div className="container py-8 md:py-12">
       <h1 className="text-2xl md:text-3xl font-bold mb-6">{t('common.cart')}</h1>
       
-      {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="animate-pulse flex flex-col items-center">
-            <div className="h-12 w-12 rounded-full bg-primary/20 mb-4"></div>
-            <p>{t('common.loading')}</p>
-          </div>
-        </div>
-      ) : items.length > 0 ? (
+      {cartItems.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
             <div className="bg-card rounded-lg shadow-sm overflow-hidden">
@@ -138,7 +91,7 @@ const CartPage = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {items.map((item) => (
+                    {cartItems.map((item) => (
                       <tr key={item.id} className="hover:bg-muted/50">
                         <td className="p-4">
                           <div className="flex items-center gap-3">
@@ -163,24 +116,13 @@ const CartPage = () => {
                                 {isRTL && item.name_ar ? item.name_ar : item.name}
                               </h3>
                               <p className="text-sm text-muted-foreground md:hidden">
-                                ${(item.sale_price || item.price || 0).toFixed(2)}
+                                ${item.price.toFixed(2)}
                               </p>
                             </div>
                           </div>
                         </td>
                         <td className="p-4 text-center hidden md:table-cell">
-                          {item.sale_price ? (
-                            <div>
-                              <span className="text-destructive font-medium">
-                                ${item.sale_price.toFixed(2)}
-                              </span>
-                              <span className="text-muted-foreground line-through ml-2 rtl:mr-2 rtl:ml-0">
-                                ${item.price.toFixed(2)}
-                              </span>
-                            </div>
-                          ) : (
-                            <span>${(item.price || 0).toFixed(2)}</span>
-                          )}
+                          <span>${item.price.toFixed(2)}</span>
                         </td>
                         <td className="p-4">
                           <div className="flex items-center justify-center">
@@ -201,7 +143,7 @@ const CartPage = () => {
                           </div>
                         </td>
                         <td className="p-4 text-right font-medium">
-                          ${((item.sale_price || item.price || 0) * item.quantity).toFixed(2)}
+                          ${(item.price * item.quantity).toFixed(2)}
                         </td>
                         <td className="p-4 text-center">
                           <button 

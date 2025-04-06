@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/context/AuthContext';
 
 type CartItem = {
   id: string;
@@ -27,35 +28,19 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-
-  // Check for auth state changes
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUserId(session?.user.id || null);
-    });
-
-    // Check current session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUserId(session?.user.id || null);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  const { user } = useAuth();
 
   // Fetch cart items when user changes
   useEffect(() => {
-    if (userId) {
+    if (user) {
       fetchCartItems();
     } else {
       setCartItems([]);
     }
-  }, [userId]);
+  }, [user]);
 
   const fetchCartItems = async () => {
-    if (!userId) return;
+    if (!user) return;
     
     setIsLoading(true);
     try {
@@ -72,7 +57,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
             image
           )
         `)
-        .eq('user_id', userId);
+        .eq('user_id', user.id);
       
       if (error) {
         throw error;
@@ -104,7 +89,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addToCart = async (product: Omit<CartItem, 'id'>) => {
-    if (!userId) {
+    if (!user) {
       toast({
         title: "Authentication required",
         description: "Please sign in to add items to your cart",
@@ -126,7 +111,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { error } = await supabase
           .from('cart')
           .insert({
-            user_id: userId,
+            user_id: user.id,
             product_id: product.product_id,
             quantity: product.quantity
           });
@@ -154,14 +139,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const removeFromCart = async (productId: string) => {
-    if (!userId) return;
+    if (!user) return;
     
     setIsLoading(true);
     try {
       const { error } = await supabase
         .from('cart')
         .delete()
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .eq('product_id', productId);
       
       if (error) throw error;
@@ -186,7 +171,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateCartItemQuantity = async (productId: string, quantity: number) => {
-    if (!userId) return;
+    if (!user) return;
     
     if (quantity <= 0) {
       return removeFromCart(productId);
@@ -197,7 +182,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { error } = await supabase
         .from('cart')
         .update({ quantity })
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .eq('product_id', productId);
       
       if (error) throw error;
@@ -219,14 +204,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const clearCart = async () => {
-    if (!userId) return;
+    if (!user) return;
     
     setIsLoading(true);
     try {
       const { error } = await supabase
         .from('cart')
         .delete()
-        .eq('user_id', userId);
+        .eq('user_id', user.id);
       
       if (error) throw error;
       

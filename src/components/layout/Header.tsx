@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '@/context/LanguageContext';
+import { useCart } from '@/context/CartContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -21,15 +22,18 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 const Header = () => {
   const { t } = useTranslation();
   const { currentLanguage, changeLanguage, isRTL } = useLanguage();
   const [isDarkMode, setIsDarkMode] = useState(false);
   const isMobile = useIsMobile();
+  const { cartItems } = useCart();
+  const { user, signOut } = useAuth();
   
-  // Mock cart count - will be replaced with actual count from cart context
-  const cartCount = 3;
+  // Get cart count from actual cart items
+  const cartCount = cartItems.length;
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -58,13 +62,29 @@ const Header = () => {
                 <Link to="/categories" className="px-2 py-1 text-lg font-medium">
                   {t('common.categories')}
                 </Link>
-                <div className="pattern-divider" />
-                <Link to="/signin" className="px-2 py-1 text-lg font-medium">
-                  {t('common.signIn')}
-                </Link>
-                <Link to="/signup" className="px-2 py-1 text-lg font-medium">
-                  {t('common.signUp')}
-                </Link>
+                <div className="border-t my-2"></div>
+                {user ? (
+                  <>
+                    <Link to="/profile" className="px-2 py-1 text-lg font-medium">
+                      {t('common.profile')}
+                    </Link>
+                    <Link to="/favorites" className="px-2 py-1 text-lg font-medium">
+                      {t('common.favorites')}
+                    </Link>
+                    <Link to="/cart" className="px-2 py-1 text-lg font-medium">
+                      {t('common.cart')}
+                    </Link>
+                    <Button variant="ghost" onClick={signOut} className="justify-start px-2 py-1 h-auto font-medium">
+                      {t('common.signOut')}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/auth" className="px-2 py-1 text-lg font-medium">
+                      {t('common.signIn')}
+                    </Link>
+                  </>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
@@ -80,16 +100,9 @@ const Header = () => {
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={navigationMenuTriggerStyle()}>
+                <Link to="/" className={navigationMenuTriggerStyle()}>
                   {t('common.home')}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="p-2">
-                    <Button asChild variant="ghost" className="w-full justify-start">
-                      <Link to="/">{t('common.home')}</Link>
-                    </Button>
-                  </div>
-                </NavigationMenuContent>
+                </Link>
               </NavigationMenuItem>
 
               <NavigationMenuItem>
@@ -118,7 +131,7 @@ const Header = () => {
                         >
                           <div className="text-sm font-medium leading-none">{t('home.featured')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Discover our featured products
+                            {t('home.featuredDesc')}
                           </p>
                         </Link>
                       </Button>
@@ -132,7 +145,7 @@ const Header = () => {
                         >
                           <div className="text-sm font-medium leading-none">{t('home.newArrivals')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Our latest additions
+                            {t('home.newArrivalsDesc')}
                           </p>
                         </Link>
                       </Button>
@@ -146,7 +159,7 @@ const Header = () => {
                         >
                           <div className="text-sm font-medium leading-none">{t('home.sale')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Limited time offers
+                            {t('home.saleDesc')}
                           </p>
                         </Link>
                       </Button>
@@ -160,7 +173,7 @@ const Header = () => {
                         >
                           <div className="text-sm font-medium leading-none">{t('home.trending')}</div>
                           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-                            Popular right now
+                            {t('home.trendingDesc')}
                           </p>
                         </Link>
                       </Button>
@@ -170,16 +183,9 @@ const Header = () => {
               </NavigationMenuItem>
               
               <NavigationMenuItem>
-                <NavigationMenuTrigger className={navigationMenuTriggerStyle()}>
+                <Link to="/categories" className={navigationMenuTriggerStyle()}>
                   {t('common.categories')}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <div className="p-2">
-                    <Button asChild variant="ghost" className="w-full justify-start">
-                      <Link to="/categories">{t('common.categories')}</Link>
-                    </Button>
-                  </div>
-                </NavigationMenuContent>
+                </Link>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
@@ -239,12 +245,37 @@ const Header = () => {
             </Button>
           </Link>
 
-          <Link to="/profile">
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-              <span className="sr-only">{t('common.profile')}</span>
-            </Button>
-          </Link>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">{t('common.profile')}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild>
+                  <Link to="/profile">{t('common.profile')}</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/cart">{t('common.cart')}</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/favorites">{t('common.favorites')}</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={signOut}>
+                  {t('common.signOut')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/auth">
+              <Button variant="ghost" size="icon">
+                <User className="h-5 w-5" />
+                <span className="sr-only">{t('common.signIn')}</span>
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>

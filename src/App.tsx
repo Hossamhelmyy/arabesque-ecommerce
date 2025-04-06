@@ -21,11 +21,13 @@ import CartPage from "./pages/CartPage";
 import AuthPage from "./pages/AuthPage";
 import "./i18n/i18n"; // Import i18n configuration
 
+// Create a new query client with default options
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes
     },
   },
 });

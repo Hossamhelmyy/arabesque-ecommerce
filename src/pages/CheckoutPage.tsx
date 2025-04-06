@@ -1,520 +1,458 @@
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCart } from '@/context/CartContext';
-import { useLanguage } from '@/context/LanguageContext';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { supabase } from '@/integrations/supabase/client';
+import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
+import { useLanguage } from '@/context/LanguageContext';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, CreditCard, CreditCardIcon, ShoppingBag, Truck } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Separator } from '@/components/ui/separator';
+import { 
+  Form, 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormControl, 
+  FormMessage 
+} from '@/components/ui/form';
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardFooter, 
+  CardHeader, 
+  CardTitle 
+} from '@/components/ui/card';
+import { Loader2, CreditCard, Banknote } from 'lucide-react';
 
-// Form validation schema
-const formSchema = z.object({
-  firstName: z.string().min(2, 'First name must be at least 2 characters'),
-  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  addressLine1: z.string().min(5, 'Address must be at least 5 characters'),
-  addressLine2: z.string().optional(),
-  city: z.string().min(2, 'City must be at least 2 characters'),
-  state: z.string().min(2, 'State must be at least 2 characters'),
-  postalCode: z.string().min(3, 'Postal code must be at least 3 characters'),
-  country: z.string().min(2, 'Country must be at least 2 characters'),
-  phone: z.string().min(5, 'Phone must be at least 5 characters'),
-  sameAsBilling: z.boolean().default(true),
-  paymentMethod: z.enum(['creditCard', 'paypal', 'applePay']),
-  shippingMethod: z.enum(['standard', 'express']),
-  cardNumber: z.string().optional(),
-  cardName: z.string().optional(),
-  cardExpiry: z.string().optional(),
-  cardCvv: z.string().optional(),
+// Define form schema
+const checkoutFormSchema = z.object({
+  fullName: z.string().min(2, { message: "Full name is required" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  phone: z.string().min(5, { message: "Phone number is required" }),
+  address: z.string().min(5, { message: "Address is required" }),
+  city: z.string().min(2, { message: "City is required" }),
+  state: z.string().min(2, { message: "State is required" }),
+  zipCode: z.string().min(3, { message: "ZIP code is required" }),
+  country: z.string().min(2, { message: "Country is required" }),
+  paymentMethod: z.enum(["credit_card", "cash_on_delivery"]),
+  notes: z.string().optional(),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;
 
 const CheckoutPage = () => {
   const { t } = useTranslation();
   const { isRTL } = useLanguage();
-  const navigate = useNavigate();
   const { cartItems, clearCart } = useCart();
   const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [step, setStep] = useState('shipping'); // 'shipping', 'payment', 'confirmation'
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  // Initialize form with default values
+  const form = useForm<CheckoutFormValues>({
+    resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      addressLine1: '',
-      addressLine2: '',
+      fullName: '',
+      email: '',
+      phone: '',
+      address: '',
       city: '',
       state: '',
-      postalCode: '',
+      zipCode: '',
       country: '',
-      phone: '',
-      sameAsBilling: true,
-      paymentMethod: 'creditCard',
-      shippingMethod: 'standard',
+      paymentMethod: 'credit_card',
+      notes: '',
     },
   });
 
-  // Calculate order summary
-  const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
-  const shippingCost = form.watch('shippingMethod') === 'express' ? 15 : 5;
-  const tax = subtotal * 0.05; // 5% tax
-  const total = subtotal + shippingCost + tax;
+  // Check if user is authenticated
+  useEffect(() => {
+    if (!user && !isLoadingProfile) {
+      toast({
+        title: t('common.authRequired'),
+        description: t('checkout.loginToCheckout'),
+        variant: "destructive"
+      });
+      navigate('/auth');
+    }
+  }, [user, isLoadingProfile, navigate, toast, t]);
 
-  const onSubmit = async (data: FormValues) => {
-    if (step === 'shipping') {
-      setStep('payment');
+  // Fetch user profile data
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) {
+        setIsLoadingProfile(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error) throw error;
+
+        setUserProfile(data);
+        
+        // Pre-fill form with user data if available
+        if (data) {
+          const fullName = `${data.first_name || ''} ${data.last_name || ''}`.trim();
+          const address = data.address ? (typeof data.address === 'string' ? data.address : data.address.street || '') : '';
+          
+          form.setValue('fullName', fullName || '');
+          form.setValue('email', user.email || '');
+          form.setValue('phone', data.phone || '');
+          form.setValue('address', address);
+          form.setValue('city', data.address?.city || '');
+          form.setValue('state', data.address?.state || '');
+          form.setValue('zipCode', data.address?.zipCode || '');
+          form.setValue('country', data.address?.country || '');
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user, form]);
+
+  // Redirect if cart is empty
+  useEffect(() => {
+    if (cartItems.length === 0 && !isLoadingProfile) {
+      toast({
+        title: t('checkout.emptyCart'),
+        description: t('checkout.addItemsToCart'),
+      });
+      navigate('/products');
+    }
+  }, [cartItems, isLoadingProfile, navigate, toast, t]);
+
+  const calculateSubtotal = () => {
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+  };
+
+  const shippingCost = cartItems.length > 0 ? 10 : 0;
+  const taxRate = 0.05; // 5% tax
+  const taxAmount = calculateSubtotal() * taxRate;
+  const totalAmount = calculateSubtotal() + shippingCost + taxAmount;
+
+  const onSubmit = async (values: CheckoutFormValues) => {
+    if (!user) {
+      toast({
+        title: t('common.authRequired'),
+        description: t('checkout.loginToCheckout'),
+        variant: "destructive"
+      });
+      navigate('/auth');
       return;
     }
 
-    if (step === 'payment') {
-      // Final submission
-      setIsSubmitting(true);
-      
-      try {
-        if (!user) {
-          throw new Error('You must be logged in to complete checkout');
-        }
+    setIsSubmitting(true);
 
-        // Create an order in Supabase
-        const { data: order, error: orderError } = await supabase
-          .from('orders')
-          .insert({
-            user_id: user.id,
-            total: total,
-            status: 'pending',
-            payment_method: data.paymentMethod,
-            shipping_address: {
-              firstName: data.firstName,
-              lastName: data.lastName,
-              addressLine1: data.addressLine1,
-              addressLine2: data.addressLine2,
-              city: data.city,
-              state: data.state,
-              postalCode: data.postalCode,
-              country: data.country,
-              phone: data.phone,
-              shippingMethod: data.shippingMethod
+    try {
+      // Create address object
+      const shippingAddress = {
+        fullName: values.fullName,
+        email: values.email,
+        phone: values.phone,
+        street: values.address,
+        city: values.city,
+        state: values.state,
+        zipCode: values.zipCode,
+        country: values.country,
+      };
+
+      // Store order in database
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          total: totalAmount,
+          shipping_address: shippingAddress,
+          payment_method: values.paymentMethod,
+          status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // Add order items
+      const orderItems = cartItems.map(item => ({
+        order_id: orderData.id,
+        product_id: item.product_id,
+        quantity: item.quantity,
+        price: item.price
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
+      // Update user profile with shipping information if not already present
+      if (userProfile) {
+        await supabase
+          .from('profiles')
+          .update({
+            phone: values.phone || userProfile.phone,
+            address: {
+              ...userProfile.address,
+              street: values.address,
+              city: values.city,
+              state: values.state,
+              zipCode: values.zipCode,
+              country: values.country
             }
           })
-          .select()
-          .single();
-
-        if (orderError) throw orderError;
-
-        // Add order items
-        const orderItems = cartItems.map(item => ({
-          order_id: order.id,
-          product_id: item.product_id,
-          quantity: item.quantity,
-          price: item.price
-        }));
-
-        const { error: itemsError } = await supabase
-          .from('order_items')
-          .insert(orderItems);
-
-        if (itemsError) throw itemsError;
-
-        // Clear cart
-        await clearCart();
-        
-        // Navigate to confirmation
-        setStep('confirmation');
-        
-      } catch (error) {
-        console.error('Checkout error:', error);
-        toast({
-          title: t('common.error'),
-          description: error instanceof Error ? error.message : 'Failed to process your order',
-          variant: 'destructive'
-        });
-      } finally {
-        setIsSubmitting(false);
+          .eq('id', user.id);
       }
+
+      // Clear the cart
+      await clearCart();
+
+      // Show success message
+      toast({
+        title: t('checkout.orderSuccess'),
+        description: t('checkout.orderConfirmation'),
+      });
+
+      // Redirect to a success page or order confirmation
+      navigate('/profile');
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast({
+        title: t('common.error'),
+        description: t('checkout.orderError'),
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (cartItems.length === 0 && step !== 'confirmation') {
+  if (isLoadingProfile) {
     return (
-      <div className="container py-12">
-        <div className="text-center py-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
-            <ShoppingBag className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <h2 className="text-xl font-medium mb-2">{t('cart.empty')}</h2>
-          <p className="text-muted-foreground max-w-md mx-auto mb-6">
-            {t('cart.emptyMessage')}
-          </p>
-          <Button asChild>
-            <Link to="/products">{t('cart.startShopping')}</Link>
-          </Button>
-        </div>
+      <div className="container py-16 flex flex-col items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
+        <p className="text-muted-foreground">{t('common.loading')}</p>
       </div>
     );
   }
 
-  if (step === 'confirmation') {
-    return (
-      <div className="container py-12">
-        <div className="max-w-md mx-auto text-center py-16">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-4">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8">
-              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-              <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold mb-2">{t('checkout.orderSuccess')}</h1>
-          <p className="text-muted-foreground mb-8">
-            {t('checkout.orderSuccessMessage')}
-          </p>
-          <Button asChild>
-            <Link to="/">{t('checkout.returnToHome')}</Link>
-          </Button>
-        </div>
-      </div>
-    );
+  if (!user || cartItems.length === 0) {
+    return null; // Handled by useEffect redirects
   }
 
   return (
     <div className="container py-8 md:py-12">
-      <div className="flex items-center mb-8">
-        <Button variant="ghost" size="sm" asChild className="mr-2">
-          <Link to="/cart" className="flex items-center gap-1">
-            <ArrowLeft className={`h-4 w-4 ${isRTL ? 'rotate-180' : ''}`} />
-            {t('cart.title')}
-          </Link>
-        </Button>
-        <h1 className="text-3xl font-bold">{t('checkout.title')}</h1>
-      </div>
-
+      <h1 className="text-2xl md:text-3xl font-bold mb-6">{t('checkout.title')}</h1>
+      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {step === 'shipping' ? (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Truck className="h-5 w-5" />
-                      {t('checkout.shippingAddress')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="firstName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('checkout.firstName')}</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="lastName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('checkout.lastName')}</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('checkout.shippingInfo')}</CardTitle>
+              <CardDescription>{t('checkout.shippingDesc')}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
-                      name="addressLine1"
+                      name="fullName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('checkout.addressLine1')}</FormLabel>
+                          <FormLabel>{t('checkout.fullName')}</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input placeholder={t('checkout.fullNamePlaceholder')} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
+                    
                     <FormField
                       control={form.control}
-                      name="addressLine2"
+                      name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('checkout.addressLine2')}</FormLabel>
+                          <FormLabel>{t('checkout.email')}</FormLabel>
                           <FormControl>
-                            <Input {...field} />
+                            <Input type="email" placeholder={t('checkout.emailPlaceholder')} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+                  </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="city"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('checkout.city')}</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="state"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('checkout.state')}</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('checkout.phone')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('checkout.phonePlaceholder')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="postalCode"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('checkout.postalCode')}</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="country"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{t('checkout.country')}</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('checkout.address')}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={t('checkout.addressPlaceholder')} {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <FormField
                       control={form.control}
-                      name="phone"
+                      name="city"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>{t('checkout.phone')}</FormLabel>
+                          <FormLabel>{t('checkout.city')}</FormLabel>
                           <FormControl>
-                            <Input {...field} type="tel" />
+                            <Input placeholder={t('checkout.cityPlaceholder')} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
+                    
                     <FormField
                       control={form.control}
-                      name="sameAsBilling"
+                      name="state"
                       render={({ field }) => (
-                        <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormItem>
+                          <FormLabel>{t('checkout.state')}</FormLabel>
                           <FormControl>
-                            <Checkbox
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
+                            <Input placeholder={t('checkout.statePlaceholder')} {...field} />
                           </FormControl>
-                          <div className="space-y-1 leading-none">
-                            <FormLabel>
-                              {t('checkout.sameAsShipping')}
-                            </FormLabel>
-                          </div>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
+                  </div>
 
-                    <div className="space-y-4">
-                      <h3 className="font-medium">{t('checkout.shippingOptions')}</h3>
-                      <FormField
-                        control={form.control}
-                        name="shippingMethod"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <RadioGroup
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                                className="flex flex-col space-y-2"
-                              >
-                                <div className="flex items-center space-x-2 space-y-0">
-                                  <RadioGroupItem value="standard" id="standard" />
-                                  <FormLabel htmlFor="standard" className="font-normal">
-                                    {t('checkout.standardShipping')} - $5.00
-                                  </FormLabel>
-                                </div>
-                                <div className="flex items-center space-x-2 space-y-0">
-                                  <RadioGroupItem value="express" id="express" />
-                                  <FormLabel htmlFor="express" className="font-normal">
-                                    {t('checkout.expressShipping')} - $15.00
-                                  </FormLabel>
-                                </div>
-                              </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </CardContent>
-                  <CardFooter>
-                    <Button type="submit" className="ml-auto">
-                      {t('common.continue')}
-                    </Button>
-                  </CardFooter>
-                </Card>
-              ) : (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CreditCardIcon className="h-5 w-5" />
-                      {t('checkout.paymentMethod')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                      control={form.control}
+                      name="zipCode"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('checkout.zipCode')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('checkout.zipCodePlaceholder')} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('checkout.country')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('checkout.countryPlaceholder')} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <Separator className="my-6" />
+
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">{t('checkout.paymentMethod')}</h3>
+                    
                     <FormField
                       control={form.control}
                       name="paymentMethod"
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="space-y-3">
                           <FormControl>
-                            <Tabs 
-                              defaultValue={field.value} 
+                            <RadioGroup
                               onValueChange={field.onChange}
-                              className="w-full"
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-3"
                             >
-                              <TabsList className="grid w-full grid-cols-3">
-                                <TabsTrigger value="creditCard">
+                              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                                <RadioGroupItem value="credit_card" id="credit_card" />
+                                <Label htmlFor="credit_card" className="flex items-center">
+                                  <CreditCard className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
                                   {t('checkout.creditCard')}
-                                </TabsTrigger>
-                                <TabsTrigger value="paypal">
-                                  {t('checkout.paypal')}
-                                </TabsTrigger>
-                                <TabsTrigger value="applePay">
-                                  {t('checkout.applePay')}
-                                </TabsTrigger>
-                              </TabsList>
-                              <TabsContent value="creditCard" className="pt-4">
-                                <div className="space-y-3">
-                                  <FormField
-                                    control={form.control}
-                                    name="cardNumber"
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>{t('checkout.cardNumber')}</FormLabel>
-                                        <FormControl>
-                                          <Input {...field} placeholder="4242 4242 4242 4242" />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <FormField
-                                    control={form.control}
-                                    name="cardName"
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>{t('checkout.cardName')}</FormLabel>
-                                        <FormControl>
-                                          <Input {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <FormField
-                                      control={form.control}
-                                      name="cardExpiry"
-                                      render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>{t('checkout.expiryDate')}</FormLabel>
-                                          <FormControl>
-                                            <Input {...field} placeholder="MM/YY" />
-                                          </FormControl>
-                                          <FormMessage />
-                                        </FormItem>
-                                      )}
-                                    />
-                                    <FormField
-                                      control={form.control}
-                                      name="cardCvv"
-                                      render={({ field }) => (
-                                        <FormItem>
-                                          <FormLabel>{t('checkout.cvv')}</FormLabel>
-                                          <FormControl>
-                                            <Input {...field} placeholder="123" />
-                                          </FormControl>
-                                          <FormMessage />
-                                        </FormItem>
-                                      )}
-                                    />
-                                  </div>
-                                </div>
-                              </TabsContent>
-                              <TabsContent value="paypal" className="pt-4">
-                                <div className="flex items-center justify-center py-8 px-4 border rounded-md bg-muted/50">
-                                  <p className="text-muted-foreground">PayPal integration will be available soon</p>
-                                </div>
-                              </TabsContent>
-                              <TabsContent value="applePay" className="pt-4">
-                                <div className="flex items-center justify-center py-8 px-4 border rounded-md bg-muted/50">
-                                  <p className="text-muted-foreground">Apple Pay integration will be available soon</p>
-                                </div>
-                              </TabsContent>
-                            </Tabs>
+                                </Label>
+                              </div>
+                              
+                              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                                <RadioGroupItem value="cash_on_delivery" id="cash_on_delivery" />
+                                <Label htmlFor="cash_on_delivery" className="flex items-center">
+                                  <Banknote className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
+                                  {t('checkout.cashOnDelivery')}
+                                </Label>
+                              </div>
+                            </RadioGroup>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  </CardContent>
-                  <CardFooter className="flex justify-between">
-                    <Button variant="outline" type="button" onClick={() => setStep('shipping')}>
-                      {t('common.back')}
-                    </Button>
-                    <Button type="submit" disabled={isSubmitting}>
+                  </div>
+
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('checkout.notes')}</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder={t('checkout.notesPlaceholder')} 
+                            className="min-h-[100px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="lg:hidden">
+                    <Button type="submit" className="w-full" disabled={isSubmitting}>
                       {isSubmitting ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -524,69 +462,67 @@ const CheckoutPage = () => {
                         t('checkout.placeOrder')
                       )}
                     </Button>
-                  </CardFooter>
-                </Card>
-              )}
-            </form>
-          </Form>
+                  </div>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
         </div>
-
+        
         <div className="lg:col-span-1">
           <Card>
             <CardHeader>
               <CardTitle>{t('checkout.orderSummary')}</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+            <CardContent>
+              <div className="space-y-4">
                 {cartItems.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 rounded overflow-hidden mr-2">
-                        <img 
-                          src={item.image} 
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/placeholder.svg';
-                          }}
-                        />
-                      </div>
-                      <div>
-                        <p className="font-medium line-clamp-1">{item.name}</p>
-                        <p className="text-muted-foreground text-xs">
-                          {t('product.quantity')}: {item.quantity}
-                        </p>
-                      </div>
+                  <div key={item.id} className="flex justify-between py-2 border-b">
+                    <div>
+                      <p className="font-medium">
+                        {isRTL && item.name_ar ? item.name_ar : item.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {t('product.quantity')}: {item.quantity}
+                      </p>
                     </div>
-                    <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-medium">${(item.quantity * item.price).toFixed(2)}</p>
                   </div>
                 ))}
-              </div>
-
-              <Separator />
-
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <p>{t('cart.subtotal')}</p>
-                  <p>${subtotal.toFixed(2)}</p>
+                
+                <div className="space-y-2 pt-4">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('cart.subtotal')}</span>
+                    <span>${calculateSubtotal().toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('cart.shipping')}</span>
+                    <span>${shippingCost.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">{t('cart.tax')}</span>
+                    <span>${taxAmount.toFixed(2)}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <p>{t('cart.shipping')}</p>
-                  <p>${shippingCost.toFixed(2)}</p>
-                </div>
-                <div className="flex justify-between">
-                  <p>{t('cart.tax')}</p>
-                  <p>${tax.toFixed(2)}</p>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div className="flex justify-between font-medium">
-                <p>{t('cart.total')}</p>
-                <p>${total.toFixed(2)}</p>
               </div>
             </CardContent>
+            <CardFooter className="flex flex-col">
+              <div className="flex justify-between w-full pb-4 mb-4 border-b font-bold">
+                <span>{t('cart.total')}</span>
+                <span>${totalAmount.toFixed(2)}</span>
+              </div>
+              
+              <Button type="submit" className="w-full" onClick={form.handleSubmit(onSubmit)} disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('common.processing')}
+                  </>
+                ) : (
+                  t('checkout.placeOrder')
+                )}
+              </Button>
+            </CardFooter>
           </Card>
         </div>
       </div>
