@@ -164,7 +164,7 @@ export default {
 			},
 			fontFamily: {
 				sans: ["var(--font-sans)", "sans-serif"],
-				heading: ["var(--font-heading)", "serif"],
+				heading: ["var(--font-sans)", "sans-serif"],
 				arabic: ["var(--font-arabic)", "sans-serif"],
 			},
 		},

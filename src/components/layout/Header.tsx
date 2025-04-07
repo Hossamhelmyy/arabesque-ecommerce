@@ -19,6 +19,8 @@ import {
 	Sun,
 	Moon,
 	Globe,
+	Settings,
+	Bell,
 } from "lucide-react";
 import {
 	DropdownMenu,
@@ -39,7 +41,11 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 
-const Header = () => {
+interface HeaderProps {
+	isAdmin?: boolean;
+}
+
+const Header = ({ isAdmin = false }: HeaderProps) => {
 	const { t } = useTranslation();
 	const { currentLanguage, changeLanguage, isRTL } =
 		useLanguage();
@@ -77,63 +83,69 @@ const Header = () => {
 							className="w-[80vw] sm:w-[350px]">
 							<nav className="flex flex-col gap-4 py-8">
 								<Link
-									to="/"
+									to={isAdmin ? "/admin/dashboard" : "/"}
 									className="px-2 py-1 text-lg font-medium">
-									{t("common.home")}
+									{isAdmin
+										? t("admin.dashboard")
+										: t("common.home")}
 								</Link>
-								<Link
-									to="/products"
-									className="px-2 py-1 text-lg font-medium">
-									{t("common.products")}
-								</Link>
-								<Link
-									to="/categories"
-									className="px-2 py-1 text-lg font-medium">
-									{t("common.categories")}
-								</Link>
-								<div className="border-t my-2"></div>
-								{user ? (
-									<>
-										<Link
-											to="/profile"
-											className="px-2 py-1 text-lg font-medium">
-											{t("common.profile")}
-										</Link>
-										<Link
-											to="/favorites"
-											className="px-2 py-1 text-lg font-medium">
-											{t("common.favorites")}
-										</Link>
-										<Link
-											to="/cart"
-											className="px-2 py-1 text-lg font-medium">
-											{t("common.cart")}
-										</Link>
-										<Button
-											variant="ghost"
-											onClick={signOut}
-											className="justify-start px-2 py-1 h-auto font-medium">
-											{t("common.signOut")}
-										</Button>
-									</>
-								) : (
-									<>
+
+								<>
+									<Link
+										to="/products"
+										className="px-2 py-1 text-lg font-medium">
+										{t("common.products")}
+									</Link>
+									<Link
+										to="/categories"
+										className="px-2 py-1 text-lg font-medium">
+										{t("common.categories")}
+									</Link>
+									<div className="border-t my-2"></div>
+									{user ? (
+										<>
+											<Link
+												to="/profile"
+												className="px-2 py-1 text-lg font-medium">
+												{t("common.profile")}
+											</Link>
+											<Link
+												to="/favorites"
+												className="px-2 py-1 text-lg font-medium">
+												{t("common.favorites")}
+											</Link>
+											<Link
+												to="/cart"
+												className="px-2 py-1 text-lg font-medium">
+												{t("common.cart")}
+											</Link>
+										</>
+									) : (
 										<Link
 											to="/auth"
 											className="px-2 py-1 text-lg font-medium">
 											{t("common.signIn")}
 										</Link>
-									</>
-								)}
+									)}
+								</>
+
+								<Button
+									variant="ghost"
+									onClick={signOut}
+									className="justify-start px-2 py-1 h-auto font-medium">
+									{t("common.signOut")}
+								</Button>
 							</nav>
 						</SheetContent>
 					</Sheet>
 
 					<Link
-						to="/"
+						to={isAdmin ? "/admin/dashboard" : "/"}
 						className="flex items-center space-x-2 rtl:space-x-reverse">
 						<span className="text-2xl font-heading font-bold text-primary">
-							{t("common.appName")}
+							{isAdmin
+								? t("admin.title")
+								: t("common.appName")}
 						</span>
 					</Link>
 				</div>
@@ -311,30 +323,54 @@ const Header = () => {
 						</span>
 					</Button>
 
-					<Link to="/favorites" className="hidden sm:block">
-						<Button variant="ghost" size="icon">
-							<Heart className="h-5 w-5" />
-							<span className="sr-only">
-								{t("common.favorites")}
-							</span>
-						</Button>
-					</Link>
+					{isAdmin ? (
+						<>
+							<Button variant="ghost" size="icon">
+								<Bell className="h-5 w-5" />
+								<span className="sr-only">
+									{t("admin.notifications")}
+								</span>
+							</Button>
 
-					<Link to="/cart" className="relative">
-						<Button variant="ghost" size="icon">
-							<ShoppingCart className="h-5 w-5" />
-							<span className="sr-only">
-								{t("common.cart")}
-							</span>
-							{cartCount > 0 && (
-								<Badge
-									className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 flex items-center justify-center"
-									variant="destructive">
-									{cartCount}
-								</Badge>
-							)}
-						</Button>
-					</Link>
+							<Link to="/admin/settings">
+								<Button variant="ghost" size="icon">
+									<Settings className="h-5 w-5" />
+									<span className="sr-only">
+										{t("admin.settings")}
+									</span>
+								</Button>
+							</Link>
+						</>
+					) : (
+						<>
+							<Link
+								to="/favorites"
+								className="hidden sm:block">
+								<Button variant="ghost" size="icon">
+									<Heart className="h-5 w-5" />
+									<span className="sr-only">
+										{t("common.favorites")}
+									</span>
+								</Button>
+							</Link>
+
+							<Link to="/cart" className="relative">
+								<Button variant="ghost" size="icon">
+									<ShoppingCart className="h-5 w-5" />
+									<span className="sr-only">
+										{t("common.cart")}
+									</span>
+									{cartCount > 0 && (
+										<Badge
+											className="absolute -right-1 -top-1 h-5 w-5 rounded-full p-0 flex items-center justify-center"
+											variant="destructive">
+											{cartCount}
+										</Badge>
+									)}
+								</Button>
+							</Link>
+						</>
+					)}
 
 					{user ? (
 						<DropdownMenu>
@@ -347,19 +383,38 @@ const Header = () => {
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
-								<DropdownMenuItem asChild>
-									<Link to="/profile">
-										{t("common.profile")}
-									</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem asChild>
-									<Link to="/cart">{t("common.cart")}</Link>
-								</DropdownMenuItem>
-								<DropdownMenuItem asChild>
-									<Link to="/favorites">
-										{t("common.favorites")}
-									</Link>
-								</DropdownMenuItem>
+								{isAdmin ? (
+									<>
+										<DropdownMenuItem asChild>
+											<Link to="/admin/profile">
+												{t("admin.profile")}
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem asChild>
+											<Link to="/admin/settings">
+												{t("admin.settings")}
+											</Link>
+										</DropdownMenuItem>
+									</>
+								) : (
+									<>
+										<DropdownMenuItem asChild>
+											<Link to="/profile">
+												{t("common.profile")}
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem asChild>
+											<Link to="/cart">
+												{t("common.cart")}
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem asChild>
+											<Link to="/favorites">
+												{t("common.favorites")}
+											</Link>
+										</DropdownMenuItem>
+									</>
+								)}
 								<DropdownMenuItem onClick={signOut}>
 									{t("common.signOut")}
 								</DropdownMenuItem>

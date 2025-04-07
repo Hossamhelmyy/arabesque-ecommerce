@@ -1,3 +1,5 @@
+import { Address } from "@/features/admin/types";
+
 export type AuthCredentials = {
 	email: string;
 	password: string;
@@ -24,6 +26,14 @@ export type User = {
 	email: string;
 	role?: string;
 	created_at: string;
+	profile?: {
+		id?: string;
+		first_name?: string | null;
+		last_name?: string | null;
+		phone?: string | null;
+		avatar_url?: string | null;
+		address?: Address;
+	} | null;
 };
 
 export type LoginCredentials = {
