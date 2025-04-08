@@ -68,103 +68,107 @@ export const RecentOrdersList = ({
 				<CardTitle>{t("admin.recentOrders")}</CardTitle>
 			</CardHeader>
 			<CardContent>
-				{isLoading ? (
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead className="text-start">
-									{t("admin.orderId")}
-								</TableHead>
-								<TableHead className="text-start">
-									{t("admin.date")}
-								</TableHead>
-								<TableHead className="text-start">
-									{t("admin.status")}
-								</TableHead>
-								<TableHead className="text-start">
-									{t("admin.total")}
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{Array.from({ length: 5 }).map((_, index) => (
-								<TableRow key={index}>
-									<TableCell>
-										<Skeleton className="h-4 w-[80px]" />
-									</TableCell>
-									<TableCell>
-										<Skeleton className="h-4 w-[120px]" />
-									</TableCell>
-									<TableCell>
-										<Skeleton className="h-5 w-[80px]" />
-									</TableCell>
-									<TableCell>
-										<Skeleton className="h-4 w-[70px] ml-auto" />
-									</TableCell>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				) : (
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead className="text-start">
-									{t("admin.orderId")}
-								</TableHead>
-								<TableHead className="text-start">
-									{t("admin.date")}
-								</TableHead>
-								<TableHead className="text-start">
-									{t("admin.status")}
-								</TableHead>
-								<TableHead className="text-start">
-									{t("admin.total")}
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{orders.length === 0 ? (
+				<div className="overflow-x-auto">
+					{isLoading ? (
+						<Table>
+							<TableHeader>
 								<TableRow>
-									<TableCell
-										colSpan={4}
-										className="text-center">
-										{t("admin.noRecentOrders")}
-									</TableCell>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.orderId")}
+									</TableHead>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.date")}
+									</TableHead>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.status")}
+									</TableHead>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.total")}
+									</TableHead>
 								</TableRow>
-							) : (
-								orders.map((order) => (
-									<TableRow key={order.id}>
-										<TableCell className="font-medium">
-											#{order.orderNumber}
-										</TableCell>
-										<TableCell>
-											{formatDate(order.date)}
-										</TableCell>
-										<TableCell>
-											{(() => {
-												const badgeInfo = getStatusBadge(
-													order.status,
-												);
-												return (
-													<Badge
-														variant={mapToBadgeVariant(
-															badgeInfo.variant,
-														)}>
-														{badgeInfo.status}
-													</Badge>
-												);
-											})()}
-										</TableCell>
-										<TableCell>
-											{formatCurrency(order.total)}
+							</TableHeader>
+							<TableBody>
+								{Array.from({ length: 5 }).map(
+									(_, index) => (
+										<TableRow key={index}>
+											<TableCell>
+												<Skeleton className="h-4 w-[80px]" />
+											</TableCell>
+											<TableCell>
+												<Skeleton className="h-4 w-[120px]" />
+											</TableCell>
+											<TableCell>
+												<Skeleton className="h-5 w-[80px]" />
+											</TableCell>
+											<TableCell>
+												<Skeleton className="h-4 w-[70px] ml-auto" />
+											</TableCell>
+										</TableRow>
+									),
+								)}
+							</TableBody>
+						</Table>
+					) : (
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.orderId")}
+									</TableHead>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.date")}
+									</TableHead>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.status")}
+									</TableHead>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.total")}
+									</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{orders.length === 0 ? (
+									<TableRow>
+										<TableCell
+											colSpan={4}
+											className="text-center">
+											{t("admin.noRecentOrders")}
 										</TableCell>
 									</TableRow>
-								))
-							)}
-						</TableBody>
-					</Table>
-				)}
+								) : (
+									orders.map((order) => (
+										<TableRow key={order.id}>
+											<TableCell className="font-medium whitespace-nowrap">
+												#{order.orderNumber}
+											</TableCell>
+											<TableCell className="whitespace-nowrap">
+												{formatDate(order.date)}
+											</TableCell>
+											<TableCell className="whitespace-nowrap">
+												{(() => {
+													const badgeInfo = getStatusBadge(
+														order.status,
+													);
+													return (
+														<Badge
+															variant={mapToBadgeVariant(
+																badgeInfo.variant,
+															)}>
+															{badgeInfo.status}
+														</Badge>
+													);
+												})()}
+											</TableCell>
+											<TableCell className="whitespace-nowrap">
+												{formatCurrency(order.total)}
+											</TableCell>
+										</TableRow>
+									))
+								)}
+							</TableBody>
+						</Table>
+					)}
+				</div>
 			</CardContent>
 		</Card>
 	);

@@ -42,138 +42,144 @@ export const OrderList = ({
 	if (isLoading) {
 		return (
 			<div className="rounded-md border">
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead className="text-start">
-								{t("admin.orderId")}
-							</TableHead>
-							<TableHead className="text-start">
-								{t("admin.customer")}
-							</TableHead>
-							<TableHead className="text-start">
-								{t("admin.date")}
-							</TableHead>
-							<TableHead className="text-start">
-								{t("admin.status")}
-							</TableHead>
-							<TableHead className="text-start">
-								{t("admin.total")}
-							</TableHead>
-							<TableHead className="text-start">
-								{t("admin.actions")}
-							</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{Array.from({ length: 5 }).map((_, index) => (
-							<TableRow key={index}>
-								<TableCell>
-									<Skeleton className="h-4 w-[80px]" />
-								</TableCell>
-								<TableCell>
-									<Skeleton className="h-4 w-[150px]" />
-								</TableCell>
-								<TableCell>
-									<Skeleton className="h-4 w-[120px]" />
-								</TableCell>
-								<TableCell>
-									<Skeleton className="h-4 w-[100px]" />
-								</TableCell>
-								<TableCell>
-									<Skeleton className="h-4 w-[80px]" />
-								</TableCell>
-								<TableCell>
-									<div className="flex justify-end">
-										<Skeleton className="h-8 w-8" />
-									</div>
-								</TableCell>
+				<div className="overflow-x-auto">
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead className="text-start whitespace-nowrap">
+									{t("admin.orderId")}
+								</TableHead>
+								<TableHead className="text-start whitespace-nowrap">
+									{t("admin.customer")}
+								</TableHead>
+								<TableHead className="text-start whitespace-nowrap">
+									{t("admin.date")}
+								</TableHead>
+								<TableHead className="text-start whitespace-nowrap">
+									{t("admin.status")}
+								</TableHead>
+								<TableHead className="text-start whitespace-nowrap">
+									{t("admin.total")}
+								</TableHead>
+								<TableHead className="text-start whitespace-nowrap">
+									{t("admin.actions")}
+								</TableHead>
 							</TableRow>
-						))}
-					</TableBody>
-				</Table>
+						</TableHeader>
+						<TableBody>
+							{Array.from({ length: 5 }).map((_, index) => (
+								<TableRow key={index}>
+									<TableCell>
+										<Skeleton className="h-4 w-[80px]" />
+									</TableCell>
+									<TableCell>
+										<Skeleton className="h-4 w-[150px]" />
+									</TableCell>
+									<TableCell>
+										<Skeleton className="h-4 w-[120px]" />
+									</TableCell>
+									<TableCell>
+										<Skeleton className="h-4 w-[100px]" />
+									</TableCell>
+									<TableCell>
+										<Skeleton className="h-4 w-[80px]" />
+									</TableCell>
+									<TableCell>
+										<div className="flex justify-end">
+											<Skeleton className="h-8 w-8" />
+										</div>
+									</TableCell>
+								</TableRow>
+							))}
+						</TableBody>
+					</Table>
+				</div>
 			</div>
 		);
 	}
 
 	return (
 		<div className="rounded-md border">
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead className="text-start">
-							{t("admin.orderId")}
-						</TableHead>
-						<TableHead className="text-start">
-							{t("admin.customer")}
-						</TableHead>
-						<TableHead className="text-start">
-							{t("admin.date")}
-						</TableHead>
-						<TableHead className="text-start">
-							{t("admin.status")}
-						</TableHead>
-						<TableHead className="text-start">
-							{t("admin.total")}
-						</TableHead>
-						<TableHead className="text-start">
-							{t("admin.actions")}
-						</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{orders.length === 0 ? (
+			<div className="overflow-x-auto">
+				<Table>
+					<TableHeader>
 						<TableRow>
-							<TableCell
-								colSpan={6}
-								className="text-center">
-								{t("admin.noOrders")}
-							</TableCell>
+							<TableHead className="text-start whitespace-nowrap">
+								{t("admin.orderId")}
+							</TableHead>
+							<TableHead className="text-start whitespace-nowrap">
+								{t("admin.customer")}
+							</TableHead>
+							<TableHead className="text-start whitespace-nowrap">
+								{t("admin.date")}
+							</TableHead>
+							<TableHead className="text-start whitespace-nowrap">
+								{t("admin.status")}
+							</TableHead>
+							<TableHead className="text-start whitespace-nowrap">
+								{t("admin.total")}
+							</TableHead>
+							<TableHead className="text-start whitespace-nowrap">
+								{t("admin.actions")}
+							</TableHead>
 						</TableRow>
-					) : (
-						orders.map((order) => (
-							<TableRow key={order.id}>
-								<TableCell className="font-medium">
-									#{order.id}
-								</TableCell>
-								<TableCell>
-									{getShippingAddressProperty(
-										order,
-										"name",
-										order.shipping_address?.email || "",
-									)}
-								</TableCell>
-								<TableCell>
-									<div className="flex flex-col">
-										<span>
-											{formatDate(order.created_at)}
-										</span>
-										<span className="text-sm text-muted-foreground">
-											{formatTime(order.created_at)}
-										</span>
-									</div>
-								</TableCell>
-								<TableCell>
-									{getStatusBadge(order.status)}
-								</TableCell>
-								<TableCell>
-									{formatCurrency(order.total)}
-								</TableCell>
-								<TableCell>
-									<div className="flex justify-start">
-										<Button
-											variant="ghost"
-											size="icon"
-											onClick={() => onViewDetails(order)}>
-											<Eye className="h-4 w-4" />
-										</Button>
-									</div>
+					</TableHeader>
+					<TableBody>
+						{orders.length === 0 ? (
+							<TableRow>
+								<TableCell
+									colSpan={6}
+									className="text-center">
+									{t("admin.noOrders")}
 								</TableCell>
 							</TableRow>
-						))
-					)}
-				</TableBody>
-			</Table>
+						) : (
+							orders.map((order) => (
+								<TableRow key={order.id}>
+									<TableCell className="font-medium whitespace-nowrap">
+										#{order.id}
+									</TableCell>
+									<TableCell className="max-w-[180px] truncate">
+										{getShippingAddressProperty(
+											order,
+											"name",
+											order.shipping_address?.email || "",
+										)}
+									</TableCell>
+									<TableCell className="whitespace-nowrap">
+										<div className="flex flex-col">
+											<span>
+												{formatDate(order.created_at)}
+											</span>
+											<span className="text-sm text-muted-foreground">
+												{formatTime(order.created_at)}
+											</span>
+										</div>
+									</TableCell>
+									<TableCell className="whitespace-nowrap">
+										{getStatusBadge(order.status)}
+									</TableCell>
+									<TableCell className="whitespace-nowrap">
+										{formatCurrency(order.total)}
+									</TableCell>
+									<TableCell className="whitespace-nowrap">
+										<div className="flex justify-start">
+											<Button
+												variant="ghost"
+												size="icon"
+												onClick={() =>
+													onViewDetails(order)
+												}>
+												<Eye className="h-4 w-4" />
+											</Button>
+										</div>
+									</TableCell>
+								</TableRow>
+							))
+						)}
+					</TableBody>
+				</Table>
+			</div>
 		</div>
 	);
 };

@@ -19,7 +19,7 @@ export const CategoryHeader = ({
 	const { t } = useTranslation();
 
 	return (
-		<div className="flex items-center justify-between">
+		<div className="flex sm:items-center justify-between sm:flex-row items-start flex-col gap-3">
 			<div className="flex flex-1 items-center space-x-2">
 				<Input
 					placeholder={t("admin.searchCategories")}

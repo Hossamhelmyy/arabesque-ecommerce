@@ -123,7 +123,7 @@ export const DashboardView = () => {
 				<TabsContent value="overview" className="space-y-4">
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
 						{/* Sales Chart */}
-						<Card className="lg:col-span-4">
+						<Card className="col-span-1 md:col-span-1 lg:col-span-4">
 							<CardHeader>
 								<CardTitle>
 									{t("admin.salesOverview")}
@@ -138,43 +138,45 @@ export const DashboardView = () => {
 										<Skeleton className="h-[250px] w-full" />
 									</div>
 								) : (
-									<ResponsiveContainer
-										width="100%"
-										height={300}>
-										<AreaChart
-											data={salesData}
-											margin={{
-												top: 10,
-												right: 30,
-												left: 0,
-												bottom: 0,
-											}}>
-											<CartesianGrid strokeDasharray="3 3" />
-											<XAxis dataKey="name" />
-											<YAxis />
-											<Tooltip
-												formatter={(value) => [
-													formatCurrency(value as number),
-													t("admin.revenue"),
-												]}
-												labelFormatter={(label) =>
-													`${t("admin.date")}: ${label}`
-												}
-											/>
-											<Area
-												type="monotone"
-												dataKey="revenue"
-												stroke="hsl(var(--primary))"
-												fill="hsl(var(--primary) / 0.2)"
-											/>
-										</AreaChart>
-									</ResponsiveContainer>
+									<div className="w-full h-[300px]">
+										<ResponsiveContainer
+											width="100%"
+											height={300}>
+											<AreaChart
+												data={salesData}
+												margin={{
+													top: 10,
+													right: 30,
+													left: 0,
+													bottom: 0,
+												}}>
+												<CartesianGrid strokeDasharray="3 3" />
+												<XAxis dataKey="name" />
+												<YAxis />
+												<Tooltip
+													formatter={(value) => [
+														formatCurrency(value as number),
+														t("admin.revenue"),
+													]}
+													labelFormatter={(label) =>
+														`${t("admin.date")}: ${label}`
+													}
+												/>
+												<Area
+													type="monotone"
+													dataKey="revenue"
+													stroke="hsl(var(--primary))"
+													fill="hsl(var(--primary) / 0.2)"
+												/>
+											</AreaChart>
+										</ResponsiveContainer>
+									</div>
 								)}
 							</CardContent>
 						</Card>
 
 						{/* Category Distribution */}
-						<Card className="lg:col-span-3">
+						<Card className="col-span-1 md:col-span-1 lg:col-span-3">
 							<CardHeader>
 								<CardTitle>
 									{t("admin.categories")}
@@ -189,52 +191,56 @@ export const DashboardView = () => {
 										<Skeleton className="h-full w-full rounded-full" />
 									</div>
 								) : (
-									<ResponsiveContainer
-										width="100%"
-										height={250}>
-										<PieChart>
-											<Pie
-												data={categories}
-												cx="50%"
-												cy="50%"
-												outerRadius={80}
-												fill="hsl(var(--primary))"
-												dataKey="value"
-												nameKey="name"
-												label={({ name, percent }) =>
-													`${name}: ${formatPercentage(
-														percent * 100,
-													)}`
-												}>
-												{categories.map((entry, index) => (
-													<Cell
-														key={`cell-${index}`}
-														fill={
-															CATEGORY_COLORS[
-																entry.name as keyof typeof CATEGORY_COLORS
-															] ||
-															`hsl(${
-																(index * 40) % 360
-															}, 70%, 60%)`
-														}
-													/>
-												))}
-											</Pie>
-											<Tooltip
-												formatter={(value) => [
-													formatCurrency(value as number),
-													t("admin.sales"),
-												]}
-											/>
-										</PieChart>
-									</ResponsiveContainer>
+									<div className="w-full max-w-[300px] h-[250px] mx-auto">
+										<ResponsiveContainer
+											width="100%"
+											height={250}>
+											<PieChart>
+												<Pie
+													data={categories}
+													cx="50%"
+													cy="50%"
+													outerRadius={80}
+													fill="hsl(var(--primary))"
+													dataKey="value"
+													nameKey="name"
+													label={({ name, percent }) =>
+														`${name}: ${formatPercentage(
+															percent * 100,
+														)}`
+													}>
+													{categories.map(
+														(entry, index) => (
+															<Cell
+																key={`cell-${index}`}
+																fill={
+																	CATEGORY_COLORS[
+																		entry.name as keyof typeof CATEGORY_COLORS
+																	] ||
+																	`hsl(${
+																		(index * 40) % 360
+																	}, 70%, 60%)`
+																}
+															/>
+														),
+													)}
+												</Pie>
+												<Tooltip
+													formatter={(value) => [
+														formatCurrency(value as number),
+														t("admin.sales"),
+													]}
+												/>
+											</PieChart>
+										</ResponsiveContainer>
+									</div>
 								)}
 							</CardContent>
 						</Card>
 					</div>
 
 					{/* Top Products and Recent Orders */}
-					<div className="grid gap-4 md:grid-cols-2">
+					<div className="grid gap-4 grid-cols-1 md:grid-cols-2">
 						<TopProductsList
 							products={topProducts}
 							isLoading={isLoading}

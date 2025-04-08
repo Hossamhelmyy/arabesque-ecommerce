@@ -153,7 +153,7 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 					<Link
 						to={isAdmin ? "/admin/dashboard" : "/"}
 						className="flex items-center space-x-2 rtl:space-x-reverse">
-						<span className="text-2xl font-heading font-bold text-primary">
+						<span className="md:text-2xl text-lg font-heading font-bold text-primary">
 							{isAdmin
 								? t("admin.title")
 								: t("common.appName")}

@@ -50,26 +50,26 @@ export const ProductList = ({
 
 	return (
 		<div className="rounded-md border shadow-sm bg-card">
-			<div className="relative w-full overflow-auto">
+			<div className="relative w-full overflow-x-auto">
 				<Table>
 					<TableHeader className="bg-muted/50">
 						<TableRow>
-							<TableHead className="text-start">
+							<TableHead className="text-start whitespace-nowrap">
 								{t("admin.product")}
 							</TableHead>
-							<TableHead className="text-start">
+							<TableHead className="text-start whitespace-nowrap">
 								{t("admin.category")}
 							</TableHead>
-							<TableHead className="text-start">
+							<TableHead className="text-start whitespace-nowrap">
 								{t("admin.status")}
 							</TableHead>
-							<TableHead className="text-start">
+							<TableHead className="text-start whitespace-nowrap">
 								{t("admin.price")}
 							</TableHead>
-							<TableHead className="text-start">
+							<TableHead className="text-start whitespace-nowrap">
 								{t("admin.created")}
 							</TableHead>
-							<TableHead className="text-start">
+							<TableHead className="text-start whitespace-nowrap">
 								{t("admin.actions")}
 							</TableHead>
 						</TableRow>
@@ -80,7 +80,7 @@ export const ProductList = ({
 								<TableRow key={index}>
 									<TableCell>
 										<div className="flex items-center gap-3">
-											<Skeleton className="h-10 w-10 rounded-md" />
+											<Skeleton className="h-10 w-10 rounded-md flex-shrink-0" />
 											<div className="space-y-1">
 												<Skeleton className="h-4 w-[150px]" />
 												<Skeleton className="h-3 w-[120px]" />
@@ -122,9 +122,9 @@ export const ProductList = ({
 								<TableRow
 									key={product.id}
 									className="group hover:bg-muted/50">
-									<TableCell>
+									<TableCell className="min-w-[200px]">
 										<div className="flex items-center gap-3">
-											<div className="h-10 w-10 rounded-md overflow-hidden bg-background">
+											<div className="h-10 w-10 rounded-md overflow-hidden bg-background flex-shrink-0">
 												{product.image ? (
 													<img
 														src={product.image}
@@ -142,23 +142,23 @@ export const ProductList = ({
 													</div>
 												)}
 											</div>
-											<div>
-												<div className="font-medium">
+											<div className="min-w-0">
+												<div className="font-medium truncate max-w-[150px]">
 													{product.name}
 												</div>
-												<div className="text-sm text-muted-foreground">
+												<div className="text-sm text-muted-foreground truncate max-w-[150px]">
 													{product.name_ar}
 												</div>
 											</div>
 										</div>
 									</TableCell>
-									<TableCell>
+									<TableCell className="whitespace-nowrap">
 										{getCategoryName(
 											product.category_id,
 											i18n.language === "ar" ? "ar" : "en",
 										)}
 									</TableCell>
-									<TableCell>
+									<TableCell className="min-w-[120px]">
 										<div className="flex flex-wrap gap-1">
 											{product.is_featured && (
 												<Badge variant="outline">
@@ -184,7 +184,7 @@ export const ProductList = ({
 												)}
 										</div>
 									</TableCell>
-									<TableCell>
+									<TableCell className="whitespace-nowrap">
 										<div className="font-medium text-sm">
 											{formatPrice(product.price)}
 										</div>
@@ -197,10 +197,10 @@ export const ProductList = ({
 												</div>
 											)}
 									</TableCell>
-									<TableCell>
+									<TableCell className="whitespace-nowrap">
 										{formatDate(product.created_at)}
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell className="whitespace-nowrap">
 										<div className="flex items-center justify-start gap-2">
 											<Button
 												variant="ghost"

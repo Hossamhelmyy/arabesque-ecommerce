@@ -29,7 +29,7 @@ export const ProductHeader = ({
 				</p>
 			</div>
 
-			<div className="flex items-center justify-between">
+			<div className="flex sm:items-center justify-between sm:flex-row items-start flex-col gap-3">
 				<div className="relative flex-1 max-w-sm">
 					<Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
 					<Input

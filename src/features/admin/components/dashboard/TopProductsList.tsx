@@ -44,103 +44,107 @@ export const TopProductsList = ({
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				{isLoading ? (
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead className="text-start">
-									{t("admin.product")}
-								</TableHead>
-								<TableHead className="text-start">
-									{t("admin.sales")}
-								</TableHead>
-								<TableHead className="text-start">
-									{t("admin.revenue")}
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{Array.from({ length: 5 }).map((_, index) => (
-								<TableRow key={index}>
-									<TableCell>
-										<div className="flex items-center space-x-3">
-											<Skeleton className="h-10 w-10 rounded-full" />
-											<Skeleton className="h-4 w-[180px]" />
-										</div>
-									</TableCell>
-									<TableCell className="text-right">
-										<Skeleton className="h-4 w-12 ml-auto" />
-									</TableCell>
-									<TableCell className="text-right">
-										<Skeleton className="h-4 w-16 ml-auto" />
-									</TableCell>
-								</TableRow>
-							))}
-						</TableBody>
-					</Table>
-				) : (
-					<Table>
-						<TableHeader>
-							<TableRow>
-								<TableHead className="text-start">
-									{t("admin.product")}
-								</TableHead>
-								<TableHead className="text-start">
-									{t("admin.sales")}
-								</TableHead>
-								<TableHead className="text-start">
-									{t("admin.revenue")}
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{products.length === 0 ? (
+				<div className="overflow-x-auto">
+					{isLoading ? (
+						<Table>
+							<TableHeader>
 								<TableRow>
-									<TableCell
-										colSpan={3}
-										className="text-center">
-										{t("admin.noProducts")}
-									</TableCell>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.product")}
+									</TableHead>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.sales")}
+									</TableHead>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.revenue")}
+									</TableHead>
 								</TableRow>
-							) : (
-								products.map((product) => (
-									<TableRow key={product.id}>
-										<TableCell>
-											<div className="flex items-center space-x-3">
-												<Avatar className="h-10 w-10">
-													<AvatarImage
-														src={product.image}
-														alt={product.name}
-														onError={(e) => {
-															(
-																e.target as HTMLImageElement
-															).src =
-																"https://placehold.co/100?text=Error";
-														}}
-													/>
-													<AvatarFallback>
-														{product.name
-															.substring(0, 2)
-															.toUpperCase()}
-													</AvatarFallback>
-												</Avatar>
-												<div className="font-medium">
-													{product.name}
+							</TableHeader>
+							<TableBody>
+								{Array.from({ length: 5 }).map(
+									(_, index) => (
+										<TableRow key={index}>
+											<TableCell>
+												<div className="flex items-center space-x-3">
+													<Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
+													<Skeleton className="h-4 w-[180px]" />
 												</div>
-											</div>
-										</TableCell>
-										<TableCell className="text-right">
-											{product.quantity}
-										</TableCell>
-										<TableCell className="text-right">
-											{formatCurrency(product.total)}
+											</TableCell>
+											<TableCell className="text-right">
+												<Skeleton className="h-4 w-12 ml-auto" />
+											</TableCell>
+											<TableCell className="text-right">
+												<Skeleton className="h-4 w-16 ml-auto" />
+											</TableCell>
+										</TableRow>
+									),
+								)}
+							</TableBody>
+						</Table>
+					) : (
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.product")}
+									</TableHead>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.sales")}
+									</TableHead>
+									<TableHead className="text-start whitespace-nowrap">
+										{t("admin.revenue")}
+									</TableHead>
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{products.length === 0 ? (
+									<TableRow>
+										<TableCell
+											colSpan={3}
+											className="text-center">
+											{t("admin.noProducts")}
 										</TableCell>
 									</TableRow>
-								))
-							)}
-						</TableBody>
-					</Table>
-				)}
+								) : (
+									products.map((product) => (
+										<TableRow key={product.id}>
+											<TableCell>
+												<div className="flex items-center space-x-3">
+													<Avatar className="h-10 w-10 flex-shrink-0">
+														<AvatarImage
+															src={product.image}
+															alt={product.name}
+															onError={(e) => {
+																(
+																	e.target as HTMLImageElement
+																).src =
+																	"https://placehold.co/100?text=Error";
+															}}
+														/>
+														<AvatarFallback>
+															{product.name
+																.substring(0, 2)
+																.toUpperCase()}
+														</AvatarFallback>
+													</Avatar>
+													<div className="font-medium truncate max-w-[150px]">
+														{product.name}
+													</div>
+												</div>
+											</TableCell>
+											<TableCell className="text-right whitespace-nowrap">
+												{product.quantity}
+											</TableCell>
+											<TableCell className="text-right whitespace-nowrap">
+												{formatCurrency(product.total)}
+											</TableCell>
+										</TableRow>
+									))
+								)}
+							</TableBody>
+						</Table>
+					)}
+				</div>
 			</CardContent>
 		</Card>
 	);
