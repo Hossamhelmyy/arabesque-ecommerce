@@ -286,11 +286,7 @@ export const ProductDialog = ({
 														maxFiles={6}
 													/>
 												</FormControl>
-												<FormDescription className="text-start">
-													{t(
-														"admin.productImagesDescription",
-													)}
-												</FormDescription>
+
 												<FormMessage />
 											</FormItem>
 										)}
@@ -478,7 +474,7 @@ export const ProductDialog = ({
 											control={form.control}
 											name="is_featured"
 											render={({ field }) => (
-												<FormItem className="flex flex-row items-start space-x-3 space-y-0">
+												<FormItem className="flex flex-row items-start space-x-3 space-y-0 gap-2">
 													<FormControl>
 														<Checkbox
 															checked={field.value || false}
@@ -500,7 +496,7 @@ export const ProductDialog = ({
 											control={form.control}
 											name="is_new"
 											render={({ field }) => (
-												<FormItem className="flex flex-row items-start space-x-3 space-y-0">
+												<FormItem className="flex flex-row items-start space-x-3 space-y-0 gap-2">
 													<FormControl>
 														<Checkbox
 															checked={field.value || false}
@@ -522,7 +518,7 @@ export const ProductDialog = ({
 											control={form.control}
 											name="is_on_sale"
 											render={({ field }) => (
-												<FormItem className="flex flex-row items-start space-x-3 space-y-0">
+												<FormItem className="flex flex-row items-start space-x-3 space-y-0 gap-2">
 													<FormControl>
 														<Checkbox
 															checked={field.value || false}
