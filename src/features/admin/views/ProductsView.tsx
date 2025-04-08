@@ -20,8 +20,6 @@ export const ProductsView = () => {
 		selectedProduct,
 		setSearchQuery,
 		setSelectedProduct,
-		createProduct,
-		updateProduct,
 		deleteProduct,
 		formatDate,
 		formatPrice,
@@ -100,42 +98,6 @@ export const ProductsView = () => {
 				onOpenChange={setIsAddEditDialogOpen}
 				selectedProduct={selectedProduct}
 				categories={categories}
-				isSubmitting={isSubmitting}
-				onSubmit={async (data) => {
-					try {
-						if (selectedProduct) {
-							await updateProduct(selectedProduct.id, data);
-							toast({
-								title: t("admin.productUpdated"),
-								description: t(
-									"admin.productUpdatedMessage",
-								),
-							});
-						} else {
-							await createProduct(data);
-							toast({
-								title: t("admin.productCreated"),
-								description: t(
-									"admin.productCreatedMessage",
-								),
-							});
-						}
-						setIsAddEditDialogOpen(false);
-						setSelectedProduct(null);
-					} catch (error) {
-						console.error(
-							`Error ${
-								selectedProduct ? "updating" : "creating"
-							} product:`,
-							error,
-						);
-						toast({
-							title: t("common.error"),
-							description: t("admin.productSaveError"),
-							variant: "destructive",
-						});
-					}
-				}}
 			/>
 
 			<DeleteProductDialog

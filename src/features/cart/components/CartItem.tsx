@@ -34,7 +34,9 @@ const CartItem: React.FC<CartItemProps> = ({
 
 			<div className="flex flex-1 flex-col">
 				<div className="flex justify-between text-base font-medium">
-					<h3>{isRTL ? item.name_ar : item.name}</h3>
+					<h5 className="text-[20px]">
+						{isRTL ? item.name_ar : item.name}
+					</h5>
 					<p className="ml-4 rtl:mr-4 rtl:ml-0">
 						${item.price.toFixed(2)}
 					</p>

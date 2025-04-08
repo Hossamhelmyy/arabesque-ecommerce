@@ -9,6 +9,7 @@ import { format } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import type { Category } from "../types";
+import type { CategoryFormValues } from "../components/categories/category-form-schema";
 
 // Define the database schema that matches what Supabase returns
 interface SupabaseCategory {
@@ -49,14 +50,7 @@ const mapToCategoryModel = (
 	};
 };
 
-// Type for form values - what the form will provide
-export interface CategoryFormValues {
-	name: string;
-	name_ar: string;
-	description: string;
-	description_ar: string;
-	image: string;
-}
+// Type for form values is now imported from category-form-schema.ts
 
 export function useCategories() {
 	const { t } = useTranslation();
@@ -316,14 +310,18 @@ export function useCategories() {
 		return format(new Date(dateString), "MMM d, yyyy");
 	}, []);
 
+	// Check if any mutation is pending for loading states
+	const isSubmitting =
+		createCategoryMutation.isPending ||
+		updateCategoryMutation.isPending ||
+		deleteCategoryMutation.isPending;
+
 	return {
 		categories,
 		filteredCategories,
 		isLoading,
-		isSubmitting:
-			createCategoryMutation.isPending ||
-			updateCategoryMutation.isPending ||
-			deleteCategoryMutation.isPending,
+		isSubmitting,
+		error,
 		searchQuery,
 		selectedCategory,
 		setSearchQuery,
