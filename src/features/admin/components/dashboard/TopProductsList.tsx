@@ -48,11 +48,13 @@ export const TopProductsList = ({
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead>{t("admin.product")}</TableHead>
-								<TableHead className="text-right">
-									{t("admin.sold")}
+								<TableHead className="text-start">
+									{t("admin.product")}
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
+									{t("admin.sales")}
+								</TableHead>
+								<TableHead className="text-start">
 									{t("admin.revenue")}
 								</TableHead>
 							</TableRow>
@@ -80,11 +82,13 @@ export const TopProductsList = ({
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead>{t("admin.product")}</TableHead>
-								<TableHead className="text-right">
-									{t("admin.sold")}
+								<TableHead className="text-start">
+									{t("admin.product")}
 								</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
+									{t("admin.sales")}
+								</TableHead>
+								<TableHead className="text-start">
 									{t("admin.revenue")}
 								</TableHead>
 							</TableRow>

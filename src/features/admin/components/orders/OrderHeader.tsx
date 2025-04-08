@@ -18,10 +18,11 @@ interface OrderHeaderProps {
 }
 
 const orderStatuses = [
-	{ value: "", label: "All" },
+	{ value: "all", label: "All" },
 	{ value: "pending", label: "Pending" },
 	{ value: "processing", label: "Processing" },
-	{ value: "completed", label: "Completed" },
+	{ value: "shipped", label: "Shipped" },
+	{ value: "delivered", label: "Delivered" },
 	{ value: "cancelled", label: "Cancelled" },
 ];
 

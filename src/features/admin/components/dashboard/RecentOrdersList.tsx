@@ -15,7 +15,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import type { Order } from "../../types";
+import type { RecentOrder } from "../../types";
 
 // Valid badge variants based on the UI components available
 type BadgeVariant =
@@ -25,7 +25,7 @@ type BadgeVariant =
 	| "outline";
 
 interface RecentOrdersListProps {
-	orders: Order[];
+	orders: RecentOrder[];
 	isLoading: boolean;
 	formatDate: (date: string) => string;
 	formatCurrency: (amount: number) => string;
@@ -72,10 +72,16 @@ export const RecentOrdersList = ({
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead>{t("admin.orderId")}</TableHead>
-								<TableHead>{t("admin.date")}</TableHead>
-								<TableHead>{t("admin.status")}</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
+									{t("admin.orderId")}
+								</TableHead>
+								<TableHead className="text-start">
+									{t("admin.date")}
+								</TableHead>
+								<TableHead className="text-start">
+									{t("admin.status")}
+								</TableHead>
+								<TableHead className="text-start">
 									{t("admin.total")}
 								</TableHead>
 							</TableRow>
@@ -92,7 +98,7 @@ export const RecentOrdersList = ({
 									<TableCell>
 										<Skeleton className="h-5 w-[80px]" />
 									</TableCell>
-									<TableCell className="text-right">
+									<TableCell>
 										<Skeleton className="h-4 w-[70px] ml-auto" />
 									</TableCell>
 								</TableRow>
@@ -103,10 +109,16 @@ export const RecentOrdersList = ({
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead>{t("admin.orderId")}</TableHead>
-								<TableHead>{t("admin.date")}</TableHead>
-								<TableHead>{t("admin.status")}</TableHead>
-								<TableHead className="text-right">
+								<TableHead className="text-start">
+									{t("admin.orderId")}
+								</TableHead>
+								<TableHead className="text-start">
+									{t("admin.date")}
+								</TableHead>
+								<TableHead className="text-start">
+									{t("admin.status")}
+								</TableHead>
+								<TableHead className="text-start">
 									{t("admin.total")}
 								</TableHead>
 							</TableRow>
@@ -124,10 +136,10 @@ export const RecentOrdersList = ({
 								orders.map((order) => (
 									<TableRow key={order.id}>
 										<TableCell className="font-medium">
-											#{order.id.substring(0, 8)}
+											#{order.orderNumber}
 										</TableCell>
 										<TableCell>
-											{formatDate(order.created_at)}
+											{formatDate(order.date)}
 										</TableCell>
 										<TableCell>
 											{(() => {
@@ -144,7 +156,7 @@ export const RecentOrdersList = ({
 												);
 											})()}
 										</TableCell>
-										<TableCell className="text-right">
+										<TableCell>
 											{formatCurrency(order.total)}
 										</TableCell>
 									</TableRow>

@@ -38,7 +38,7 @@ export const UserList = ({
 	formatDate,
 }: UserListProps) => {
 	const { t } = useTranslation();
-
+	console.log(users);
 	const getRoleBadge = (role: string) => {
 		switch (role?.toLowerCase()) {
 			case "admin":
@@ -90,11 +90,19 @@ export const UserList = ({
 						<Table>
 							<TableHeader>
 								<TableRow>
-									<TableHead>{t("admin.user")}</TableHead>
-									<TableHead>{t("admin.email")}</TableHead>
-									<TableHead>{t("admin.role")}</TableHead>
-									<TableHead>{t("admin.joined")}</TableHead>
-									<TableHead>
+									<TableHead className="text-start">
+										{t("admin.user")}
+									</TableHead>
+									<TableHead className="text-start">
+										{t("admin.email")}
+									</TableHead>
+									<TableHead className="text-start">
+										{t("admin.role")}
+									</TableHead>
+									<TableHead className="text-start">
+										{t("admin.joined")}
+									</TableHead>
+									<TableHead className="text-start">
 										{t("admin.actions")}
 									</TableHead>
 								</TableRow>
@@ -124,6 +132,7 @@ export const UserList = ({
 										</TableRow>
 									),
 								)}
+								,
 							</TableBody>
 						</Table>
 					</div>
@@ -131,11 +140,21 @@ export const UserList = ({
 					<Table>
 						<TableHeader>
 							<TableRow>
-								<TableHead>{t("admin.user")}</TableHead>
-								<TableHead>{t("admin.email")}</TableHead>
-								<TableHead>{t("admin.role")}</TableHead>
-								<TableHead>{t("admin.joined")}</TableHead>
-								<TableHead>{t("admin.actions")}</TableHead>
+								<TableHead className="text-start">
+									{t("admin.user")}
+								</TableHead>
+								<TableHead className="text-start">
+									{t("admin.email")}
+								</TableHead>
+								<TableHead className="text-start">
+									{t("admin.role")}
+								</TableHead>
+								<TableHead className="text-start">
+									{t("admin.joined")}
+								</TableHead>
+								<TableHead className="text-start">
+									{t("admin.actions")}
+								</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>

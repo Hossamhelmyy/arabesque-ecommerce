@@ -1,182 +1,233 @@
-import { useState, useEffect, useCallback } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabase";
-import type { User } from "../types";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+	useQuery,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
+import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
+import type { User, UsersData, Profile } from "../types";
 
-// Define the response type from Supabase for better type safety
-interface UserResponse {
-	id: string;
-	email: string;
-	role?: string;
-	created_at: string;
-	profiles?: {
-		first_name?: string;
-		last_name?: string;
-		avatar_url?: string;
-	};
-}
-
-export const useUsers = () => {
-	const [users, setUsers] = useState<User[]>([]);
+export const useUsers = (): UsersData => {
+	const { t } = useTranslation();
+	const queryClient = useQueryClient();
 	const [selectedUser, setSelectedUser] =
 		useState<User | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
-	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
-	const { toast } = useToast();
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
-	const fetchUsers = useCallback(async () => {
-		try {
-			setIsLoading(true);
-			const { data, error } = await supabase.from("users")
-				.select(`
-				id,
-				email,
-				role,
-				created_at,
-				profiles:profiles(
-					id,
-					first_name,
-					last_name,
-					avatar_url
-				)
-			`);
-
-			if (error) throw error;
-
-			// Transform the data to match our User interface
-			const transformedUsers: User[] = (
-				data as UserResponse[]
-			).map((userData) => ({
-				id: userData.id,
-				name: userData.profiles
-					? `${userData.profiles.first_name || ""} ${
-							userData.profiles.last_name || ""
-					  }`.trim()
-					: userData.email.split("@")[0],
-				email: userData.email,
-				role: userData.role || "customer",
-				avatar: userData.profiles?.avatar_url || "",
-				createdAt: userData.created_at,
-			}));
-
-			setUsers(transformedUsers);
-		} catch (error) {
-			console.error("Error fetching users:", error);
-			toast({
-				title: "Error",
-				description:
-					"Failed to load users. Please try again.",
-				variant: "destructive",
-			});
-
-			// Provide mock data for development
-			const mockUsers: User[] = [
-				{
-					id: "1",
-					name: "John Doe",
-					email: "john@example.com",
-					role: "admin",
-					avatar: "",
-					createdAt: new Date().toISOString(),
-				},
-				{
-					id: "2",
-					name: "Jane Smith",
-					email: "jane@example.com",
-					role: "customer",
-					avatar: "",
-					createdAt: new Date().toISOString(),
-				},
-				{
-					id: "3",
-					name: "Bob Johnson",
-					email: "bob@example.com",
-					role: "moderator",
-					avatar: "",
-					createdAt: new Date(
-						Date.now() - 30 * 24 * 60 * 60 * 1000,
-					).toISOString(),
-				},
-			];
-			setUsers(mockUsers);
-		} finally {
-			setIsLoading(false);
-		}
-	}, [toast]);
-
-	const updateUserRole = useCallback(
-		async (userId: string, role: string) => {
+	// Fetch all users with profile data
+	const { data: users = [], isLoading } = useQuery({
+		queryKey: ["admin", "profiles"],
+		queryFn: async () => {
 			try {
-				setIsSubmitting(true);
-				// In a real app, this would update the user's role in Supabase
-				// const { error } = await supabase.from("users").update({ role }).eq("id", userId);
-				// if (error) throw error;
+				// Fetch profiles from the profiles table
+				const { data: profilesData, error: profilesError } =
+					await supabase.from("profiles").select("*");
 
-				// For demo purposes, we'll just update the state
-				setUsers((prevUsers) =>
-					prevUsers.map((user) =>
-						user.id === userId ? { ...user, role } : user,
-					),
+				if (profilesError) throw profilesError;
+
+				// Create users with profiles and order stats
+				const usersWithData = await Promise.all(
+					(
+						(profilesData as unknown as Profile[]) || []
+					).map(async (profile: Profile) => {
+						// Get order count from orders table
+						const { count: ordersCount } = await supabase
+							.from("orders")
+							.select("id", {
+								count: "exact",
+								head: true,
+							})
+							.eq("user_id", profile.id);
+
+						// Get total spent from orders
+						const { data: orders } = await supabase
+							.from("orders")
+							.select("total")
+							.eq("user_id", profile.id);
+
+						const totalSpent =
+							orders?.reduce(
+								(sum, order) => sum + order.total,
+								0,
+							) || 0;
+
+						// Create a properly typed user object
+						const user: User = {
+							id: profile.id,
+							name: profile.email,
+							email: profile.email,
+							role: profile.role,
+							avatar: profile.avatar_url || "",
+							createdAt:
+								profile.created_at ||
+								new Date().toISOString(),
+							profiles: {
+								first_name: profile.first_name,
+								last_name: profile.last_name,
+								avatar_url: profile.avatar_url,
+								email: profile.email,
+							},
+						};
+
+						return user;
+					}),
 				);
 
-				return true;
+				return usersWithData || [];
 			} catch (error) {
-				console.error("Error updating user role:", error);
-				throw error;
-			} finally {
-				setIsSubmitting(false);
+				console.error("Error fetching users:", error);
+				toast({
+					title: t("common.error"),
+					description:
+						"Failed to fetch users. Please try again.",
+					variant: "destructive",
+				});
+
+				// Provide fallback mock data for development
+
+				return;
 			}
 		},
-		[],
-	);
+	});
 
-	const viewUserDetails = useCallback((user: User) => {
+	// View user details
+	const viewUserDetails = (user: User) => {
 		setSelectedUser(user);
-	}, []);
+	};
 
-	const formatDate = useCallback((dateString: string) => {
-		const options: Intl.DateTimeFormatOptions = {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-		};
-		return new Date(dateString).toLocaleDateString(
-			undefined,
-			options,
-		);
-	}, []);
+	// Update user role mutation
+	const updateUserRoleMutation = useMutation({
+		mutationFn: async ({
+			userId,
+			role,
+		}: {
+			userId: string;
+			role: string;
+		}) => {
+			// In a real app, this would update a user_roles table
+			// For this demo, we'll simulate a successful update
+			await new Promise((resolve) =>
+				setTimeout(resolve, 500),
+			); // Simulate API delay
+			return { id: userId, role };
+		},
+		onSuccess: (result) => {
+			// Update local cache
+			queryClient.setQueryData(
+				["admin", "profiles"],
+				(oldData: User[] | undefined) =>
+					(oldData || []).map((user) =>
+						user.id === result.id
+							? { ...user, role: result.role }
+							: user,
+					),
+			);
 
-	const formatCurrency = useCallback((amount: number) => {
+			toast({
+				title: "Success",
+				description: `User role updated to ${result.role}.`,
+			});
+		},
+		onError: (error) => {
+			console.error("Error updating user role:", error);
+			toast({
+				title: t("common.error"),
+				description: "Failed to update user role.",
+				variant: "destructive",
+			});
+		},
+	});
+
+	// Update user role wrapper function
+	const updateUserRole = async (
+		userId: string,
+		role: string,
+	): Promise<boolean> => {
+		try {
+			setIsSubmitting(true);
+			await updateUserRoleMutation.mutateAsync({
+				userId,
+				role,
+			});
+
+			// Update selected user if it's the one being updated
+			if (selectedUser && selectedUser.id === userId) {
+				setSelectedUser({ ...selectedUser, role });
+			}
+
+			return true;
+		} catch (error) {
+			console.error(error);
+			return false;
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	// Format functions
+	const formatDate = (dateString: string) => {
+		return format(new Date(dateString), "MMM dd, yyyy");
+	};
+
+	const formatCurrency = (value: number) => {
 		return new Intl.NumberFormat("en-US", {
 			style: "currency",
 			currency: "USD",
-		}).format(amount);
-	}, []);
+		}).format(value);
+	};
 
-	const getInitials = useCallback((user: User) => {
-		const firstName = user.profiles?.first_name || "";
-		const lastName = user.profiles?.last_name || "";
-		return `${firstName.charAt(0)}${lastName.charAt(
-			0,
-		)}`.toUpperCase();
-	}, []);
+	// Helper functions
+	const getInitials = (user: User) => {
+		if (user.profiles?.first_name) {
+			return `${user.profiles.first_name.charAt(0)}${
+				user.profiles.last_name
+					? user.profiles.last_name.charAt(0)
+					: ""
+			}`.toUpperCase();
+		}
+		return (user.email || "").charAt(0).toUpperCase();
+	};
 
-	const getFullName = useCallback((user: User) => {
-		const firstName = user.profiles?.first_name || "";
-		const lastName = user.profiles?.last_name || "";
-		return firstName || lastName
-			? `${firstName} ${lastName}`.trim()
-			: "No Name";
-	}, []);
+	const getFullName = (user: User) => {
+		if (user.profiles?.first_name) {
+			return `${user.profiles.first_name} ${
+				user.profiles.last_name || ""
+			}`.trim();
+		}
+		return "N/A";
+	};
 
-	// Load users on mount
-	useEffect(() => {
-		fetchUsers();
-	}, [fetchUsers]);
+	// Filter users based on search
+	const filteredUsers = users.filter((user) => {
+		const searchLower = searchQuery.toLowerCase();
+		return (
+			searchQuery === "" ||
+			(user.email || "")
+				.toLowerCase()
+				.includes(searchLower) ||
+			(user.name || "")
+				.toLowerCase()
+				.includes(searchLower) ||
+			(user.role || "")
+				.toLowerCase()
+				.includes(searchLower) ||
+			user.id.toLowerCase().includes(searchLower)
+		);
+	});
+
+	// Function to refresh users data
+	const fetchUsers = async () => {
+		await queryClient.invalidateQueries({
+			queryKey: ["admin", "profiles"],
+		});
+	};
 
 	return {
-		users,
+		users: filteredUsers,
 		selectedUser,
 		isLoading,
 		isSubmitting,

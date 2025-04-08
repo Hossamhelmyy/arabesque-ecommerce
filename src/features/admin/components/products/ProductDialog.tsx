@@ -286,7 +286,7 @@ export const ProductDialog = ({
 														maxFiles={6}
 													/>
 												</FormControl>
-												<FormDescription>
+												<FormDescription className="text-start">
 													{t(
 														"admin.productImagesDescription",
 													)}

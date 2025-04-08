@@ -201,7 +201,7 @@ export function CategoryDialog({
 									<FormControl>
 										<Input {...field} />
 									</FormControl>
-									<FormDescription>
+									<FormDescription className="text-start">
 										{t("common.slugDescription")}
 									</FormDescription>
 									<FormMessage />
@@ -244,7 +244,7 @@ export function CategoryDialog({
 								</FormItem>
 							)}
 						/>
-						<DialogFooter>
+						<DialogFooter className="flex space-x-2 rtl:space-x-reverse">
 							<Button
 								type="button"
 								variant="outline"
@@ -254,7 +254,7 @@ export function CategoryDialog({
 							<Button type="submit" disabled={loading}>
 								{loading ? (
 									<>
-										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										<Loader2 className="mr-2 rtl:ml-2 rtl:mr-0 h-4 w-4 animate-spin" />
 										{selectedCategory
 											? t("common.updating")
 											: t("common.creating")}

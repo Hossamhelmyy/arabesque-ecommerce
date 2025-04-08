@@ -8,7 +8,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, Image } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Category } from "../../types";
 
@@ -35,13 +35,19 @@ export const CategoryList = ({
 				<Table>
 					<TableHeader>
 						<TableRow>
-							<TableHead>{t("admin.name")}</TableHead>
-							<TableHead>
+							<TableHead className="text-start">
+								{t("admin.name")}
+							</TableHead>
+							<TableHead className="text-start">
 								{t("admin.description")}
 							</TableHead>
-							<TableHead>{t("admin.createdAt")}</TableHead>
-							<TableHead>{t("admin.updatedAt")}</TableHead>
-							<TableHead className="text-right">
+							<TableHead className="text-start">
+								{t("admin.createdAt")}
+							</TableHead>
+							<TableHead className="text-start">
+								{t("admin.updatedAt")}
+							</TableHead>
+							<TableHead className="text-start">
 								{t("admin.actions")}
 							</TableHead>
 						</TableRow>
@@ -50,7 +56,10 @@ export const CategoryList = ({
 						{Array.from({ length: 5 }).map((_, index) => (
 							<TableRow key={index}>
 								<TableCell>
-									<Skeleton className="h-4 w-[100px]" />
+									<div className="flex items-center gap-3">
+										<Skeleton className="h-10 w-10 rounded-md" />
+										<Skeleton className="h-4 w-[100px]" />
+									</div>
 								</TableCell>
 								<TableCell>
 									<Skeleton className="h-4 w-[200px]" />
@@ -80,11 +89,19 @@ export const CategoryList = ({
 			<Table>
 				<TableHeader>
 					<TableRow>
-						<TableHead>{t("admin.name")}</TableHead>
-						<TableHead>{t("admin.description")}</TableHead>
-						<TableHead>{t("admin.createdAt")}</TableHead>
-						<TableHead>{t("admin.updatedAt")}</TableHead>
-						<TableHead className="text-right">
+						<TableHead className="text-start">
+							{t("admin.name")}
+						</TableHead>
+						<TableHead className="text-start">
+							{t("admin.description")}
+						</TableHead>
+						<TableHead className="text-start">
+							{t("admin.createdAt")}
+						</TableHead>
+						<TableHead className="text-start">
+							{t("admin.updatedAt")}
+						</TableHead>
+						<TableHead className="text-start">
 							{t("admin.actions")}
 						</TableHead>
 					</TableRow>
@@ -101,7 +118,31 @@ export const CategoryList = ({
 					) : (
 						categories.map((category) => (
 							<TableRow key={category.id}>
-								<TableCell>{category.name}</TableCell>
+								<TableCell>
+									<div className="flex items-center gap-3">
+										<div className="h-10 w-10 rounded-md overflow-hidden bg-background">
+											{category.image ? (
+												<img
+													src={category.image}
+													alt={category.name}
+													className="h-full w-full object-cover"
+													onError={(e) => {
+														(
+															e.target as HTMLImageElement
+														).src = "/placeholder.svg";
+													}}
+												/>
+											) : (
+												<div className="h-full w-full flex items-center justify-center bg-muted">
+													<Image className="h-5 w-5 text-muted-foreground" />
+												</div>
+											)}
+										</div>
+										<div className="font-medium">
+											{category.name}
+										</div>
+									</div>
+								</TableCell>
 								<TableCell>
 									{category.description}
 								</TableCell>
@@ -112,18 +153,18 @@ export const CategoryList = ({
 									{formatDate(category.updated_at)}
 								</TableCell>
 								<TableCell>
-									<div className="flex justify-end space-x-2">
+									<div className="flex justify-start space-x-2">
 										<Button
 											variant="ghost"
 											size="icon"
 											onClick={() => onEdit(category)}>
-											<Edit className="h-4 w-4" />
+											<Edit className="h-4 w-4 text-blue-500" />
 										</Button>
 										<Button
 											variant="ghost"
 											size="icon"
 											onClick={() => onDelete(category.id)}>
-											<Trash2 className="h-4 w-4" />
+											<Trash2 className="h-4 w-4 text-red-500" />
 										</Button>
 									</div>
 								</TableCell>

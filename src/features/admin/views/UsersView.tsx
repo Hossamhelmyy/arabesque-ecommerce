@@ -16,11 +16,12 @@ export const UsersView = () => {
 		isSubmitting,
 		updateUserRole,
 		formatDate,
+		searchQuery,
+		setSearchQuery,
+		viewUserDetails,
+		selectedUser,
 	} = useUsers();
 
-	const [searchQuery, setSearchQuery] = useState("");
-	const [selectedUser, setSelectedUser] =
-		useState<User | null>(null);
 	const [userDetailsOpen, setUserDetailsOpen] =
 		useState(false);
 
@@ -43,7 +44,7 @@ export const UsersView = () => {
 
 	// Handle viewing user details
 	const handleViewDetails = (user: User) => {
-		setSelectedUser(user);
+		viewUserDetails(user);
 		setUserDetailsOpen(true);
 	};
 

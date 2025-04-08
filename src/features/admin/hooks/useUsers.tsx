@@ -8,40 +8,29 @@ import {
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
-import type {
-	Order,
-	AdminUser,
-	UsersData,
-	UserProfile,
-} from "../types";
-import { Tables } from "@/integrations/supabase/types";
+import type { Order, User, UsersData } from "../types";
 
 const useUsers = (): UsersData => {
 	const { t } = useTranslation();
 	const queryClient = useQueryClient();
 	const [selectedUser, setSelectedUser] =
-		useState<AdminUser | null>(null);
+		useState<User | null>(null);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [userOrders, setUserOrders] = useState<Order[]>([]);
-	const [isOrdersLoading, setIsOrdersLoading] =
-		useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	// Fetch all users with profile data
 	const { data: users = [], isLoading } = useQuery({
-		queryKey: ["admin", "users"],
+		queryKey: ["admin", "profiles"],
 		queryFn: async () => {
 			try {
-				// Fetch users from auth schema
-				// In a real app, we would use an admin API endpoint
-				// For this demo, we'll fetch profiles and simulate auth data
+				// Fetch profiles from the profiles table
 				const { data: profilesData, error: profilesError } =
 					await supabase.from("profiles").select("*");
 
 				if (profilesError) throw profilesError;
 
 				// Create users with profiles and order stats
-				const usersWithStats = await Promise.all(
+				const usersWithData = await Promise.all(
 					(profilesData || []).map(async (profile) => {
 						// Get order count
 						const { count: ordersCount } = await supabase
@@ -61,54 +50,29 @@ const useUsers = (): UsersData => {
 								0,
 							) || 0;
 
-						// Get or create address object in the correct format
-						let address = null;
-						if (profile.address) {
-							if (typeof profile.address === "string") {
-								try {
-									address = JSON.parse(profile.address);
-								} catch (e) {
-									console.error(
-										"Error parsing address:",
-										e,
-									);
-								}
-							} else {
-								address = profile.address;
-							}
-						}
-
 						// Create a properly typed user object
-						const adminUser: AdminUser = {
+						const user: User = {
 							id: profile.id,
-							email: `user_${profile.id.substring(
-								0,
-								4,
-							)}@example.com`, // Simulated email
-							role:
-								Math.random() > 0.9
-									? "admin"
-									: "authenticated", // Random role for demo
-							created_at:
+							name: profile.email,
+							email: profile.email,
+							role: profile.role,
+							avatar: profile.avatar_url || "",
+							createdAt:
 								profile.created_at ||
 								new Date().toISOString(),
-							profile: {
-								id: profile.id,
+							profiles: {
 								first_name: profile.first_name,
 								last_name: profile.last_name,
-								phone: profile.phone,
 								avatar_url: profile.avatar_url,
-								address: address,
+								email: profile.email,
 							},
-							orders_count: ordersCount || 0,
-							total_spent: totalSpent,
 						};
 
-						return adminUser;
+						return user;
 					}),
 				);
 
-				return usersWithStats || [];
+				return usersWithData || [];
 			} catch (error) {
 				console.error("Error fetching users:", error);
 				toast({
@@ -122,53 +86,9 @@ const useUsers = (): UsersData => {
 		},
 	});
 
-	// Fetch user orders
-	const fetchUserOrders = async (userId: string) => {
-		try {
-			setIsOrdersLoading(true);
-			const { data, error } = await supabase
-				.from("orders")
-				.select("*")
-				.eq("user_id", userId)
-				.order("created_at", { ascending: false });
-
-			if (error) throw error;
-
-			// Transform the data to match Order type
-			const typedOrders: Order[] = (data || []).map(
-				(order) => ({
-					id: order.id,
-					created_at: order.created_at,
-					updated_at: order.updated_at || null,
-					user_id: order.user_id,
-					status: order.status,
-					total: order.total,
-					payment_method: order.payment_method || "card",
-					shipping_address:
-						typeof order.shipping_address === "string"
-							? JSON.parse(order.shipping_address)
-							: order.shipping_address || {},
-				}),
-			);
-
-			setUserOrders(typedOrders);
-		} catch (error) {
-			console.error("Error fetching user orders:", error);
-			toast({
-				title: t("common.error"),
-				description: "Failed to fetch user orders.",
-				variant: "destructive",
-			});
-			setUserOrders([]);
-		} finally {
-			setIsOrdersLoading(false);
-		}
-	};
-
-	// View user details and fetch their orders
-	const viewUserDetails = async (user: AdminUser) => {
+	// View user details
+	const viewUserDetails = (user: User) => {
 		setSelectedUser(user);
-		await fetchUserOrders(user.id);
 	};
 
 	// Update user role mutation
@@ -180,22 +100,24 @@ const useUsers = (): UsersData => {
 			userId: string;
 			role: string;
 		}) => {
-			// This is a mock implementation since supabase.auth.admin is not available on the client
-			// In a real app, you'd use a server endpoint
+			// Update user role in the database
+			const { data, error } = await supabase
+				.from("user_roles")
+				.upsert(
+					{ user_id: userId, role },
+					{ onConflict: "user_id" },
+				)
+				.select()
+				.single();
 
-			// Simulate API delay
-			await new Promise((resolve) =>
-				setTimeout(resolve, 1000),
-			);
-
-			// Return a mock response
+			if (error) throw error;
 			return { id: userId, role };
 		},
 		onSuccess: (result) => {
-			// Update local state
+			// Update local cache
 			queryClient.setQueryData(
-				["admin", "users"],
-				(oldData: AdminUser[] | undefined) =>
+				["admin", "profiles"],
+				(oldData: User[] | undefined) =>
 					(oldData || []).map((user) =>
 						user.id === result.id
 							? { ...user, role: result.role }
@@ -222,7 +144,7 @@ const useUsers = (): UsersData => {
 	const updateUserRole = async (
 		userId: string,
 		role: string,
-	) => {
+	): Promise<boolean> => {
 		try {
 			setIsSubmitting(true);
 			await updateUserRoleMutation.mutateAsync({
@@ -234,6 +156,11 @@ const useUsers = (): UsersData => {
 			if (selectedUser && selectedUser.id === userId) {
 				setSelectedUser({ ...selectedUser, role });
 			}
+
+			return true;
+		} catch (error) {
+			console.error(error);
+			return false;
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -252,41 +179,50 @@ const useUsers = (): UsersData => {
 	};
 
 	// Helper functions
-	const getInitials = (user: AdminUser) => {
-		if (user.profile?.first_name) {
-			return `${user.profile.first_name.charAt(0)}${
-				user.profile.last_name
-					? user.profile.last_name.charAt(0)
+	const getInitials = (user: User) => {
+		if (user.profiles?.first_name) {
+			return `${user.profiles.first_name.charAt(0)}${
+				user.profiles.last_name
+					? user.profiles.last_name.charAt(0)
 					: ""
-			}`;
+			}`.toUpperCase();
 		}
-		return user.email.charAt(0).toUpperCase();
+		return (user.email || "").charAt(0).toUpperCase();
 	};
 
-	const getFullName = (user: AdminUser) => {
-		if (user.profile?.first_name) {
-			return `${user.profile.first_name} ${
-				user.profile.last_name || ""
-			}`;
+	const getFullName = (user: User) => {
+		if (user.profiles?.first_name) {
+			return `${user.profiles.first_name} ${
+				user.profiles.last_name || ""
+			}`.trim();
 		}
 		return "N/A";
 	};
 
 	// Filter users based on search
-	const filteredUsers = (users || []).filter((user) => {
+	const filteredUsers = users.filter((user) => {
 		const searchLower = searchQuery.toLowerCase();
 		return (
 			searchQuery === "" ||
-			user.email.toLowerCase().includes(searchLower) ||
-			(user.profile?.first_name || "")
+			(user.email || "")
 				.toLowerCase()
 				.includes(searchLower) ||
-			(user.profile?.last_name || "")
+			(user.name || "")
+				.toLowerCase()
+				.includes(searchLower) ||
+			(user.role || "")
 				.toLowerCase()
 				.includes(searchLower) ||
 			user.id.toLowerCase().includes(searchLower)
 		);
 	});
+
+	// Function to refresh users data
+	const fetchUsers = async () => {
+		await queryClient.invalidateQueries({
+			queryKey: ["admin", "profiles"],
+		});
+	};
 
 	return {
 		users: filteredUsers,
@@ -294,12 +230,10 @@ const useUsers = (): UsersData => {
 		isLoading,
 		isSubmitting,
 		searchQuery,
-		setSelectedUser,
 		setSearchQuery,
+		fetchUsers,
 		viewUserDetails,
 		updateUserRole,
-		userOrders,
-		isOrdersLoading,
 		formatDate,
 		formatCurrency,
 		getInitials,

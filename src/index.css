@@ -162,7 +162,7 @@
 
 @layer components {
 	.rtl-flip {
-		@apply [dir="rtl"]:rotate-180;
+		transform: rotate(180deg); /* Using regular CSS */
 	}
 
 	.product-card {
@@ -327,6 +327,14 @@
 }
 
 @layer utilities {
+	.rtl-flip {
+		@apply rotate-0;
+	}
+
+	[dir="rtl"] .rtl-flip {
+		transform: rotate(180deg); /* Using regular CSS */
+	}
+
 	.rtl-space-x-reverse {
 		@apply [dir="rtl"]:space-x-reverse;
 	}

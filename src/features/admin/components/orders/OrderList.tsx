@@ -45,12 +45,22 @@ export const OrderList = ({
 				<Table>
 					<TableHeader>
 						<TableRow>
-							<TableHead>{t("admin.orderId")}</TableHead>
-							<TableHead>{t("admin.customer")}</TableHead>
-							<TableHead>{t("admin.date")}</TableHead>
-							<TableHead>{t("admin.status")}</TableHead>
-							<TableHead>{t("admin.total")}</TableHead>
-							<TableHead className="text-right">
+							<TableHead className="text-start">
+								{t("admin.orderId")}
+							</TableHead>
+							<TableHead className="text-start">
+								{t("admin.customer")}
+							</TableHead>
+							<TableHead className="text-start">
+								{t("admin.date")}
+							</TableHead>
+							<TableHead className="text-start">
+								{t("admin.status")}
+							</TableHead>
+							<TableHead className="text-start">
+								{t("admin.total")}
+							</TableHead>
+							<TableHead className="text-start">
 								{t("admin.actions")}
 							</TableHead>
 						</TableRow>
@@ -91,12 +101,22 @@ export const OrderList = ({
 			<Table>
 				<TableHeader>
 					<TableRow>
-						<TableHead>{t("admin.orderId")}</TableHead>
-						<TableHead>{t("admin.customer")}</TableHead>
-						<TableHead>{t("admin.date")}</TableHead>
-						<TableHead>{t("admin.status")}</TableHead>
-						<TableHead>{t("admin.total")}</TableHead>
-						<TableHead className="text-right">
+						<TableHead className="text-start">
+							{t("admin.orderId")}
+						</TableHead>
+						<TableHead className="text-start">
+							{t("admin.customer")}
+						</TableHead>
+						<TableHead className="text-start">
+							{t("admin.date")}
+						</TableHead>
+						<TableHead className="text-start">
+							{t("admin.status")}
+						</TableHead>
+						<TableHead className="text-start">
+							{t("admin.total")}
+						</TableHead>
+						<TableHead className="text-start">
 							{t("admin.actions")}
 						</TableHead>
 					</TableRow>
@@ -140,7 +160,7 @@ export const OrderList = ({
 									{formatCurrency(order.total)}
 								</TableCell>
 								<TableCell>
-									<div className="flex justify-end">
+									<div className="flex justify-start">
 										<Button
 											variant="ghost"
 											size="icon"

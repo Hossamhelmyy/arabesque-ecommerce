@@ -135,7 +135,11 @@ export const ProductCard = ({
 					</div>
 
 					{/* Badges */}
-					<div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
+					<div
+						className={cn(
+							"absolute top-3 z-10 flex flex-col gap-2",
+							isRTL ? "right-3" : "left-3",
+						)}>
 						{product.is_new && (
 							<Badge className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-md">
 								{t("product.new")}
@@ -153,16 +157,26 @@ export const ProductCard = ({
 					</div>
 
 					{/* Quick action buttons on hover */}
-					<div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center gap-2 p-3 translate-y-full transition-transform duration-300 group-hover:translate-y-0">
+					<div className="absolute inset-x-0 bottom-0 z-10 flex items-center justify-center gap-2 rtl:space-x-reverse p-3 translate-y-full transition-transform duration-300 group-hover:translate-y-0">
 						<Button
 							variant="secondary"
 							size="icon"
 							className="h-9 w-9 rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-background"
 							onClick={handleAddToCart}>
 							{addedToCart ? (
-								<Check className="h-4 w-4 animate-fadeIn" />
+								<Check
+									className={cn(
+										"h-4 w-4",
+										isRTL ? "ml-2" : "mr-2",
+									)}
+								/>
 							) : (
-								<ShoppingCart className="h-4 w-4" />
+								<ShoppingCart
+									className={cn(
+										"h-4 w-4",
+										isRTL ? "ml-2" : "mr-2",
+									)}
+								/>
 							)}
 							<span className="sr-only">
 								{t("product.addToCart")}
@@ -248,12 +262,22 @@ export const ProductCard = ({
 						onClick={handleAddToCart}>
 						{addedToCart ? (
 							<>
-								<Check className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
+								<Check
+									className={cn(
+										"mr-2 h-4 w-4",
+										isRTL ? "ml-2" : "mr-2",
+									)}
+								/>
 								{t("product.addedToCart")}
 							</>
 						) : (
 							<>
-								<ShoppingCart className="mr-2 h-4 w-4 rtl:ml-2 rtl:mr-0" />
+								<ShoppingCart
+									className={cn(
+										"mr-2 h-4 w-4",
+										isRTL ? "ml-2" : "mr-2",
+									)}
+								/>
 								{t("product.addToCart")}
 							</>
 						)}

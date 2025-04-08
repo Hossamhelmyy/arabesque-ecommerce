@@ -74,7 +74,7 @@ export const ProductList = ({
 							<TableHead className="text-start">
 								{t("admin.created")}
 							</TableHead>
-							<TableHead className="text-right">
+							<TableHead className="text-start">
 								{t("admin.actions")}
 							</TableHead>
 						</TableRow>
@@ -203,7 +203,7 @@ export const ProductList = ({
 										{formatDate(product.created_at)}
 									</TableCell>
 									<TableCell className="text-right">
-										<div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+										<div className="flex items-center justify-start gap-2">
 											<Button
 												variant="ghost"
 												size="sm"
@@ -235,7 +235,7 @@ export const ProductList = ({
 													</span>
 												</Button>
 											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end">
+											<DropdownMenuContent align="start">
 												<DropdownMenuItem
 													onClick={() => onEdit(product)}>
 													<Pencil className="h-4 w-4 mr-2" />

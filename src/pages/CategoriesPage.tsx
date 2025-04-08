@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +12,7 @@ import {
 	ShoppingBag,
 	ArrowLeft,
 	Search,
+	X,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
@@ -19,6 +20,8 @@ import {
 	CategoryCard,
 	CategoryCardSkeleton,
 } from "@/components/category";
+import { DirectionalIcon } from "@/components/ui/directional-icon";
+import { cn } from "@/lib/utils";
 
 type Category = {
 	id: string;
@@ -31,13 +34,18 @@ type Category = {
 };
 
 const CategoriesPage = () => {
-	const { t } = useTranslation();
-	const { i18n } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const { isRTL } = useLanguage();
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchTerm, setSearchTerm] = useState("");
+	const [categories, setCategories] = useState<Category[]>(
+		[],
+	);
+	const [filteredCategories, setFilteredCategories] =
+		useState<Category[]>([]);
+	const [loading, setLoading] = useState(true);
 
 	const {
-		data: categories,
+		data: categoriesData,
 		isLoading,
 		error,
 	} = useQuery({
@@ -64,20 +72,36 @@ const CategoriesPage = () => {
 		},
 	});
 
-	// Filter categories based on search query
-	const filteredCategories = categories
-		? categories.filter((category) => {
-				const searchLower = searchQuery.toLowerCase();
-				return (
-					category.name
-						.toLowerCase()
-						.includes(searchLower) ||
-					category.name_ar
-						.toLowerCase()
-						.includes(searchLower)
-				);
-		  })
-		: [];
+	useEffect(() => {
+		if (categoriesData) {
+			setCategories(categoriesData);
+			setFilteredCategories(categoriesData);
+			setLoading(false);
+		}
+	}, [categoriesData]);
+
+	// Filter categories based on search term
+	useEffect(() => {
+		if (searchTerm.trim() === "") {
+			setFilteredCategories(categories);
+		} else {
+			const filtered = categories.filter((category) => {
+				const name =
+					i18n.language === "ar" && category.name_ar
+						? category.name_ar
+						: category.name;
+				return name
+					.toLowerCase()
+					.includes(searchTerm.toLowerCase());
+			});
+			setFilteredCategories(filtered);
+		}
+	}, [searchTerm, categories, i18n.language]);
+
+	// Clear search function
+	const clearSearch = () => {
+		setSearchTerm("");
+	};
 
 	if (isLoading) {
 		return (
@@ -147,36 +171,56 @@ const CategoriesPage = () => {
 				</p>
 			</div>
 
-			<div className="max-w-md mx-auto mb-8">
+			<div className="max-w-md mx-auto mb-12">
 				<div className="relative">
-					<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-					<Input
-						placeholder={t("categories.searchPlaceholder")}
-						className="pl-9"
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
+					<Search
+						className={cn(
+							"absolute top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4",
+							isRTL ? "right-3" : "left-3",
+						)}
 					/>
+					<Input
+						type="text"
+						placeholder={t("categories.searchPlaceholder")}
+						className={cn(
+							"h-10 bg-background border-muted-foreground/20",
+							isRTL ? "pr-10 pl-10" : "pl-10 pr-10",
+						)}
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+					/>
+					{searchTerm && (
+						<Button
+							variant="ghost"
+							className={cn(
+								"absolute top-1/2 transform -translate-y-1/2 h-7 w-7 p-0",
+								isRTL ? "left-2" : "right-2",
+							)}
+							onClick={clearSearch}>
+							<X className="h-4 w-4" />
+							<span className="sr-only">
+								{t("categories.clearSearch")}
+							</span>
+						</Button>
+					)}
 				</div>
 			</div>
 
-			{filteredCategories.length === 0 ? (
-				<div className="text-center py-16">
-					<div className="inline-block p-4 rounded-full bg-muted mb-4">
-						<ShoppingBag className="h-8 w-8 text-muted-foreground" />
-					</div>
+			{filteredCategories.length === 0 && !loading && (
+				<div className="text-center py-8">
 					<h2 className="text-xl font-medium mb-2">
 						{t("categories.noResults")}
 					</h2>
-					<p className="text-muted-foreground max-w-md mx-auto mb-6">
+					<p className="text-muted-foreground mb-6">
 						{t("categories.tryAnotherSearch")}
 					</p>
-					<Button
-						variant="outline"
-						onClick={() => setSearchQuery("")}>
+					<Button onClick={clearSearch}>
 						{t("categories.clearSearch")}
 					</Button>
 				</div>
-			) : (
+			)}
+
+			{filteredCategories.length > 0 && (
 				<>
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 						{filteredCategories.map((category, index) => (
@@ -202,7 +246,7 @@ const CategoriesPage = () => {
 					<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 						{filteredCategories.map((category) => {
 							const displayName =
-								i18n.language === "ar"
+								i18n.language === "ar" && category.name_ar
 									? category.name_ar
 									: category.name;
 
@@ -214,15 +258,18 @@ const CategoriesPage = () => {
 									asChild>
 									<Link to={`/category/${category.slug}`}>
 										<span>{displayName}</span>
-										<div className="flex items-center gap-1 text-muted-foreground">
+										<div className="flex items-center gap-1 text-muted-foreground rtl:space-x-reverse">
 											<span className="text-xs">
 												{category.products_count || 0}
 											</span>
-											{isRTL ? (
-												<ArrowLeft className="h-4 w-4" />
-											) : (
-												<ArrowRight className="h-4 w-4" />
-											)}
+											<DirectionalIcon
+												leftIcon={
+													<ArrowLeft className="h-4 w-4" />
+												}
+												rightIcon={
+													<ArrowRight className="h-4 w-4" />
+												}
+											/>
 										</div>
 									</Link>
 								</Button>

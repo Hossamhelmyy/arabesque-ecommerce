@@ -59,6 +59,13 @@ export type Order = {
 	shipping_address: ShippingAddress;
 	created_at: string;
 	updated_at: string;
+	user?: {
+		email?: string;
+		profile?: {
+			first_name?: string | null;
+			last_name?: string | null;
+		};
+	};
 };
 
 export type Category = {
@@ -94,17 +101,21 @@ export type Profile = {
 	id: string;
 	user_id: string;
 	first_name?: string;
+	first_name_ar?: string;
 	last_name?: string;
+	last_name_ar?: string;
+	avatar_url?: string;
+	phone?: string;
 	address?: {
 		address?: string;
 		city?: string;
 		postal_code?: string;
 		country?: string;
 	};
-	phone?: string;
-	avatar_url?: string;
 	created_at: string;
 	updated_at: string;
+	role: string;
+	email: string;
 };
 
 export type AdminUser = SupabaseUser & {
@@ -123,6 +134,8 @@ export type BannerItem = {
 	link: string;
 	active: boolean;
 	position: number;
+	created_at: string;
+	updated_at: string;
 };
 
 export type Promotion = {
@@ -135,6 +148,8 @@ export type Promotion = {
 	startDate: string;
 	endDate: string;
 	active: boolean;
+	created_at: string;
+	updated_at: string;
 };
 
 export type DashboardStats = {
@@ -235,7 +250,27 @@ export interface User {
 		first_name?: string;
 		last_name?: string;
 		avatar_url?: string;
+		email: string;
 	};
+}
+
+export interface UsersData {
+	users: User[];
+	selectedUser: User | null;
+	isLoading: boolean;
+	isSubmitting: boolean;
+	searchQuery: string;
+	setSearchQuery: (query: string) => void;
+	fetchUsers: () => Promise<void>;
+	viewUserDetails: (user: User) => void;
+	updateUserRole: (
+		userId: string,
+		role: string,
+	) => Promise<boolean>;
+	formatDate: (dateString: string) => string;
+	formatCurrency: (amount: number) => string;
+	getInitials: (user: User) => string;
+	getFullName: (user: User) => string;
 }
 
 export type StoreSettings = {
@@ -273,3 +308,37 @@ export type ShippingZone = {
 	countries: string[];
 	rate: string;
 };
+
+export interface OrdersData {
+	orders: Order[];
+	filteredOrders: Order[];
+	selectedOrder: Order | null;
+	orderItems: OrderItem[];
+	isLoading: boolean;
+	isSubmitting: boolean;
+	isItemsLoading: boolean;
+	statusFilter: string;
+	searchQuery: string;
+	setSearchQuery: (query: string) => void;
+	setStatusFilter: (status: string) => void;
+	setSelectedOrder: (order: Order | null) => void;
+	fetchOrderItems: (
+		orderId: string,
+	) => Promise<OrderItem[]>;
+	viewOrderDetails: (order: Order) => Promise<void>;
+	updateOrderStatus: (
+		orderId: string,
+		status: string,
+	) => Promise<void>;
+	getShippingAddressProperty: (
+		order: Order,
+		property: keyof ShippingAddress,
+		fallback?: string,
+	) => string;
+	formatDate: (dateString: string) => string;
+	formatTime: (dateString: string) => string;
+	getStatusBadge: (status: string) => React.ReactElement;
+	formatCurrency: (value: number) => string;
+	handleSearch: (query: string) => void;
+	handleStatusFilter: (status: string) => void;
+}

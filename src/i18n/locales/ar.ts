@@ -26,6 +26,16 @@ export default {
 		toggleTheme: "تبديل السمة",
 		backToProducts: "العودة إلى المنتجات",
 		unknownError: "حدث خطأ غير معروف",
+		image: "الصورة",
+		create: "إنشاء",
+		update: "تحديث",
+		updating: "جاري التحديث...",
+		creating: "جاري الإنشاء...",
+		uploadError: "خطأ في التحميل",
+		uploadErrorDesc:
+			"حدثت مشكلة أثناء تحميل الملف. يرجى المحاولة مرة أخرى.",
+		description:
+			"نجمع كنوزًا أصيلة من جميع أنحاء العالم، ونوصلها إليك بعناية.",
 	},
 	admin: {
 		title: "لوحة تحكم الإدارة",
@@ -76,7 +86,6 @@ export default {
 		actions: "الإجراءات",
 		name: "الاسم",
 		details: "التفاصيل",
-		image: "الصورة",
 		englishDetails: "التفاصيل بالإنجليزية",
 		arabicDetails: "التفاصيل بالعربية",
 		description: "الوصف",
@@ -415,6 +424,11 @@ export default {
 			"جرب مصطلح بحث مختلف أو تصفح جميع الفئات",
 		clearSearch: "مسح البحث",
 		subcategories: "الفئات الفرعية",
+		jewelry: "المجوهرات",
+		textiles: "المنسوجات",
+		ceramics: "الخزف",
+		spices: "التوابل",
+		homeDecor: "ديكور المنزل",
 	},
 	favorites: {
 		title: "المفضلة",
@@ -469,6 +483,19 @@ export default {
 		allRightsReserved: "جميع الحقوق محفوظة",
 		madeWith: "صنع بـ",
 		forYou: "من أجلك",
+		followUs: "تابعنا",
+		contactUs: "اتصل بنا",
+		address:
+			"١٢٣ شارع أرابيسك، دبي، الإمارات العربية المتحدة",
+		phone: "+٩٧١ ١٢٣ ٤٥٦ ٧٨٩",
+		email: "info@arabesque.com",
+		copyright: "© {{year}} أرابيسك. جميع الحقوق محفوظة.",
+		aboutUs: "من نحن",
+		termsAndConditions: "الشروط والأحكام",
+		privacyPolicy: "سياسة الخصوصية",
+		socialMedia: "وسائل التواصل الاجتماعي",
+		newsletter: "النشرة الإخبارية",
+		subscribeToNewsletter: "اشترك في نشرتنا الإخبارية",
 	},
 	filters: {
 		title: "تصفية",
@@ -505,5 +532,31 @@ export default {
 			"لا توجد منتجات تطابق الفلاتر الخاصة بك",
 		noFilteredProductsDescription:
 			"حاول تعديل الفلاتر الخاصة بك أو تصفح جميع المنتجات في هذه الفئة.",
+	},
+	upload: {
+		limitReached: "تم الوصول إلى الحد الأقصى للتحميل",
+		limitReachedDesc:
+			"يمكنك تحميل حتى {{maxFiles}} ملف فقط",
+		invalidFile: "ملف غير صالح",
+		failed: "فشل التحميل",
+		failedDesc: "حدث خطأ أثناء تحميل الملف/الملفات",
+		dropHere: "أفلت الملفات هنا",
+		dragDropMultiple: "اسحب وأفلت الملفات أو انقر للتصفح",
+		dragDropSingle: "اسحب وأفلت الملف أو انقر للتصفح",
+		limitInfoMultiple:
+			"قم بتحميل حتى {{maxFiles}} ملف (الحد الأقصى {{maxSize}} ميجابايت لكل ملف)",
+		limitInfoSingle:
+			"قم بتحميل ملف (الحد الأقصى {{maxSize}} ميجابايت)",
+		selectFiles: "اختر الملفات",
+		selectFile: "اختر الملف",
+		uploading: "جارٍ التحميل...",
+		uploadingSingle: "جارٍ تحميل الملف...",
+		uploadedSingle: "الملف المحمّل",
+		uploadingMultiple: "جارٍ تحميل الملفات...",
+		uploadedMultiple:
+			"{{count}} من {{maxFiles}} ملفات تم تحميلها",
+		addMore: "إضافة المزيد من الملفات",
+		uploadedFile: "الملف المحمّل {{number}}",
+		remove: "إزالة",
 	},
 };

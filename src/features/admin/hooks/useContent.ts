@@ -1,7 +1,34 @@
 import { useState, useCallback, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import type { BannerItem, Promotion } from "../types";
+
+// Define the database types to match Supabase schema
+type DbBanner = {
+	id: string;
+	title: string;
+	subtitle: string;
+	image: string;
+	link: string;
+	active: boolean;
+	position: number;
+	created_at?: string;
+	updated_at?: string;
+};
+
+type DbPromotion = {
+	id: string;
+	title: string;
+	description: string;
+	code: string;
+	image?: string;
+	discount?: string;
+	startDate: string;
+	endDate: string;
+	active: boolean;
+	created_at?: string;
+	updated_at?: string;
+};
 
 export const useContent = () => {
 	const [banners, setBanners] = useState<BannerItem[]>([]);
@@ -21,36 +48,7 @@ export const useContent = () => {
 
 			if (error) throw error;
 
-			// If no banners, provide some mock data
-			if (!bannersData || bannersData.length === 0) {
-				const mockBanners: BannerItem[] = [
-					{
-						id: "1",
-						title: "Summer Collection",
-						subtitle: "Explore our new summer arrivals",
-						image:
-							"https://placehold.co/1200x400/e4e4e7/7f7f86?text=Summer+Collection",
-						link: "/collections/summer",
-						position: 1,
-						active: true,
-					},
-					{
-						id: "2",
-						title: "Sale up to 50%",
-						subtitle:
-							"Limited time offer on selected items",
-						image:
-							"https://placehold.co/1200x400/f5deb3/a9947d?text=Sale+50%+Off",
-						link: "/collections/sale",
-						position: 2,
-						active: true,
-					},
-				];
-				setBanners(mockBanners);
-				return;
-			}
-
-			setBanners(bannersData as BannerItem[]);
+			setBanners(bannersData || []);
 		} catch (error) {
 			console.error("Error fetching banners:", error);
 			toast({
@@ -66,43 +64,28 @@ export const useContent = () => {
 			const { data: promotionsData, error } = await supabase
 				.from("promotions")
 				.select("*")
-				.order("startDate", { ascending: false });
+				.order("start_date", { ascending: false });
 
 			if (error) throw error;
 
-			// If no promotions, provide some mock data
-			if (!promotionsData || promotionsData.length === 0) {
-				const mockPromotions: Promotion[] = [
-					{
-						id: "1",
-						title: "Welcome Discount",
-						description: "Get 10% off your first order",
-						image:
-							"https://placehold.co/600x400/d1d5db/6b7280?text=10%+Off",
-						discount: "10% OFF",
-						code: "WELCOME10",
-						startDate: "2023-01-01",
-						endDate: "2023-12-31",
-						active: true,
-					},
-					{
-						id: "2",
-						title: "Free Shipping",
-						description: "Free shipping on orders over $50",
-						image:
-							"https://placehold.co/600x400/dbeafe/3b82f6?text=Free+Shipping",
-						discount: "Free Shipping",
-						code: "FREESHIP",
-						startDate: "2023-01-01",
-						endDate: "2023-12-31",
-						active: true,
-					},
-				];
-				setPromotions(mockPromotions);
-				return;
-			}
+			// Transform the data to match the Promotion type
+			const transformedPromotions: Promotion[] = (
+				promotionsData || []
+			).map((promo) => ({
+				id: promo.id,
+				title: promo.title,
+				description: promo.description,
+				code: promo.code,
+				image: promo.image,
+				discount: promo.discount,
+				startDate: promo.start_date,
+				endDate: promo.end_date,
+				active: promo.active,
+				created_at: promo.created_at,
+				updated_at: promo.updated_at,
+			}));
 
-			setPromotions(promotionsData as Promotion[]);
+			setPromotions(transformedPromotions);
 		} catch (error) {
 			console.error("Error fetching promotions:", error);
 			toast({
@@ -131,31 +114,23 @@ export const useContent = () => {
 	) => {
 		setIsSubmitting(true);
 		try {
-			// In a real app, you would save to Supabase
-			// const { data, error } = await supabase.from('banners').insert(banner).select().single();
-			// if (error) throw error;
+			const { data, error } = await supabase
+				.from("banners")
+				.insert(banner)
+				.select()
+				.single();
 
-			// For demo, we'll just update the state directly
-			const newBanner: BannerItem = {
-				id: Date.now().toString(),
-				title: banner.title || "",
-				subtitle: banner.subtitle || "",
-				image: banner.image || "",
-				link: banner.link || "",
-				position: banner.position || 1,
-				active:
-					banner.active !== undefined
-						? banner.active
-						: true,
-			};
+			if (error) throw error;
 
-			setBanners((prevBanners) => [
-				...prevBanners,
-				newBanner,
-			]);
-			return newBanner;
+			setBanners((prevBanners) => [...prevBanners, data]);
+			return data;
 		} catch (error) {
 			console.error("Error creating banner:", error);
+			toast({
+				title: "Error",
+				description: "Failed to create banner",
+				variant: "destructive",
+			});
 			throw error;
 		} finally {
 			setIsSubmitting(false);
@@ -167,18 +142,27 @@ export const useContent = () => {
 	) => {
 		setIsSubmitting(true);
 		try {
-			// In a real app, you would update in Supabase
-			// const { error } = await supabase.from('banners').update(banner).eq('id', banner.id);
-			// if (error) throw error;
+			const { data, error } = await supabase
+				.from("banners")
+				.update(banner)
+				.eq("id", banner.id)
+				.select()
+				.single();
 
-			// For demo, we'll just update the state directly
+			if (error) throw error;
+
 			setBanners((prevBanners) =>
 				prevBanners.map((b) =>
-					b.id === banner.id ? { ...b, ...banner } : b,
+					b.id === banner.id ? data : b,
 				),
 			);
 		} catch (error) {
 			console.error("Error updating banner:", error);
+			toast({
+				title: "Error",
+				description: "Failed to update banner",
+				variant: "destructive",
+			});
 			throw error;
 		} finally {
 			setIsSubmitting(false);
@@ -188,16 +172,23 @@ export const useContent = () => {
 	const deleteBanner = async (bannerId: string) => {
 		setIsSubmitting(true);
 		try {
-			// In a real app, you would delete from Supabase
-			// const { error } = await supabase.from('banners').delete().eq('id', bannerId);
-			// if (error) throw error;
+			const { error } = await supabase
+				.from("banners")
+				.delete()
+				.eq("id", bannerId);
 
-			// For demo, we'll just update the state directly
+			if (error) throw error;
+
 			setBanners((prevBanners) =>
 				prevBanners.filter((b) => b.id !== bannerId),
 			);
 		} catch (error) {
 			console.error("Error deleting banner:", error);
+			toast({
+				title: "Error",
+				description: "Failed to delete banner",
+				variant: "destructive",
+			});
 			throw error;
 		} finally {
 			setIsSubmitting(false);
@@ -209,32 +200,34 @@ export const useContent = () => {
 	) => {
 		setIsSubmitting(true);
 		try {
-			// In a real app, you would save to Supabase
-			// const { data, error } = await supabase.from('promotions').insert(promotion).select().single();
-			// if (error) throw error;
+			// Convert to database format
+			const dbPromotion = {
+				...promotion,
+				start_date: promotion.startDate,
+				end_date: promotion.endDate,
+			};
 
-			// For demo, we'll just update the state directly
+			const { data, error } = await supabase
+				.from("promotions")
+				.insert(dbPromotion)
+				.select()
+				.single();
+
+			if (error) throw error;
+
+			// Transform the response to match the Promotion type
 			const newPromotion: Promotion = {
-				id: Date.now().toString(),
-				title: promotion.title || "",
-				description: promotion.description || "",
-				image: promotion.image || "",
-				discount: promotion.discount || "",
-				code: promotion.code || "",
-				startDate:
-					promotion.startDate ||
-					new Date().toISOString().split("T")[0],
-				endDate:
-					promotion.endDate ||
-					new Date(
-						new Date().setMonth(new Date().getMonth() + 1),
-					)
-						.toISOString()
-						.split("T")[0],
-				active:
-					promotion.active !== undefined
-						? promotion.active
-						: true,
+				id: data.id,
+				title: data.title,
+				description: data.description,
+				code: data.code,
+				image: data.image,
+				discount: data.discount,
+				startDate: data.start_date,
+				endDate: data.end_date,
+				active: data.active,
+				created_at: data.created_at,
+				updated_at: data.updated_at,
 			};
 
 			setPromotions((prevPromotions) => [
@@ -244,6 +237,11 @@ export const useContent = () => {
 			return newPromotion;
 		} catch (error) {
 			console.error("Error creating promotion:", error);
+			toast({
+				title: "Error",
+				description: "Failed to create promotion",
+				variant: "destructive",
+			});
 			throw error;
 		} finally {
 			setIsSubmitting(false);
@@ -255,20 +253,49 @@ export const useContent = () => {
 	) => {
 		setIsSubmitting(true);
 		try {
-			// In a real app, you would update in Supabase
-			// const { error } = await supabase.from('promotions').update(promotion).eq('id', promotion.id);
-			// if (error) throw error;
+			// Convert to database format
+			const dbPromotion = {
+				...promotion,
+				start_date: promotion.startDate,
+				end_date: promotion.endDate,
+			};
 
-			// For demo, we'll just update the state directly
+			const { data, error } = await supabase
+				.from("promotions")
+				.update(dbPromotion)
+				.eq("id", promotion.id)
+				.select()
+				.single();
+
+			if (error) throw error;
+
+			// Transform the response to match the Promotion type
+			const updatedPromotion: Promotion = {
+				id: data.id,
+				title: data.title,
+				description: data.description,
+				code: data.code,
+				image: data.image,
+				discount: data.discount,
+				startDate: data.start_date,
+				endDate: data.end_date,
+				active: data.active,
+				created_at: data.created_at,
+				updated_at: data.updated_at,
+			};
+
 			setPromotions((prevPromotions) =>
 				prevPromotions.map((p) =>
-					p.id === promotion.id
-						? { ...p, ...promotion }
-						: p,
+					p.id === promotion.id ? updatedPromotion : p,
 				),
 			);
 		} catch (error) {
 			console.error("Error updating promotion:", error);
+			toast({
+				title: "Error",
+				description: "Failed to update promotion",
+				variant: "destructive",
+			});
 			throw error;
 		} finally {
 			setIsSubmitting(false);
@@ -278,16 +305,23 @@ export const useContent = () => {
 	const deletePromotion = async (promotionId: string) => {
 		setIsSubmitting(true);
 		try {
-			// In a real app, you would delete from Supabase
-			// const { error } = await supabase.from('promotions').delete().eq('id', promotionId);
-			// if (error) throw error;
+			const { error } = await supabase
+				.from("promotions")
+				.delete()
+				.eq("id", promotionId);
 
-			// For demo, we'll just update the state directly
+			if (error) throw error;
+
 			setPromotions((prevPromotions) =>
 				prevPromotions.filter((p) => p.id !== promotionId),
 			);
 		} catch (error) {
 			console.error("Error deleting promotion:", error);
+			toast({
+				title: "Error",
+				description: "Failed to delete promotion",
+				variant: "destructive",
+			});
 			throw error;
 		} finally {
 			setIsSubmitting(false);

@@ -6,6 +6,21 @@ import { OrderHeader } from "../components/orders/OrderHeader";
 import { OrderDetailsDialog } from "../components/orders/OrderDetailsDialog";
 import { useToast } from "@/components/ui/use-toast";
 import type { Order } from "../types";
+import { Badge } from "@/components/ui/badge";
+import { BadgeProps } from "@/components/ui/badge";
+
+// Wrapper component to render the status badge
+const StatusBadge = ({ status }: { status: string }) => {
+	const { getStatusBadge } = useOrders();
+	const badgeInfo = getStatusBadge(status);
+
+	return (
+		<Badge
+			variant={badgeInfo.variant as BadgeProps["variant"]}>
+			{badgeInfo.status}
+		</Badge>
+	);
+};
 
 export const OrdersView = () => {
 	const { t } = useTranslation();
@@ -28,6 +43,7 @@ export const OrdersView = () => {
 		formatCurrency,
 		getStatusBadge,
 		getShippingAddressProperty,
+		orderItems,
 	} = useOrders();
 
 	const [isDetailsDialogOpen, setIsDetailsDialogOpen] =
@@ -79,6 +95,11 @@ export const OrdersView = () => {
 		}
 	};
 
+	// Wrapper function to render the status badge
+	const renderStatusBadge = (status: string) => {
+		return <StatusBadge status={status} />;
+	};
+
 	return (
 		<div className="space-y-6">
 			<OrderHeader
@@ -95,7 +116,7 @@ export const OrdersView = () => {
 				formatDate={formatDate}
 				formatTime={formatTime}
 				formatCurrency={formatCurrency}
-				getStatusBadge={getStatusBadge}
+				getStatusBadge={renderStatusBadge}
 				getShippingAddressProperty={
 					getShippingAddressProperty
 				}
@@ -111,7 +132,7 @@ export const OrdersView = () => {
 				formatDate={formatDate}
 				formatTime={formatTime}
 				formatCurrency={formatCurrency}
-				getStatusBadge={getStatusBadge}
+				getStatusBadge={renderStatusBadge}
 				getShippingAddressProperty={
 					getShippingAddressProperty
 				}

@@ -11,88 +11,89 @@ import {
 	Grid3X3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DirectionalIcon } from "@/components/ui/directional-icon";
 
-export type CategoryCardProps = {
-	category: {
-		id: string;
-		name: string;
-		name_ar: string;
-		slug: string;
-		image: string | null;
-		products_count?: number;
-	};
-	imagePriority?: boolean;
+export interface Category {
+	id: string;
+	name: string;
+	name_ar?: string;
+	slug: string;
+	description?: string;
+	description_ar?: string;
+	image?: string;
+	parent_id?: string | null;
+	created_at?: string;
+	updated_at?: string;
+	products_count?: number;
+}
+
+export interface CategoryCardProps {
+	category: Category;
 	className?: string;
-};
+	imagePriority?: boolean;
+}
 
 export const CategoryCard = ({
 	category,
-	imagePriority = false,
 	className,
+	imagePriority = false,
 }: CategoryCardProps) => {
 	const { t, i18n } = useTranslation();
 	const { isRTL } = useLanguage();
 	const [isHovered, setIsHovered] = useState(false);
 
 	const displayName =
-		i18n.language === "ar"
+		i18n.language === "ar" && category.name_ar
 			? category.name_ar
 			: category.name;
 
 	return (
 		<Card
 			className={cn(
-				"group overflow-hidden border transition-all hover:shadow-lg",
+				"overflow-hidden transition-all duration-300 hover:shadow-md group h-full",
 				className,
 			)}
 			onMouseEnter={() => setIsHovered(true)}
 			onMouseLeave={() => setIsHovered(false)}>
 			<Link
 				to={`/category/${category.slug}`}
-				className="block h-full">
-				<div className="relative overflow-hidden aspect-[4/3]">
-					{/* Overlay gradient */}
-					<div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
-
-					{/* Category image */}
+				aria-label={`${t(
+					"categories.browseCategory",
+				)}: ${displayName}`}
+				className="flex flex-col h-full">
+				<div className="relative overflow-hidden">
 					{category.image ? (
-						<img
-							src={category.image}
-							alt={displayName}
-							loading={imagePriority ? "eager" : "lazy"}
-							className={cn(
-								"w-full h-full object-cover transition-transform duration-700",
-								isHovered ? "scale-110" : "scale-100",
-							)}
-							onError={(e) => {
-								(e.target as HTMLImageElement).src =
-									"/placeholder.svg";
-							}}
-						/>
+						<div className="aspect-[4/3] overflow-hidden bg-muted">
+							<img
+								src={category.image}
+								alt={displayName}
+								className={cn(
+									"w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
+									isHovered && "scale-105",
+								)}
+								loading={imagePriority ? "eager" : "lazy"}
+							/>
+						</div>
 					) : (
-						<div className="w-full h-full flex items-center justify-center bg-muted">
-							<Grid3X3 className="h-12 w-12 text-muted-foreground opacity-50" />
+						<div className="aspect-[4/3] flex items-center justify-center bg-muted">
+							<div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+								<span className="text-xl font-medium text-primary">
+									{displayName.charAt(0).toUpperCase()}
+								</span>
+							</div>
 						</div>
 					)}
 
-					{/* Category name overlay */}
-					<div className="absolute bottom-0 left-0 right-0 p-4 z-20">
-						<h3 className="font-bold text-xl text-white mb-1 line-clamp-1">
-							{displayName}
-						</h3>
-						{category.products_count !== undefined && (
-							<Badge
-								variant="outline"
-								className="bg-black/30 text-white border-white/20 backdrop-blur-sm">
-								{t("category.productsCount", {
-									count: category.products_count,
-								})}
-							</Badge>
+					{/* Optional Overlay */}
+					<div
+						className={cn(
+							"absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 transition-opacity",
+							isHovered && "opacity-100",
 						)}
-					</div>
+					/>
 				</div>
 
-				<CardContent className="p-4">
+				<CardContent className="p-4 flex-grow">
 					<div className="flex items-center justify-between">
 						<div>
 							<h3 className="font-medium text-lg mb-1 line-clamp-1">
@@ -111,11 +112,12 @@ export const CategoryCard = ({
 									? "bg-primary text-primary-foreground"
 									: "bg-muted text-muted-foreground",
 							)}>
-							{isRTL ? (
-								<ArrowLeft className="h-5 w-5" />
-							) : (
-								<ArrowRight className="h-5 w-5" />
-							)}
+							<DirectionalIcon
+								leftIcon={<ArrowLeft className="h-5 w-5" />}
+								rightIcon={
+									<ArrowRight className="h-5 w-5" />
+								}
+							/>
 						</Button>
 					</div>
 				</CardContent>

@@ -48,7 +48,8 @@ interface OrderDetailsDialogProps {
 const orderStatuses = [
 	{ value: "pending", label: "Pending" },
 	{ value: "processing", label: "Processing" },
-	{ value: "completed", label: "Completed" },
+	{ value: "shipped", label: "Shipped" },
+	{ value: "delivered", label: "Delivered" },
 	{ value: "cancelled", label: "Cancelled" },
 ];
 
@@ -170,16 +171,16 @@ export const OrderDetailsDialog = ({
 							<Table>
 								<TableHeader>
 									<TableRow>
-										<TableHead>
+										<TableHead className="text-start">
 											{t("admin.product")}
 										</TableHead>
-										<TableHead className="text-right">
+										<TableHead className="text-start">
 											{t("admin.price")}
 										</TableHead>
-										<TableHead className="text-right">
+										<TableHead className="text-start">
 											{t("admin.quantity")}
 										</TableHead>
-										<TableHead className="text-right">
+										<TableHead className="text-start">
 											{t("admin.total")}
 										</TableHead>
 									</TableRow>
@@ -210,15 +211,15 @@ export const OrderDetailsDialog = ({
 														</div>
 													</div>
 												</TableCell>
-												<TableCell className="text-right">
-													{formatCurrency(item.price)}
+												<TableCell>
+													{formatCurrency(item.unit_price)}
 												</TableCell>
-												<TableCell className="text-right">
+												<TableCell>
 													{item.quantity}
 												</TableCell>
-												<TableCell className="text-right">
+												<TableCell>
 													{formatCurrency(
-														item.price * item.quantity,
+														item.unit_price * item.quantity,
 													)}
 												</TableCell>
 											</TableRow>

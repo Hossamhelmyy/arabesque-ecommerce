@@ -19,6 +19,8 @@ import {
 	MAX_FILE_SIZE,
 	ALLOWED_FILE_TYPES,
 } from "@/utils/env";
+import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/context/LanguageContext";
 
 // Define the FileUpload component props
 export interface FileUploadProps {
@@ -58,6 +60,8 @@ export function FileUpload({
 	multiple = false,
 }: FileUploadProps) {
 	const { toast } = useToast();
+	const { t } = useTranslation();
+	const { isRTL } = useLanguage();
 	const [isUploading, setIsUploading] = useState(false);
 
 	// Make sure value is always an array
@@ -74,10 +78,11 @@ export function FileUpload({
 				maxFiles
 			) {
 				toast({
-					title: "Upload limit reached",
-					description: `You can only upload up to ${maxFiles} file${
-						maxFiles === 1 ? "" : "s"
-					}`,
+					title: t("upload.limitReached"),
+					description: t("upload.limitReachedDesc", {
+						maxFiles,
+						s: maxFiles === 1 ? "" : "s",
+					}),
 					variant: "destructive",
 				});
 				return;
@@ -93,7 +98,7 @@ export function FileUpload({
 					} catch (error) {
 						if (error instanceof UploadValidationError) {
 							toast({
-								title: "Invalid file",
+								title: t("upload.invalidFile"),
 								description: error.message,
 								variant: "destructive",
 							});
@@ -118,9 +123,8 @@ export function FileUpload({
 			} catch (error) {
 				console.error("Error uploading files:", error);
 				toast({
-					title: "Upload failed",
-					description:
-						"There was an error uploading your file(s)",
+					title: t("upload.failed"),
+					description: t("upload.failedDesc"),
 					variant: "destructive",
 				});
 			} finally {
@@ -136,6 +140,7 @@ export function FileUpload({
 			onFilesAdded,
 			maxSize,
 			accept,
+			t,
 		],
 	);
 
@@ -190,21 +195,25 @@ export function FileUpload({
 						</div>
 						<p className="text-base font-medium">
 							{isDragActive
-								? "Drop files here"
+								? t("upload.dropHere")
 								: multiple
-								? "Drag & drop files or click to browse"
-								: "Drag & drop a file or click to browse"}
+								? t("upload.dragDropMultiple")
+								: t("upload.dragDropSingle")}
 						</p>
 						<p className="text-xs text-muted-foreground mt-1">
 							{multiple
-								? `Upload up to ${maxFiles} file${
-										maxFiles === 1 ? "" : "s"
-								  } (max ${Math.round(
-										maxSize / 1024 / 1024,
-								  )}MB each)`
-								: `Upload a file (max ${Math.round(
-										maxSize / 1024 / 1024,
-								  )}MB)`}
+								? t("upload.limitInfoMultiple", {
+										maxFiles,
+										s: maxFiles === 1 ? "" : "s",
+										maxSize: Math.round(
+											maxSize / 1024 / 1024,
+										),
+								  })
+								: t("upload.limitInfoSingle", {
+										maxSize: Math.round(
+											maxSize / 1024 / 1024,
+										),
+								  })}
 						</p>
 
 						{!disabled &&
@@ -214,19 +223,25 @@ export function FileUpload({
 									type="button"
 									variant="outline"
 									size="sm"
-									className="mt-4 rounded-full flex gap-2 px-4"
+									className="mt-4 rounded-full flex gap-2 rtl:space-x-reverse px-4"
 									disabled={isUploading || disabled}>
 									<Camera className="h-4 w-4" />
 									{multiple
-										? "Select Files"
-										: "Select File"}
+										? t("upload.selectFiles")
+										: t("upload.selectFile")}
 								</Button>
 							)}
 
 						{isUploading && (
-							<div className="flex items-center gap-2 mt-4 text-primary">
-								<div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-								<p className="text-sm">Uploading...</p>
+							<div className="flex items-center justify-between rtl:space-x-reverse">
+								<div className="flex flex-col gap-1">
+									<div className="flex items-center gap-2 rtl:space-x-reverse">
+										<div className="h-4 w-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+										<p className="text-sm">
+											{t("upload.uploading")}
+										</p>
+									</div>
+								</div>
 							</div>
 						)}
 					</div>
@@ -236,8 +251,8 @@ export function FileUpload({
 					<div className="flex flex-col items-center">
 						<p className="text-sm text-muted-foreground mb-2">
 							{isUploading
-								? "Uploading your file..."
-								: "Your uploaded file"}
+								? t("upload.uploadingSingle")
+								: t("upload.uploadedSingle")}
 						</p>
 					</div>
 				)}
@@ -246,8 +261,11 @@ export function FileUpload({
 					<div className="flex flex-col items-center">
 						<p className="text-sm text-muted-foreground mb-2">
 							{isUploading
-								? "Uploading your files..."
-								: `${valueArray.length} of ${maxFiles} files uploaded`}
+								? t("upload.uploadingMultiple")
+								: t("upload.uploadedMultiple", {
+										count: valueArray.length,
+										maxFiles,
+								  })}
 						</p>
 
 						{!disabled && valueArray.length < maxFiles && (
@@ -255,10 +273,10 @@ export function FileUpload({
 								type="button"
 								variant="outline"
 								size="sm"
-								className="mt-2 rounded-full flex gap-2 px-4"
+								className="mt-2 rounded-full flex gap-2 rtl:space-x-reverse px-4"
 								disabled={isUploading || disabled}>
 								<ImagePlus className="h-4 w-4" />
-								Add More Files
+								{t("upload.addMore")}
 							</Button>
 						)}
 					</div>
@@ -266,44 +284,42 @@ export function FileUpload({
 			</div>
 
 			{valueArray.length > 0 && (
-				<div
-					className={cn(
-						"grid gap-4",
-						multiple
-							? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
-							: "grid-cols-1",
-					)}>
+				<div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{valueArray.map((file, index) => (
-						<div
-							key={`${file}-${index}`}
-							className="relative group rounded-lg overflow-hidden bg-background border shadow-sm transition-all hover:shadow-md">
-							<div className="aspect-square w-full relative bg-muted/20">
-								<img
-									src={file}
-									alt={`Uploaded file ${index + 1}`}
-									className="h-full w-full object-cover transition-transform group-hover:scale-105"
-									onError={(e) => {
-										(e.target as HTMLImageElement).src =
-											"/placeholder.svg";
-									}}
-								/>
+						<div key={index} className="relative">
+							<div className="group relative aspect-[1/1] overflow-hidden rounded-xl border border-border bg-card/50">
+								<div className="aspect-square w-full relative bg-muted/20">
+									<img
+										src={file}
+										alt={t("upload.uploadedFile", {
+											number: index + 1,
+										})}
+										className="h-full w-full object-cover transition-transform group-hover:scale-105"
+										onError={(e) => {
+											(e.target as HTMLImageElement).src =
+												"/placeholder.svg";
+										}}
+									/>
 
-								{!disabled && (
-									<Button
-										type="button"
-										variant="destructive"
-										size="icon"
-										className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
-										onClick={(e) => {
-											e.stopPropagation();
-											removeFile(index);
-										}}>
-										<X className="h-4 w-4" />
-										<span className="sr-only">Remove</span>
-									</Button>
-								)}
+									{!disabled && (
+										<button
+											onClick={(e) => {
+												e.stopPropagation();
+												removeFile(index);
+											}}
+											className={cn(
+												"absolute p-1 rounded-full bg-black/60 text-white hover:bg-black/70 top-2",
+												isRTL ? "left-2" : "right-2",
+											)}
+											aria-label={t(
+												"fileUpload.removeFile",
+											)}>
+											<X className="h-4 w-4" />
+										</button>
+									)}
 
-								<div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+									<div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+								</div>
 							</div>
 						</div>
 					))}
