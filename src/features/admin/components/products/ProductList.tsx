@@ -10,18 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-	Image,
-	MoreHorizontal,
-	Pencil,
-	Trash2,
-} from "lucide-react";
+
+import { Image, Edit, Trash2 } from "lucide-react";
 import type { Product, Category } from "../../types";
 
 interface ProductListProps {
@@ -43,14 +33,19 @@ export const ProductList = ({
 	formatDate,
 	formatPrice,
 }: ProductListProps) => {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 
-	const getCategoryName = (categoryId: string | null) => {
+	const getCategoryName = (
+		categoryId: string | null,
+		lang: "ar" | "en",
+	) => {
 		if (!categoryId) return t("admin.uncategorized");
 		const category = categories.find(
 			(c) => c.id === categoryId,
 		);
-		return category?.name || t("admin.uncategorized");
+		return lang === "ar"
+			? category?.name_ar
+			: category?.name || t("admin.uncategorized");
 	};
 
 	return (
@@ -158,7 +153,10 @@ export const ProductList = ({
 										</div>
 									</TableCell>
 									<TableCell>
-										{getCategoryName(product.category_id)}
+										{getCategoryName(
+											product.category_id,
+											i18n.language === "ar" ? "ar" : "en",
+										)}
 									</TableCell>
 									<TableCell>
 										<div className="flex flex-wrap gap-1">
@@ -208,49 +206,18 @@ export const ProductList = ({
 												variant="ghost"
 												size="sm"
 												onClick={() => onEdit(product)}>
-												<Pencil className="h-4 w-4 mr-1" />
-												{t("admin.edit")}
+												<Edit className="h-4 w-4 text-blue-500" />
 											</Button>
 											<Button
 												variant="ghost"
 												size="sm"
-												className="text-destructive hover:text-destructive"
+												className="text-red-500 hover:text-destructive"
 												onClick={() =>
 													onDelete(product.id)
 												}>
 												<Trash2 className="h-4 w-4 mr-1" />
-												{t("admin.delete")}
 											</Button>
 										</div>
-
-										<DropdownMenu>
-											<DropdownMenuTrigger asChild>
-												<Button
-													variant="ghost"
-													size="sm"
-													className="md:hidden">
-													<MoreHorizontal className="h-4 w-4" />
-													<span className="sr-only">
-														{t("admin.actions")}
-													</span>
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="start">
-												<DropdownMenuItem
-													onClick={() => onEdit(product)}>
-													<Pencil className="h-4 w-4 mr-2" />
-													{t("admin.edit")}
-												</DropdownMenuItem>
-												<DropdownMenuItem
-													onClick={() =>
-														onDelete(product.id)
-													}
-													className="text-destructive focus:text-destructive">
-													<Trash2 className="h-4 w-4 mr-2" />
-													{t("admin.delete")}
-												</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
 									</TableCell>
 								</TableRow>
 							))

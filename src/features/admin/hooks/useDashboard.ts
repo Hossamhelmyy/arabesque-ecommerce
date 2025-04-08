@@ -13,26 +13,33 @@ import type { Database } from "@/integrations/supabase/types";
 
 type OrderRow =
 	Database["public"]["Tables"]["orders"]["Row"];
-type OrderItemRow =
-	Database["public"]["Tables"]["order_items"]["Row"] & {
-		product: {
-			id: string;
-			name: string;
-			image: string;
-			slug: string;
-		};
-	};
 
-type RecentOrderData = {
-	id: string;
-	order_number: string | null;
-	total: number;
-	status: string;
-	created_at: string;
-	user: {
-		first_name: string | null;
-		last_name: string | null;
+type OrderItemWithProduct = {
+	quantity: number;
+	unit_price: number;
+	product: {
+		id: string;
+		name: string;
+		price: number;
+		image: string;
+		category: {
+			name: string;
+		} | null;
 	} | null;
+};
+
+type DatabaseOrderItem = {
+	quantity: number;
+	unit_price: number;
+	product: {
+		id: string;
+		name: string;
+		price: number;
+		image: string;
+		category: {
+			name: string;
+		} | null;
+	};
 };
 
 type OrderItemData = {
@@ -41,7 +48,20 @@ type OrderItemData = {
 	product: {
 		id: string;
 		name: string;
-	};
+		category: string;
+	} | null;
+};
+
+type RecentOrderData = {
+	id: string;
+	order_number: string | null;
+	total: number | null;
+	status: string | null;
+	created_at: string;
+	user: {
+		first_name: string | null;
+		last_name: string | null;
+	} | null;
 };
 
 export const useDashboard = () => {
@@ -50,6 +70,11 @@ export const useDashboard = () => {
 		totalProducts: 0,
 		totalOrders: 0,
 		totalRevenue: 0,
+		totalSales: 0,
+		revenue: 0,
+		revenueTrend: { value: 0, isPositive: true },
+		ordersTrend: { value: 0, isPositive: true },
+		customersTrend: { value: 0, isPositive: true },
 	});
 	const [isLoading, setIsLoading] = useState(true);
 	const [recentOrders, setRecentOrders] = useState<
@@ -65,19 +90,40 @@ export const useDashboard = () => {
 	const [salesData, setSalesData] = useState<
 		SalesDataPoint[]
 	>([]);
+	const [categories, setCategories] = useState<
+		{ name: string; value: number }[]
+	>([]);
 	const { toast } = useToast();
 
 	const fetchStats = useCallback(async () => {
 		try {
 			setIsLoading(true);
 
-			// Fetch user count
-			const { count: usersCount, error: usersError } =
-				await supabase
-					.from("profiles")
-					.select("*", { count: "exact", head: true });
+			// Fetch user count and trend
+			const {
+				count: currentUsersCount,
+				error: usersError,
+			} = await supabase
+				.from("profiles")
+				.select("*", { count: "exact", head: true });
 
 			if (usersError) throw usersError;
+
+			const prevMonthStart = new Date();
+			prevMonthStart.setMonth(
+				prevMonthStart.getMonth() - 1,
+			);
+			prevMonthStart.setDate(1);
+			const { count: prevMonthUsersCount } = await supabase
+				.from("profiles")
+				.select("*", { count: "exact", head: true })
+				.lt("created_at", prevMonthStart.toISOString());
+
+			const customersTrend = prevMonthUsersCount
+				? ((currentUsersCount - prevMonthUsersCount) /
+						prevMonthUsersCount) *
+				  100
+				: 0;
 
 			// Fetch product count
 			const { count: productsCount, error: productsError } =
@@ -87,22 +133,89 @@ export const useDashboard = () => {
 
 			if (productsError) throw productsError;
 
-			// Fetch order count and total revenue
-			const { data: ordersData, error: ordersError } =
+			// Fetch current month orders and revenue
+			const currentMonth = new Date()
+				.toISOString()
+				.slice(0, 7);
+			const {
+				data: currentMonthOrders,
+				error: currentOrdersError,
+			} = await supabase
+				.from("orders")
+				.select("total")
+				.gte("created_at", `${currentMonth}-01`);
+
+			if (currentOrdersError) throw currentOrdersError;
+
+			const currentRevenue = currentMonthOrders.reduce(
+				(sum, order) => sum + (order.total || 0),
+				0,
+			);
+
+			// Fetch previous month orders and revenue
+			const prevMonth = new Date();
+			prevMonth.setMonth(prevMonth.getMonth() - 1);
+			const prevMonthStr = prevMonth
+				.toISOString()
+				.slice(0, 7);
+			const {
+				data: prevMonthOrders,
+				error: prevOrdersError,
+			} = await supabase
+				.from("orders")
+				.select("total")
+				.gte("created_at", `${prevMonthStr}-01`)
+				.lt("created_at", `${currentMonth}-01`);
+
+			if (prevOrdersError) throw prevOrdersError;
+
+			const prevRevenue = prevMonthOrders.reduce(
+				(sum, order) => sum + (order.total || 0),
+				0,
+			);
+
+			// Calculate trends
+			const revenueTrend = prevRevenue
+				? ((currentRevenue - prevRevenue) / prevRevenue) *
+				  100
+				: 0;
+			const ordersTrend = prevMonthOrders.length
+				? ((currentMonthOrders.length -
+						prevMonthOrders.length) /
+						prevMonthOrders.length) *
+				  100
+				: 0;
+
+			// Fetch total orders and revenue
+			const { data: allOrders, error: allOrdersError } =
 				await supabase.from("orders").select("total");
 
-			if (ordersError) throw ordersError;
+			if (allOrdersError) throw allOrdersError;
 
-			const totalRevenue = ordersData.reduce(
+			const totalRevenue = allOrders.reduce(
 				(sum, order) => sum + (order.total || 0),
 				0,
 			);
 
 			setStats({
-				totalUsers: usersCount || 0,
+				totalUsers: currentUsersCount || 0,
 				totalProducts: productsCount || 0,
-				totalOrders: ordersData.length || 0,
+				totalOrders: allOrders.length || 0,
 				totalRevenue,
+				totalSales: currentRevenue,
+				revenue: currentRevenue,
+				revenueTrend: {
+					value: revenueTrend,
+					isPositive: revenueTrend >= 0,
+				},
+				ordersTrend: {
+					value: ordersTrend,
+					isPositive: ordersTrend >= 0,
+				},
+				customersTrend: {
+					value: customersTrend,
+					isPositive: customersTrend >= 0,
+				},
 			});
 		} catch (error) {
 			console.error(
@@ -185,7 +298,12 @@ export const useDashboard = () => {
 					unit_price,
 					product:products (
 						id,
-						name
+						name,
+						price,
+						image,
+						category:categories (
+							name
+						)
 					)
 				`);
 
@@ -194,30 +312,54 @@ export const useDashboard = () => {
 			// Aggregate data by product
 			const productMap: Record<
 				string,
-				{ name: string; sales: number; revenue: number }
+				{
+					name: string;
+					sales: number;
+					revenue: number;
+					price: number;
+					image: string;
+					category: string;
+				}
 			> = {};
 
-			(orderItems as unknown as OrderItemData[]).forEach(
-				(item) => {
-					const productId = item.product?.id;
-					if (!productId) return;
+			const typedOrderItems =
+				orderItems as unknown as DatabaseOrderItem[];
 
-					if (!productMap[productId]) {
-						productMap[productId] = {
-							name: item.product?.name || "Unknown Product",
-							sales: 0,
-							revenue: 0,
-						};
-					}
+			typedOrderItems.forEach((item) => {
+				if (!item.product) return;
 
-					productMap[productId].sales += item.quantity || 0;
-					productMap[productId].revenue +=
-						(item.quantity || 0) * (item.unit_price || 0);
-				},
-			);
+				const productId = item.product.id;
+				if (!productId) return;
+
+				if (!productMap[productId]) {
+					productMap[productId] = {
+						name: item.product.name || "Unknown Product",
+						sales: 0,
+						revenue: 0,
+						price: item.product.price || 0,
+						image: item.product.image || "/placeholder.svg",
+						category:
+							item.product.category?.name ||
+							"Uncategorized",
+					};
+				}
+
+				productMap[productId].sales += item.quantity || 0;
+				productMap[productId].revenue +=
+					(item.quantity || 0) * (item.unit_price || 0);
+			});
 
 			// Convert to array and sort by revenue
-			const topProducts = Object.values(productMap)
+			const topProducts = Object.entries(productMap)
+				.map(([id, data]) => ({
+					id,
+					name: data.name,
+					sales: data.sales,
+					revenue: data.revenue,
+					price: data.price,
+					image: data.image,
+					category: data.category,
+				}))
 				.sort((a, b) => b.revenue - a.revenue)
 				.slice(0, 5);
 
@@ -311,6 +453,57 @@ export const useDashboard = () => {
 		}
 	}, [toast]);
 
+	const fetchCategories = useCallback(async () => {
+		try {
+			const { data: orderItems, error: orderItemsError } =
+				await supabase.from("order_items").select(`
+					quantity,
+					unit_price,
+					product:products (
+						id,
+						name,
+						category:categories (
+							name
+						)
+					)
+				`);
+
+			if (orderItemsError) throw orderItemsError;
+
+			// Aggregate sales by category
+			const categoryMap: Record<string, number> = {};
+			const typedOrderItems =
+				orderItems as unknown as DatabaseOrderItem[];
+
+			typedOrderItems.forEach((item) => {
+				if (!item.product) return;
+				const categoryName =
+					item.product.category?.name || "Uncategorized";
+				const itemTotal =
+					(item.quantity || 0) * (item.unit_price || 0);
+				categoryMap[categoryName] =
+					(categoryMap[categoryName] || 0) + itemTotal;
+			});
+
+			// Convert to array format for the pie chart
+			const categoryData = Object.entries(categoryMap).map(
+				([name, value]) => ({
+					name,
+					value,
+				}),
+			);
+
+			setCategories(categoryData);
+		} catch (error) {
+			console.error("Error fetching category data:", error);
+			toast({
+				title: "Error",
+				description: "Failed to fetch category data.",
+				variant: "destructive",
+			});
+		}
+	}, [toast]);
+
 	useEffect(() => {
 		const fetchData = async () => {
 			await Promise.all([
@@ -318,6 +511,7 @@ export const useDashboard = () => {
 				fetchRecentOrders(),
 				fetchTopProducts(),
 				fetchSalesData(),
+				fetchCategories(),
 			]);
 		};
 
@@ -327,6 +521,7 @@ export const useDashboard = () => {
 		fetchRecentOrders,
 		fetchTopProducts,
 		fetchSalesData,
+		fetchCategories,
 	]);
 
 	const formatDate = useCallback((date: string) => {
@@ -373,6 +568,7 @@ export const useDashboard = () => {
 		topProducts,
 		isTopProductsLoading,
 		salesData,
+		categories,
 		formatDate,
 		formatCurrency,
 		getStatusBadge,
@@ -382,6 +578,7 @@ export const useDashboard = () => {
 				fetchRecentOrders(),
 				fetchTopProducts(),
 				fetchSalesData(),
+				fetchCategories(),
 			]);
 		},
 	};

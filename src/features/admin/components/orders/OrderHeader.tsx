@@ -36,7 +36,7 @@ export const OrderHeader = ({
 
 	return (
 		<div className="flex items-center justify-between">
-			<div className="flex flex-1 items-center space-x-4">
+			<div className="flex flex-1 items-center space-x-4 gap-3">
 				<Input
 					placeholder={t("admin.searchOrders")}
 					value={searchQuery}

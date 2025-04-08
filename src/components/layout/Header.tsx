@@ -21,6 +21,7 @@ import {
 	Globe,
 	Settings,
 	Bell,
+	LayoutDashboard,
 } from "lucide-react";
 import {
 	DropdownMenu,
@@ -62,6 +63,9 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 		document.documentElement.classList.toggle("dark");
 	};
 
+	// Check if user is admin
+	const isUserAdmin = user?.role === "admin";
+
 	return (
 		<header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">
 			<div className="container flex h-16 items-center justify-between">
@@ -101,6 +105,13 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 										className="px-2 py-1 text-lg font-medium">
 										{t("common.categories")}
 									</Link>
+									{isUserAdmin && !isAdmin && (
+										<Link
+											to="/admin"
+											className="px-2 py-1 text-lg font-medium">
+											{t("admin.dashboard")}
+										</Link>
+									)}
 									<div className="border-t my-2"></div>
 									{user ? (
 										<>
@@ -265,6 +276,17 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 									{t("common.categories")}
 								</Link>
 							</NavigationMenuItem>
+
+							{isUserAdmin && !isAdmin && (
+								<NavigationMenuItem>
+									<Link
+										to="/admin"
+										className={navigationMenuTriggerStyle()}>
+										<LayoutDashboard className="mr-2 h-4 w-4" />
+										{t("admin.dashboard")}
+									</Link>
+								</NavigationMenuItem>
+							)}
 						</NavigationMenuList>
 					</NavigationMenu>
 				)}

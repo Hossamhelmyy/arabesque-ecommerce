@@ -17,7 +17,6 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
-	FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -32,12 +31,23 @@ import {
 import { useState, useEffect } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
+import {
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger,
+} from "@/components/ui/tabs";
 
 const categorySchema = z.object({
-	name: z.string().min(1, "Name is required"),
+	name: z.string().min(2, {
+		message: "Name must be at least 2 characters.",
+	}),
+	name_ar: z.string().min(2, {
+		message: "Arabic name must be at least 2 characters.",
+	}),
 	description: z.string().optional(),
+	description_ar: z.string().optional(),
 	image: z.string().optional(),
-	slug: z.string().optional(),
 });
 
 type CategoryFormSchemaValues = z.infer<
@@ -59,6 +69,7 @@ export function CategoryDialog({
 	const { createCategory, updateCategory } =
 		useCategories();
 	const [loading, setLoading] = useState(false);
+	const [activeTab, setActiveTab] = useState("english");
 	const [images, setImages] = useState<string[]>(
 		selectedCategory?.image ? [selectedCategory.image] : [],
 	);
@@ -67,8 +78,10 @@ export function CategoryDialog({
 		resolver: zodResolver(categorySchema),
 		defaultValues: {
 			name: selectedCategory?.name || "",
+			name_ar: selectedCategory?.name_ar || "",
 			description: selectedCategory?.description || "",
-			slug: selectedCategory?.slug || "",
+			description_ar:
+				selectedCategory?.description_ar || "",
 			image: selectedCategory?.image || "",
 		},
 	});
@@ -77,8 +90,10 @@ export function CategoryDialog({
 		if (selectedCategory) {
 			form.reset({
 				name: selectedCategory.name || "",
+				name_ar: selectedCategory.name_ar || "",
 				description: selectedCategory.description || "",
-				slug: selectedCategory.slug || "",
+				description_ar:
+					selectedCategory.description_ar || "",
 				image: selectedCategory.image || "",
 			});
 			setImages(
@@ -89,8 +104,9 @@ export function CategoryDialog({
 		} else {
 			form.reset({
 				name: "",
+				name_ar: "",
 				description: "",
-				slug: "",
+				description_ar: "",
 				image: "",
 			});
 			setImages([]);
@@ -106,7 +122,9 @@ export function CategoryDialog({
 			const imageUrl = images.length > 0 ? images[0] : "";
 			const formData: CategoryFormValues = {
 				name: values.name,
+				name_ar: values.name_ar,
 				description: values.description || "",
+				description_ar: values.description_ar || "",
 				image: imageUrl,
 			};
 
@@ -179,50 +197,120 @@ export function CategoryDialog({
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
 						className="space-y-6">
-						<FormField
-							control={form.control}
-							name="name"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t("common.name")}</FormLabel>
-									<FormControl>
-										<Input {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="slug"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>{t("common.slug")}</FormLabel>
-									<FormControl>
-										<Input {...field} />
-									</FormControl>
-									<FormDescription className="text-start">
-										{t("common.slugDescription")}
-									</FormDescription>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<FormField
-							control={form.control}
-							name="description"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>
-										{t("common.description")}
-									</FormLabel>
-									<FormControl>
-										<Textarea rows={3} {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
+						<Tabs
+							value={activeTab}
+							onValueChange={setActiveTab}
+							className="w-full">
+							<TabsList className="grid w-full grid-cols-2">
+								<TabsTrigger value="english">
+									{t("admin.englishDetails")}
+								</TabsTrigger>
+								<TabsTrigger value="arabic">
+									{t("admin.arabicDetails")}
+								</TabsTrigger>
+							</TabsList>
+
+							<TabsContent
+								value="english"
+								className="space-y-4 pt-4">
+								<FormField
+									control={form.control}
+									name="name"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>
+												{t("admin.name")} (
+												{t("common.english")})
+											</FormLabel>
+											<FormControl>
+												<Input
+													placeholder={t(
+														"admin.inputNamePlaceholder",
+													)}
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<FormField
+									control={form.control}
+									name="description"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>
+												{t("admin.description")} (
+												{t("common.english")})
+											</FormLabel>
+											<FormControl>
+												<Textarea
+													placeholder={t(
+														"admin.inputDescriptionPlaceholder",
+													)}
+													rows={3}
+													{...field}
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</TabsContent>
+
+							<TabsContent
+								value="arabic"
+								className="space-y-4 pt-4">
+								<FormField
+									control={form.control}
+									name="name_ar"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>
+												{t("admin.name")} (
+												{t("common.arabic")})
+											</FormLabel>
+											<FormControl>
+												<Input
+													placeholder={t(
+														"admin.inputNamePlaceholder",
+													)}
+													{...field}
+													dir="rtl"
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+
+								<FormField
+									control={form.control}
+									name="description_ar"
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>
+												{t("admin.description")} (
+												{t("common.arabic")})
+											</FormLabel>
+											<FormControl>
+												<Textarea
+													placeholder={t(
+														"admin.inputDescriptionPlaceholder",
+													)}
+													rows={3}
+													{...field}
+													dir="rtl"
+												/>
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+							</TabsContent>
+						</Tabs>
+
 						<FormField
 							control={form.control}
 							name="image"
@@ -244,6 +332,7 @@ export function CategoryDialog({
 								</FormItem>
 							)}
 						/>
+
 						<DialogFooter className="flex space-x-2 rtl:space-x-reverse">
 							<Button
 								type="button"

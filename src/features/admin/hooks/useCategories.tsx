@@ -14,7 +14,9 @@ import type { Category } from "../types";
 interface SupabaseCategory {
 	id: string;
 	name: string;
-	name_ar: string; // Required in the DB schema
+	name_ar: string;
+	description: string | null;
+	description_ar: string | null;
 	slug: string;
 	parent_id?: string | null;
 	image?: string;
@@ -37,9 +39,11 @@ const mapToCategoryModel = (
 	return {
 		id: dbCategory.id,
 		name: dbCategory.name,
+		name_ar: dbCategory.name_ar,
 		slug: dbCategory.slug,
-		description: "", // Default value for description which is in our app model but not DB
-		image: dbCategory.image || "",
+		description: dbCategory.description,
+		description_ar: dbCategory.description_ar,
+		image: dbCategory.image || null,
 		created_at: dbCategory.created_at,
 		updated_at: dbCategory.updated_at,
 	};
@@ -48,7 +52,9 @@ const mapToCategoryModel = (
 // Type for form values - what the form will provide
 export interface CategoryFormValues {
 	name: string;
+	name_ar: string;
 	description: string;
+	description_ar: string;
 	image: string;
 }
 
@@ -125,7 +131,7 @@ export function useCategories() {
 				// Map to database format - include name_ar which is required by the DB
 				const dbData = {
 					name: formData.name,
-					name_ar: formData.name, // Default to same as name
+					name_ar: formData.name_ar,
 					slug: slug,
 					image: formData.image,
 					created_at: new Date().toISOString(),
@@ -147,6 +153,8 @@ export function useCategories() {
 
 				// Add description from form data (since it's not in the DB but needed in our app)
 				mappedCategory.description = formData.description;
+				mappedCategory.description_ar =
+					formData.description_ar;
 
 				return mappedCategory;
 			} catch (error: unknown) {
@@ -191,7 +199,7 @@ export function useCategories() {
 				// Map to database format - include name_ar which is required by the DB
 				const dbData = {
 					name: formData.name,
-					name_ar: formData.name, // Default to same as name
+					name_ar: formData.name_ar,
 					slug: slug,
 					image: formData.image,
 					updated_at: new Date().toISOString(),
@@ -213,6 +221,8 @@ export function useCategories() {
 
 				// Add description from form data (since it's not in the DB but needed in our app)
 				mappedCategory.description = formData.description;
+				mappedCategory.description_ar =
+					formData.description_ar;
 
 				return mappedCategory;
 			} catch (error: unknown) {

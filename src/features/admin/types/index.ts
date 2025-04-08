@@ -23,13 +23,13 @@ export type UserProfile = {
 };
 
 export type ShippingAddress = {
+	name: string;
+	email: string;
+	phone: string;
 	address: string;
 	city: string;
 	postal_code: string;
 	country: string;
-	name: string;
-	phone: string;
-	email: string;
 };
 
 export type OrderUser = {
@@ -44,7 +44,15 @@ export type OrderItem = {
 	id: string;
 	order_id: string;
 	product_id: string;
-	product: Product;
+	product: {
+		id: string;
+		name: string;
+		image: string;
+		slug: string;
+		price: number;
+		stock_quantity?: number;
+		description?: string;
+	};
 	quantity: number;
 	unit_price: number;
 	total_price: number;
@@ -54,28 +62,26 @@ export type Order = {
 	id: string;
 	user_id: string;
 	status: string;
-	total: number;
-	items: OrderItem[];
-	shipping_address: ShippingAddress;
 	created_at: string;
-	updated_at: string;
-	user?: {
-		email?: string;
-		profile?: {
-			first_name?: string | null;
-			last_name?: string | null;
-		};
-	};
+	updated_at?: string | null;
+	total: number;
+	shipping_address: ShippingAddress;
+	payment_method: string;
+	tracking_number?: string;
+	items?: OrderItem[];
+	user?: OrderUser;
 };
 
 export type Category = {
 	id: string;
 	name: string;
+	name_ar: string;
 	slug: string;
-	description: string;
-	image: string;
+	description: string | null;
+	description_ar: string | null;
+	image: string | null;
 	created_at: string;
-	updated_at: string;
+	updated_at: string | null;
 };
 
 export interface Product {
@@ -157,11 +163,11 @@ export type DashboardStats = {
 	totalProducts: number;
 	totalOrders: number;
 	totalRevenue: number;
-	totalSales?: number;
-	revenue?: number;
-	revenueTrend?: { value: number; isPositive: boolean };
-	ordersTrend?: { value: number; isPositive: boolean };
-	customersTrend?: { value: number; isPositive: boolean };
+	totalSales: number;
+	revenue: number;
+	revenueTrend: { value: number; isPositive: boolean };
+	ordersTrend: { value: number; isPositive: boolean };
+	customersTrend: { value: number; isPositive: boolean };
 };
 
 export type OrderStatusOption = {
@@ -176,9 +182,13 @@ export type SalesDataPoint = {
 };
 
 export type ProductPerformancePoint = {
+	id: string;
 	name: string;
 	sales: number;
 	revenue: number;
+	price: number;
+	image: string;
+	category: string;
 };
 
 export type ProductFormData = {
@@ -213,28 +223,29 @@ export interface OrderStatus {
 	icon?: React.ReactNode;
 }
 
-export interface RecentOrder {
+export type TopProduct = {
+	id: string;
+	name: string;
+	category: string;
+	price: number;
+	quantity: number;
+	total: number;
+	image: string;
+};
+
+export type RecentOrder = {
 	id: string;
 	orderNumber: string;
 	customerName: string;
 	date: string;
 	total: number;
 	status: string;
-}
+};
 
 // Dashboard Types
 export interface ChartData {
 	name: string;
 	total: number;
-}
-
-export interface TopProduct {
-	id: string;
-	name: string;
-	price: number;
-	quantity: number;
-	total: number;
-	image: string;
 }
 
 // User Types

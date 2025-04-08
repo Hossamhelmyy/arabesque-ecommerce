@@ -27,7 +27,8 @@ export const CategoryList = ({
 	onDelete,
 	formatDate,
 }: CategoryListProps) => {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
+	const isArabic = i18n.language === "ar";
 
 	if (isLoading) {
 		return (
@@ -124,7 +125,11 @@ export const CategoryList = ({
 											{category.image ? (
 												<img
 													src={category.image}
-													alt={category.name}
+													alt={
+														isArabic
+															? category.name_ar
+															: category.name
+													}
 													className="h-full w-full object-cover"
 													onError={(e) => {
 														(
@@ -138,13 +143,26 @@ export const CategoryList = ({
 												</div>
 											)}
 										</div>
-										<div className="font-medium">
-											{category.name}
+										<div
+											className={`font-medium text-start
+												`}
+											dir={isArabic ? "rtl" : "ltr"}>
+											{isArabic
+												? category.name_ar
+												: category.name}
 										</div>
 									</div>
 								</TableCell>
 								<TableCell>
-									{category.description}
+									<div
+										className={
+											isArabic ? "text-right" : "text-left"
+										}
+										dir={isArabic ? "rtl" : "ltr"}>
+										{isArabic
+											? category.description_ar
+											: category.description}
+									</div>
 								</TableCell>
 								<TableCell>
 									{formatDate(category.created_at)}
