@@ -6,6 +6,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import type { Product, Category } from "../../types";
 import { ProductForm } from "./ProductForm";
 
@@ -26,25 +27,29 @@ export const ProductDialog = ({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-w-3xl max-h-[90vh] overflow-auto">
-				<DialogHeader>
-					<DialogTitle>
-						{selectedProduct
-							? t("admin.editProductTitle")
-							: t("admin.addNewProduct")}
-					</DialogTitle>
-					<DialogDescription>
-						{selectedProduct
-							? t("admin.editProductDescription")
-							: t("admin.addProductDescription")}
-					</DialogDescription>
-				</DialogHeader>
+			<DialogContent className="p-0 w-[95vw] sm:max-w-3xl">
+				<ScrollArea className="h-[80vh]">
+					<div className="p-6">
+						<DialogHeader className="pb-4">
+							<DialogTitle>
+								{selectedProduct
+									? t("admin.editProductTitle")
+									: t("admin.addNewProduct")}
+							</DialogTitle>
+							<DialogDescription>
+								{selectedProduct
+									? t("admin.editProductDescription")
+									: t("admin.addProductDescription")}
+							</DialogDescription>
+						</DialogHeader>
 
-				<ProductForm
-					selectedProduct={selectedProduct}
-					categories={categories}
-					onOpenChange={onOpenChange}
-				/>
+						<ProductForm
+							selectedProduct={selectedProduct}
+							categories={categories}
+							onOpenChange={onOpenChange}
+						/>
+					</div>
+				</ScrollArea>
 			</DialogContent>
 		</Dialog>
 	);

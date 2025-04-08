@@ -65,6 +65,9 @@ export type Order = {
 	created_at: string;
 	updated_at?: string | null;
 	total: number;
+	subtotal: number;
+	shipping_fee: number;
+	tax: number;
 	shipping_address: ShippingAddress;
 	payment_method: string;
 	tracking_number?: string;
