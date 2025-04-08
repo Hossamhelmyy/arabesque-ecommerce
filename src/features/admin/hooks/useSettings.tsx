@@ -6,62 +6,17 @@ import {
 	useQueryClient,
 } from "@tanstack/react-query";
 import { toast } from "@/components/ui/use-toast";
-
-export type StoreSettings = {
-	store_name: string;
-	store_email: string;
-	store_phone?: string;
-	store_address?: string;
-	currency: string;
-	language: string;
-};
-
-export type EmailSettings = {
-	smtp_host: string;
-	smtp_port: string;
-	smtp_user: string;
-	smtp_password: string;
-	sender_name: string;
-	sender_email: string;
-};
-
-export type ShippingSettings = {
-	enable_shipping: boolean;
-	free_shipping_threshold?: string;
-	default_shipping_rate: string;
-	allow_international_shipping: boolean;
-};
+import {
+	StoreSettings,
+	EmailSettings,
+	ShippingSettings,
+} from "../types";
 
 export type Settings = {
 	store: StoreSettings;
 	email: EmailSettings;
 	shipping: ShippingSettings;
 };
-
-export interface StoreFormValues {
-	storeName: string;
-	storeEmail: string;
-	storePhone: string;
-	storeAddress: string;
-	storeCurrency: string;
-	storeLanguage: string;
-}
-
-export interface EmailFormValues {
-	smtpHost: string;
-	smtpPort: string;
-	smtpUser: string;
-	smtpPassword: string;
-	senderName: string;
-	senderEmail: string;
-}
-
-export interface ShippingFormValues {
-	enableShipping: boolean;
-	freeShippingThreshold: string;
-	defaultShippingRate: string;
-	allowInternationalShipping: boolean;
-}
 
 export const useSettings = () => {
 	const { t } = useTranslation();
@@ -79,12 +34,15 @@ export const useSettings = () => {
 				const dummySettings: Settings = {
 					store: {
 						store_name: "Arabesque",
-						store_email: "contact@arabesque.com",
-						store_phone: "+1 234 567 890",
-						store_address:
+						store_description:
+							"An elegant e-commerce store for exotic goods",
+						contact_email: "contact@arabesque.com",
+						contact_phone: "+1 234 567 890",
+						address:
 							"123 Oasis Street, Suite 100, Marrakech",
+						logo_url: "/images/logo.png",
+						favicon_url: "/images/favicon.ico",
 						currency: "USD",
-						language: "en",
 					},
 					email: {
 						smtp_host: "smtp.example.com",
@@ -93,12 +51,27 @@ export const useSettings = () => {
 						smtp_password: "password",
 						sender_name: "Arabesque Store",
 						sender_email: "no-reply@arabesque.com",
+						email_template:
+							"<h1>{{subject}}</h1><p>{{message}}</p>",
 					},
 					shipping: {
 						enable_shipping: true,
 						free_shipping_threshold: "100",
 						default_shipping_rate: "10",
 						allow_international_shipping: false,
+						shipping_countries: ["US", "CA", "MX"],
+						shipping_zones: [
+							{
+								name: "North America",
+								countries: ["US", "CA", "MX"],
+								rate: "10",
+							},
+							{
+								name: "Europe",
+								countries: ["UK", "FR", "DE", "ES", "IT"],
+								rate: "25",
+							},
+						],
 					},
 				};
 
@@ -125,7 +98,7 @@ export const useSettings = () => {
 	});
 
 	// Update store settings
-	const updateStoreSettings = useMutation({
+	const storeSettingsMutation = useMutation({
 		mutationFn: async (storeSettings: StoreSettings) => {
 			setIsSubmitting(true);
 			try {
@@ -175,7 +148,7 @@ export const useSettings = () => {
 	});
 
 	// Update email settings
-	const updateEmailSettings = useMutation({
+	const emailSettingsMutation = useMutation({
 		mutationFn: async (emailSettings: EmailSettings) => {
 			setIsSubmitting(true);
 			try {
@@ -225,7 +198,7 @@ export const useSettings = () => {
 	});
 
 	// Update shipping settings
-	const updateShippingSettings = useMutation({
+	const shippingSettingsMutation = useMutation({
 		mutationFn: async (
 			shippingSettings: ShippingSettings,
 		) => {
@@ -278,109 +251,52 @@ export const useSettings = () => {
 		},
 	});
 
-	// Format settings for forms
-	const getStoreSettingsValues =
-		(): StoreFormValues | null => {
-			if (!settings) return null;
+	// Wrapper functions that return Promise<void> to satisfy component props
+	const updateStoreSettings = async (
+		data: StoreSettings,
+	): Promise<void> => {
+		await storeSettingsMutation.mutateAsync(data);
+	};
 
-			return {
-				storeName: settings.store.store_name,
-				storeEmail: settings.store.store_email,
-				storePhone: settings.store.store_phone || "",
-				storeAddress: settings.store.store_address || "",
-				storeCurrency: settings.store.currency,
-				storeLanguage: settings.store.language,
-			};
+	const updateEmailSettings = async (
+		data: EmailSettings,
+	): Promise<void> => {
+		await emailSettingsMutation.mutateAsync(data);
+	};
+
+	const updateShippingSettings = async (
+		data: ShippingSettings,
+	): Promise<void> => {
+		await shippingSettingsMutation.mutateAsync(data);
+	};
+
+	// Get settings values for forms
+	const getStoreSettingsValues =
+		(): StoreSettings | null => {
+			if (!settings) return null;
+			return settings.store;
 		};
 
 	const getEmailSettingsValues =
-		(): EmailFormValues | null => {
+		(): EmailSettings | null => {
 			if (!settings) return null;
-
-			return {
-				smtpHost: settings.email.smtp_host,
-				smtpPort: settings.email.smtp_port,
-				smtpUser: settings.email.smtp_user,
-				smtpPassword: settings.email.smtp_password,
-				senderName: settings.email.sender_name,
-				senderEmail: settings.email.sender_email,
-			};
+			return settings.email;
 		};
 
 	const getShippingSettingsValues =
-		(): ShippingFormValues | null => {
+		(): ShippingSettings | null => {
 			if (!settings) return null;
-
-			return {
-				enableShipping: settings.shipping.enable_shipping,
-				freeShippingThreshold:
-					settings.shipping.free_shipping_threshold || "",
-				defaultShippingRate:
-					settings.shipping.default_shipping_rate,
-				allowInternationalShipping:
-					settings.shipping.allow_international_shipping,
-			};
+			return settings.shipping;
 		};
-
-	// Map form values back to API format
-	const mapStoreFormToApi = (
-		formData: StoreFormValues,
-	): StoreSettings => {
-		return {
-			store_name: formData.storeName,
-			store_email: formData.storeEmail,
-			store_phone: formData.storePhone,
-			store_address: formData.storeAddress,
-			currency: formData.storeCurrency,
-			language: formData.storeLanguage,
-		};
-	};
-
-	const mapEmailFormToApi = (
-		formData: EmailFormValues,
-	): EmailSettings => {
-		return {
-			smtp_host: formData.smtpHost,
-			smtp_port: formData.smtpPort,
-			smtp_user: formData.smtpUser,
-			smtp_password: formData.smtpPassword,
-			sender_name: formData.senderName,
-			sender_email: formData.senderEmail,
-		};
-	};
-
-	const mapShippingFormToApi = (
-		formData: ShippingFormValues,
-	): ShippingSettings => {
-		return {
-			enable_shipping: formData.enableShipping,
-			free_shipping_threshold:
-				formData.freeShippingThreshold,
-			default_shipping_rate: formData.defaultShippingRate,
-			allow_international_shipping:
-				formData.allowInternationalShipping,
-		};
-	};
 
 	return {
 		settings,
 		isLoading,
 		isSubmitting,
 		error,
-		updateStoreSettings: (formData: StoreFormValues) =>
-			updateStoreSettings.mutate(
-				mapStoreFormToApi(formData),
-			),
-		updateEmailSettings: (formData: EmailFormValues) =>
-			updateEmailSettings.mutate(
-				mapEmailFormToApi(formData),
-			),
-		updateShippingSettings: (
-			formData: ShippingFormValues,
-		) =>
-			updateShippingSettings.mutate(
-				mapShippingFormToApi(formData),
-			),
+		updateStoreSettings,
+		updateEmailSettings,
+		updateShippingSettings,
 		getStoreSettingsValues,
 		getEmailSettingsValues,
 		getShippingSettingsValues,

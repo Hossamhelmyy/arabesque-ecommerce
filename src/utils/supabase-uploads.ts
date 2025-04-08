@@ -1,135 +1,174 @@
-import { supabase } from "@/integrations/supabase/client";
+import {
+	supabase,
+	getStorageUrl,
+} from "@/integrations/supabase/client";
+import {
+	MAX_FILE_SIZE,
+	ALLOWED_FILE_TYPES,
+} from "@/utils/env";
 import { v4 as uuidv4 } from "uuid";
 
-const BUCKET_NAME = "arabesque-ecommerce";
-
-type UploadTarget = "products" | "categories" | "profiles";
+/**
+ * Error type for upload validation errors
+ */
+export class UploadValidationError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "UploadValidationError";
+	}
+}
 
 /**
- * Upload a file to Supabase Storage
- *
- * @param file The file to upload
- * @param targetFolder The folder to upload to (e.g., 'products', 'categories')
- * @returns The URL of the uploaded file
+ * Validates a file before upload
+ * @param file - The file to validate
+ * @param maxSize - Maximum file size in bytes
+ * @param allowedTypes - Array of allowed MIME types
+ * @returns {boolean} Whether the file is valid
+ * @throws {UploadValidationError} If validation fails
+ */
+export function validateFile(
+	file: File,
+	maxSize = MAX_FILE_SIZE,
+	allowedTypes = ALLOWED_FILE_TYPES,
+): boolean {
+	// Check file size
+	if (file.size > maxSize) {
+		throw new UploadValidationError(
+			`File is too large. Maximum size is ${
+				maxSize / (1024 * 1024)
+			}MB.`,
+		);
+	}
+
+	// Check file type
+	if (!allowedTypes.includes(file.type)) {
+		throw new UploadValidationError(
+			`File type ${
+				file.type
+			} is not allowed. Allowed types: ${allowedTypes.join(
+				", ",
+			)}`,
+		);
+	}
+
+	return true;
+}
+
+/**
+ * Uploads a file to Supabase storage
+ * @param file - The file to upload
+ * @param bucket - The storage bucket to upload to
+ * @param folder - Optional folder path within the bucket
+ * @returns The public URL of the uploaded file
  */
 export async function uploadFile(
 	file: File,
-	targetFolder: UploadTarget,
+	bucket = "uploads",
+	folder?: string,
 ): Promise<string> {
 	try {
+		// Validate the file
+		validateFile(file);
+
 		// Generate a unique filename to prevent collisions
 		const fileExt = file.name.split(".").pop();
 		const fileName = `${uuidv4()}.${fileExt}`;
-		const filePath = `${targetFolder}/${fileName}`;
 
-		// Set the correct content type
-		const contentType =
-			file.type ||
-			getContentTypeFromExtension(fileExt || "");
+		// Construct the file path, including optional folder
+		const filePath = folder
+			? `${folder}/${fileName}`
+			: fileName;
 
-		// Upload the file
-		const { data, error } = await supabase.storage
-			.from(BUCKET_NAME)
+		// Upload the file to Supabase
+		const { error: uploadError } = await supabase.storage
+			.from(bucket)
 			.upload(filePath, file, {
-				contentType,
-				upsert: true,
+				cacheControl: "3600",
+				upsert: false,
 			});
 
-		if (error) {
-			throw error;
+		if (uploadError) {
+			console.error("Error uploading file:", uploadError);
+			throw new Error(
+				`Error uploading file: ${uploadError.message}`,
+			);
 		}
 
-		// Get the public URL
-		const { data: urlData } = supabase.storage
-			.from(BUCKET_NAME)
-			.getPublicUrl(filePath);
-
-		return urlData.publicUrl;
+		// Return the public URL
+		return getStorageUrl(bucket, filePath);
 	} catch (error) {
-		console.error("Error uploading file:", error);
-		throw error;
+		console.error("File upload error:", error);
+		if (error instanceof UploadValidationError) {
+			throw error;
+		}
+		throw new Error(
+			"Failed to upload file. Please try again.",
+		);
 	}
 }
 
 /**
- * Upload multiple files to Supabase Storage
- *
- * @param files An array of files to upload
- * @param targetFolder The folder to upload to
- * @returns An array of URLs of the uploaded files
+ * Uploads multiple files to Supabase storage
+ * @param files - The files to upload
+ * @param bucket - The bucket to upload to (optional, defaults to "uploads")
+ * @param folder - The folder within the bucket (optional)
+ * @returns {Promise<string[]>} Array of public URLs of the uploaded files
  */
 export async function uploadMultipleFiles(
 	files: File[],
-	targetFolder: UploadTarget,
+	bucket = "uploads",
+	folder?: string,
 ): Promise<string[]> {
 	try {
-		// Upload each file and collect promises
 		const uploadPromises = files.map((file) =>
-			uploadFile(file, targetFolder),
+			uploadFile(file, bucket, folder),
 		);
-
-		// Wait for all uploads to complete
 		return await Promise.all(uploadPromises);
 	} catch (error) {
-		console.error("Error uploading multiple files:", error);
+		console.error("Multiple files upload error:", error);
 		throw error;
 	}
 }
 
 /**
- * Gets the content type based on the file extension
- */
-function getContentTypeFromExtension(
-	extension: string,
-): string {
-	const types: Record<string, string> = {
-		jpg: "image/jpeg",
-		jpeg: "image/jpeg",
-		png: "image/png",
-		gif: "image/gif",
-		webp: "image/webp",
-		svg: "image/svg+xml",
-		pdf: "application/pdf",
-	};
-
-	return (
-		types[extension.toLowerCase()] ||
-		"application/octet-stream"
-	);
-}
-
-/**
- * Delete a file from Supabase Storage
- *
- * @param url The public URL of the file to delete
- * @returns True if the file was deleted successfully
+ * Deletes a file from Supabase storage
+ * @param fileUrl - The URL of the file to delete
+ * @returns Success status
  */
 export async function deleteFile(
-	url: string,
+	fileUrl: string,
 ): Promise<boolean> {
 	try {
-		// Extract the path from the URL
-		const filePathMatch = url.match(
-			new RegExp(`${BUCKET_NAME}/(.*)`),
+		// Extract the bucket and path from the URL
+		const urlParts = fileUrl.split(
+			"/storage/v1/object/public/",
 		);
-
-		if (!filePathMatch || filePathMatch.length < 2) {
-			throw new Error("Invalid file URL");
+		if (urlParts.length !== 2) {
+			throw new Error("Invalid file URL format");
 		}
 
-		const filePath = filePathMatch[1];
+		const [bucket, path] = urlParts[1].split("/", 1);
+		const filePath = urlParts[1].slice(bucket.length + 1);
 
+		// Delete the file
 		const { error } = await supabase.storage
-			.from(BUCKET_NAME)
+			.from(bucket)
 			.remove([filePath]);
 
 		if (error) {
-			throw error;
+			console.error("Error deleting file:", error);
+			return false;
 		}
 
 		return true;
 	} catch (error) {
-		console.error("Error deleting file:", error);
+		console.error("Error in deleteFile:", error);
 		return false;
 	}
 }
+
+export default {
+	uploadFile,
+	deleteFile,
+	validateFile,
+};

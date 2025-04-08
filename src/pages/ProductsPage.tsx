@@ -42,20 +42,23 @@ const ProductsPage = () => {
 	// Determine main content based on state
 	let content;
 
-	if (isLoading) {
+	if (isLoading && !products) {
 		content = <ProductsLoading />;
-	} else if (error) {
+	}
+	if (error && !isLoading) {
 		content = (
 			<ProductsError
 				error={error as Error}
 				onRetry={refetch}
 			/>
 		);
-	} else if (!products?.length) {
+	}
+	if (products?.length === 0 && !isLoading) {
 		content = (
 			<EmptyResults onClearFilters={clearFilters} />
 		);
-	} else {
+	}
+	if (products?.length > 0) {
 		content = (
 			<ProductsGrid
 				products={products}

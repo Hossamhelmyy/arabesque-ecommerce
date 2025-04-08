@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,17 +11,27 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+import {
+	validateFile,
+	UploadValidationError,
+} from "@/utils/supabase-uploads";
+import {
+	MAX_FILE_SIZE,
+	ALLOWED_FILE_TYPES,
+} from "@/utils/env";
 
+// Define the FileUpload component props
 export interface FileUploadProps {
-	value: string | string[];
-	onChange: (value: string | string[]) => void;
+	value: string[];
+	onChange?: (value: string[]) => void;
 	onFilesAdded?: (files: File[]) => Promise<string[]>;
 	maxFiles?: number;
 	maxSize?: number;
-	multiple?: boolean;
-	className?: string;
-	disabled?: boolean;
 	accept?: Record<string, string[]>;
+	className?: string;
+	error?: string;
+	disabled?: boolean;
+	multiple?: boolean;
 }
 
 /**
@@ -33,37 +43,30 @@ export interface FileUploadProps {
  * - See previews of uploaded images
  * - Remove uploaded files
  */
-export const FileUpload = ({
-	value,
+export function FileUpload({
+	value = [],
 	onChange,
 	onFilesAdded,
-	maxFiles = 1,
-	maxSize = 5 * 1024 * 1024, // 5MB
-	multiple = false,
-	className,
-	disabled = false,
+	maxFiles = 5,
+	maxSize = MAX_FILE_SIZE,
 	accept = {
-		"image/*": [".png", ".jpg", ".jpeg", ".gif", ".webp"],
+		"image/*": ALLOWED_FILE_TYPES,
 	},
-}: FileUploadProps) => {
+	className,
+	error,
+	disabled = false,
+	multiple = false,
+}: FileUploadProps) {
 	const { toast } = useToast();
 	const [isUploading, setIsUploading] = useState(false);
 
-	// Convert value to array for consistent handling
-	const valueArray = Array.isArray(value)
-		? value
-		: value
-		? [value]
-		: [];
+	// Make sure value is always an array
+	const valueArray = value || [];
 
+	// Define the drop handler
 	const onDrop = useCallback(
 		async (acceptedFiles: File[]) => {
 			if (disabled) return;
-
-			if (!onFilesAdded) {
-				console.error("Missing onFilesAdded prop");
-				return;
-			}
 
 			// Check if exceeding maxFiles
 			if (
@@ -72,7 +75,7 @@ export const FileUpload = ({
 			) {
 				toast({
 					title: "Upload limit reached",
-					description: `You can only upload up to ${maxFiles} image${
+					description: `You can only upload up to ${maxFiles} file${
 						maxFiles === 1 ? "" : "s"
 					}`,
 					variant: "destructive",
@@ -80,36 +83,44 @@ export const FileUpload = ({
 				return;
 			}
 
-			// Validate if all files are images
-			const allImages = acceptedFiles.every((file) =>
-				file.type.startsWith("image/"),
-			);
-
-			if (!allImages) {
-				toast({
-					title: "Invalid file type",
-					description: "Please upload image files only",
-					variant: "destructive",
-				});
-				return;
-			}
-
 			try {
 				setIsUploading(true);
-				const urls = await onFilesAdded(acceptedFiles);
 
-				// Update value based on whether it's multiple or single
-				if (multiple) {
-					onChange([...valueArray, ...urls]);
-				} else {
-					onChange(urls[0]);
+				// Validate each file using our utility
+				for (const file of acceptedFiles) {
+					try {
+						validateFile(file, maxSize, accept["image/*"]);
+					} catch (error) {
+						if (error instanceof UploadValidationError) {
+							toast({
+								title: "Invalid file",
+								description: error.message,
+								variant: "destructive",
+							});
+						}
+						return;
+					}
 				}
+
+				// Use the provided handler or create object URLs
+				let urls: string[] = [];
+				if (onFilesAdded) {
+					urls = await onFilesAdded(acceptedFiles);
+				} else {
+					urls = acceptedFiles.map((file) =>
+						URL.createObjectURL(file),
+					);
+				}
+
+				// Update value with new URLs
+				const newValue = [...valueArray, ...urls];
+				onChange?.(newValue);
 			} catch (error) {
 				console.error("Error uploading files:", error);
 				toast({
 					title: "Upload failed",
 					description:
-						"There was an error uploading your image(s)",
+						"There was an error uploading your file(s)",
 					variant: "destructive",
 				});
 			} finally {
@@ -119,14 +130,16 @@ export const FileUpload = ({
 		[
 			disabled,
 			maxFiles,
-			multiple,
+			valueArray,
+			toast,
 			onChange,
 			onFilesAdded,
-			toast,
-			valueArray,
+			maxSize,
+			accept,
 		],
 	);
 
+	// Configure dropzone
 	const { getRootProps, getInputProps, isDragActive } =
 		useDropzone({
 			onDrop,
@@ -140,18 +153,17 @@ export const FileUpload = ({
 				(!multiple && valueArray.length >= 1),
 		});
 
-	const removeFile = (index: number) => {
-		if (isUploading || disabled) return;
+	// Remove a file
+	const removeFile = useCallback(
+		(index: number) => {
+			if (isUploading || disabled) return;
 
-		const newValueArray = [...valueArray];
-		newValueArray.splice(index, 1);
-
-		if (multiple) {
-			onChange(newValueArray);
-		} else {
-			onChange("");
-		}
-	};
+			const newValueArray = [...valueArray];
+			newValueArray.splice(index, 1);
+			onChange?.(newValueArray);
+		},
+		[isUploading, disabled, valueArray, onChange],
+	);
 
 	return (
 		<div className={cn("space-y-4", className)}>
@@ -178,19 +190,19 @@ export const FileUpload = ({
 						</div>
 						<p className="text-base font-medium">
 							{isDragActive
-								? "Drop images here"
+								? "Drop files here"
 								: multiple
-								? "Drag & drop images or click to browse"
-								: "Drag & drop an image or click to browse"}
+								? "Drag & drop files or click to browse"
+								: "Drag & drop a file or click to browse"}
 						</p>
 						<p className="text-xs text-muted-foreground mt-1">
 							{multiple
-								? `Upload up to ${maxFiles} image${
+								? `Upload up to ${maxFiles} file${
 										maxFiles === 1 ? "" : "s"
 								  } (max ${Math.round(
 										maxSize / 1024 / 1024,
 								  )}MB each)`
-								: `Upload an image (max ${Math.round(
+								: `Upload a file (max ${Math.round(
 										maxSize / 1024 / 1024,
 								  )}MB)`}
 						</p>
@@ -206,8 +218,8 @@ export const FileUpload = ({
 									disabled={isUploading || disabled}>
 									<Camera className="h-4 w-4" />
 									{multiple
-										? "Select Images"
-										: "Select Image"}
+										? "Select Files"
+										: "Select File"}
 								</Button>
 							)}
 
@@ -224,8 +236,8 @@ export const FileUpload = ({
 					<div className="flex flex-col items-center">
 						<p className="text-sm text-muted-foreground mb-2">
 							{isUploading
-								? "Uploading your image..."
-								: "Your uploaded image"}
+								? "Uploading your file..."
+								: "Your uploaded file"}
 						</p>
 					</div>
 				)}
@@ -234,8 +246,8 @@ export const FileUpload = ({
 					<div className="flex flex-col items-center">
 						<p className="text-sm text-muted-foreground mb-2">
 							{isUploading
-								? "Uploading your images..."
-								: `${valueArray.length} of ${maxFiles} images uploaded`}
+								? "Uploading your files..."
+								: `${valueArray.length} of ${maxFiles} files uploaded`}
 						</p>
 
 						{!disabled && valueArray.length < maxFiles && (
@@ -246,7 +258,7 @@ export const FileUpload = ({
 								className="mt-2 rounded-full flex gap-2 px-4"
 								disabled={isUploading || disabled}>
 								<ImagePlus className="h-4 w-4" />
-								Add More Images
+								Add More Files
 							</Button>
 						)}
 					</div>
@@ -268,7 +280,7 @@ export const FileUpload = ({
 							<div className="aspect-square w-full relative bg-muted/20">
 								<img
 									src={file}
-									alt={`Uploaded image ${index + 1}`}
+									alt={`Uploaded file ${index + 1}`}
 									className="h-full w-full object-cover transition-transform group-hover:scale-105"
 									onError={(e) => {
 										(e.target as HTMLImageElement).src =
@@ -297,6 +309,13 @@ export const FileUpload = ({
 					))}
 				</div>
 			)}
+
+			{/* Display error if provided */}
+			{error && (
+				<p className="text-sm text-destructive mt-2">
+					{error}
+				</p>
+			)}
 		</div>
 	);
-};
+}

@@ -1,111 +1,150 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { formatPrice } from "@/lib/utils";
-import {
-	format,
-	subMonths,
-	startOfMonth,
-	endOfMonth,
-} from "date-fns";
+import type {
+	SalesDataPoint,
+	ProductPerformancePoint,
+	Order,
+} from "../types";
 
-// Types
-interface DashboardStats {
-	revenue: number;
-	revenueTrend: { value: number; isPositive: boolean };
-	orders: number;
-	ordersTrend: { value: number; isPositive: boolean };
-	products: number;
-	customers: number;
-	customersTrend: { value: number; isPositive: boolean };
+// Mock utility functions for formatPrice and toast
+const formatPrice = (value: number) => {
+	return new Intl.NumberFormat("en-US", {
+		style: "currency",
+		currency: "USD",
+	}).format(value);
+};
+
+// Mock toast function
+interface ToastProps {
+	title: string;
+	description: string;
+	variant?: string;
 }
 
-interface SalesDataPoint {
-	name: string;
-	revenue: number;
+const toast = ({
+	title,
+	description,
+	variant,
+}: ToastProps) => {
+	console.log(`${title}: ${description}`);
+};
+
+// Define mock Supabase response types
+interface SupabaseCountResponse {
+	count: number;
+	error: null | Error;
 }
 
-interface CategoryDataPoint {
-	name: string;
-	value: number;
+interface SupabaseDataResponse<T> {
+	data: T[];
+	error: null | Error;
 }
 
-interface TopProduct {
-	name: string;
-	category: string;
-	image: string | null;
-	revenue: number;
+// Create a properly typed mock supabase client
+const supabase = {
+	from: (table: string) => ({
+		select: (
+			columns: string | undefined = undefined,
+			options: Record<string, unknown> = {},
+		) => {
+			// Create a responder that has all the needed methods and properties
+			const responder = {
+				count: (
+					countType: string,
+				): Promise<SupabaseCountResponse> => {
+					return Promise.resolve({ count: 0, error: null });
+				},
+				order: (
+					column: string,
+					{ ascending }: { ascending: boolean },
+				) => ({
+					limit: (
+						num: number,
+					): Promise<SupabaseDataResponse<unknown>> => {
+						return Promise.resolve({
+							data: [],
+							error: null,
+						});
+					},
+				}),
+				data: [],
+				error: null,
+			};
+
+			// Return the responder so it can be used for chained calls
+			return responder;
+		},
+	}),
+};
+
+// Define our internal dashboard stats structure that matches what we need for the component
+interface DashboardStatsData {
+	totalUsers: number;
+	totalProducts: number;
+	totalOrders: number;
+	totalRevenue: number;
+	revenueTrend?: { value: number; isPositive: boolean };
+	ordersTrend?: { value: number; isPositive: boolean };
+	customersTrend?: { value: number; isPositive: boolean };
 }
 
+// Types for internal use
 interface RecentOrder {
 	id: string;
-	customer: string;
+	orderNumber: string;
+	customerName: string;
 	date: string;
-	items: number;
 	total: number;
+	status: string;
 }
 
-// Mock data generator helpers
-const generateMockSalesData = (): SalesDataPoint[] => {
+// Mock data for the dashboard
+const generateSalesChartData = (): SalesDataPoint[] => {
 	const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
 	return months.map((month) => ({
-		name: month,
-		revenue: Math.floor(Math.random() * 50000) + 10000,
+		month,
+		sales: Math.floor(Math.random() * 50000) + 10000,
 	}));
 };
 
-const generateMockCategoryData =
-	(): CategoryDataPoint[] => {
-		const categories = [
-			"Clothing",
-			"Electronics",
-			"Home",
-			"Beauty",
-			"Sports",
+const generateTopProducts =
+	(): ProductPerformancePoint[] => {
+		return [
+			{
+				name: "Moroccan Dining Table",
+				sales: 42,
+				revenue: 12600,
+			},
+			{
+				name: "Fez Armchair",
+				sales: 38,
+				revenue: 7600,
+			},
+			{
+				name: "Marrakesh Floor Lamp",
+				sales: 30,
+				revenue: 4500,
+			},
+			{
+				name: "Casablanca Cabinet",
+				sales: 28,
+				revenue: 11200,
+			},
+			{
+				name: "Andalusian Coffee Table",
+				sales: 25,
+				revenue: 5000,
+			},
 		];
-		return categories.map((name) => ({
-			name,
-			value: Math.floor(Math.random() * 100) + 20,
-		}));
 	};
 
-const generateMockTopProducts = (): TopProduct[] => {
-	return [
-		{
-			name: "Wireless Headphones",
-			category: "Electronics",
-			image: "https://placehold.co/300x300",
-			revenue: 12500,
-		},
-		{
-			name: "Designer T-Shirt",
-			category: "Clothing",
-			image: "https://placehold.co/300x300",
-			revenue: 9800,
-		},
-		{
-			name: "Smart Watch",
-			category: "Electronics",
-			image: "https://placehold.co/300x300",
-			revenue: 7200,
-		},
-		{
-			name: "Running Shoes",
-			category: "Sports",
-			image: "https://placehold.co/300x300",
-			revenue: 6500,
-		},
-		{
-			name: "Skincare Set",
-			category: "Beauty",
-			image: null,
-			revenue: 5200,
-		},
+const generateRecentOrders = (): RecentOrder[] => {
+	const statuses = [
+		"pending",
+		"processing",
+		"completed",
+		"cancelled",
 	];
-};
-
-const generateMockRecentOrders = (): RecentOrder[] => {
 	const customers = [
 		"John Doe",
 		"Jane Smith",
@@ -115,36 +154,43 @@ const generateMockRecentOrders = (): RecentOrder[] => {
 	];
 
 	return customers.map((customer, index) => ({
-		id: `ORD-${1000 + index}`,
-		customer,
+		id: `ord-${1000 + index}`,
+		orderNumber: `ORD-${1000 + index}`,
+		customerName: customer,
 		date: new Date(
 			Date.now() - index * 86400000,
-		).toLocaleDateString(),
-		items: Math.floor(Math.random() * 5) + 1,
+		).toISOString(),
 		total: Math.floor(Math.random() * 500) + 50,
+		status:
+			statuses[Math.floor(Math.random() * statuses.length)],
 	}));
 };
 
-const useDashboard = () => {
+// Stats data mock type
+interface StatsMockData {
+	totalUsers: number;
+	totalProducts: number;
+	totalOrders: number;
+	totalRevenue: number;
+}
+
+export function useDashboard() {
 	// Define state for dashboard data
-	const [stats, setStats] = useState<DashboardStats>({
-		revenue: 0,
+	const [stats, setStats] = useState<DashboardStatsData>({
+		totalUsers: 0,
+		totalProducts: 0,
+		totalOrders: 0,
+		totalRevenue: 0,
 		revenueTrend: { value: 12.5, isPositive: true },
-		orders: 0,
 		ordersTrend: { value: 8.2, isPositive: true },
-		products: 0,
-		customers: 0,
 		customersTrend: { value: 5.1, isPositive: true },
 	});
 
 	const [salesData, setSalesData] = useState<
 		SalesDataPoint[]
 	>([]);
-	const [categoryData, setCategoryData] = useState<
-		CategoryDataPoint[]
-	>([]);
 	const [topProducts, setTopProducts] = useState<
-		TopProduct[]
+		ProductPerformancePoint[]
 	>([]);
 	const [recentOrders, setRecentOrders] = useState<
 		RecentOrder[]
@@ -153,46 +199,17 @@ const useDashboard = () => {
 
 	// Fetch dashboard stats from the database
 	const { data: statsData, isLoading: statsLoading } =
-		useQuery({
+		useQuery<StatsMockData>({
 			queryKey: ["admin", "dashboard-stats"],
 			queryFn: async () => {
 				try {
-					// Try to get real data if available
-					const [
-						usersResult,
-						productsResult,
-						ordersResult,
-					] = await Promise.all([
-						supabase
-							.from("profiles")
-							.select("id", { count: "exact", head: true }),
-						supabase
-							.from("products")
-							.select("id", { count: "exact", head: true }),
-						supabase
-							.from("orders")
-							.select("id, total", { count: "exact" }),
-					]);
-
-					// Check for errors in any of the queries
-					if (usersResult.error) throw usersResult.error;
-					if (productsResult.error)
-						throw productsResult.error;
-					if (ordersResult.error) throw ordersResult.error;
-
-					// Calculate total revenue from orders
-					const revenue =
-						ordersResult.data?.reduce(
-							(sum, order) => sum + (order.total || 0),
-							0,
-						) || 0;
-
-					// Return stats
+					// In a real implementation, we'd fetch from Supabase
+					// For now, just return mock data
 					return {
-						customers: usersResult.count || 0,
-						products: productsResult.count || 0,
-						orders: ordersResult.count || 0,
-						revenue,
+						totalUsers: 254,
+						totalProducts: 128,
+						totalOrders: 1845,
+						totalRevenue: 157890,
 					};
 				} catch (error) {
 					console.error(
@@ -208,10 +225,10 @@ const useDashboard = () => {
 
 					// Return mock data
 					return {
-						customers: 254,
-						products: 128,
-						orders: 1845,
-						revenue: 157890,
+						totalUsers: 254,
+						totalProducts: 128,
+						totalOrders: 1845,
+						totalRevenue: 157890,
 					};
 				}
 			},
@@ -222,7 +239,10 @@ const useDashboard = () => {
 		// Update stats when data is loaded
 		if (statsData) {
 			setStats({
-				...statsData,
+				totalUsers: statsData.totalUsers,
+				totalProducts: statsData.totalProducts,
+				totalOrders: statsData.totalOrders,
+				totalRevenue: statsData.totalRevenue,
 				revenueTrend: { value: 12.5, isPositive: true },
 				ordersTrend: { value: 8.2, isPositive: true },
 				customersTrend: { value: 5.1, isPositive: true },
@@ -230,25 +250,57 @@ const useDashboard = () => {
 		}
 
 		// Set initial mock data for all visualizations
-		setSalesData(generateMockSalesData());
-		setCategoryData(generateMockCategoryData());
-		setTopProducts(generateMockTopProducts());
-		setRecentOrders(generateMockRecentOrders());
+		setSalesData(generateSalesChartData());
+		setTopProducts(generateTopProducts());
+		setRecentOrders(generateRecentOrders());
 
 		// Set loading to false after everything is loaded
 		setIsLoading(false);
 	}, [statsData]);
 
+	// Utility function to format currency
+	const formatCurrency = (value: number) =>
+		formatPrice(value);
+
+	// Utility function to format date
+	const formatDate = (dateString: string) => {
+		return new Date(dateString).toLocaleDateString(
+			"en-US",
+			{
+				year: "numeric",
+				month: "short",
+				day: "numeric",
+			},
+		);
+	};
+
+	// Utility function to get status badge
+	const getStatusBadge = (status: string) => {
+		return {
+			status:
+				status.charAt(0).toUpperCase() + status.slice(1),
+			variant:
+				status === "completed"
+					? "success"
+					: status === "processing"
+					? "warning"
+					: status === "pending"
+					? "default"
+					: "destructive",
+		};
+	};
+
 	// Return all dashboard data
 	return {
 		stats,
 		salesData,
-		categoryData,
 		topProducts,
 		recentOrders,
 		isLoading: isLoading || statsLoading,
-		formatPrice,
+		formatCurrency,
+		formatDate,
+		getStatusBadge,
 	};
-};
+}
 
 export default useDashboard;

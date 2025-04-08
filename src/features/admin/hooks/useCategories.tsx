@@ -1,14 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
 	useQuery,
-	useQueryClient,
 	useMutation,
+	useQueryClient,
 } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import type { Category, CategoriesData } from "../types";
+import type { Category } from "../types";
 
-// Helper function to generate slug from name
+// Define the database schema that matches what Supabase returns
+interface SupabaseCategory {
+	id: string;
+	name: string;
+	name_ar: string; // Required in the DB schema
+	slug: string;
+	parent_id?: string | null;
+	image?: string;
+	created_at: string;
+	updated_at: string;
+}
+
+// Helper function to generate slug
 const generateSlug = (name: string): string => {
 	return name
 		.toLowerCase()
@@ -16,105 +30,132 @@ const generateSlug = (name: string): string => {
 		.replace(/ +/g, "-");
 };
 
-const useCategories = (): CategoriesData => {
+// Map from DB schema to our app type
+const mapToCategoryModel = (
+	dbCategory: SupabaseCategory,
+): Category => {
+	return {
+		id: dbCategory.id,
+		name: dbCategory.name,
+		slug: dbCategory.slug,
+		description: "", // Default value for description which is in our app model but not DB
+		image: dbCategory.image || "",
+		created_at: dbCategory.created_at,
+		updated_at: dbCategory.updated_at,
+	};
+};
+
+// Type for form values - what the form will provide
+export interface CategoryFormValues {
+	name: string;
+	description: string;
+	image: string;
+}
+
+export function useCategories() {
+	const { t } = useTranslation();
 	const queryClient = useQueryClient();
-	const { toast } = useToast();
+	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedCategory, setSelectedCategory] =
 		useState<Category | null>(null);
-	const [error, setError] = useState<string | null>(null);
-	const [searchQuery, setSearchQuery] =
-		useState<string>("");
+	const [filteredCategories, setFilteredCategories] =
+		useState<Category[]>([]);
 
-	// Fetch all categories
-	const { data: categories = [], isLoading } = useQuery({
+	// Fetch categories
+	const {
+		data: categories = [],
+		isLoading,
+		error,
+	} = useQuery({
 		queryKey: ["admin", "categories"],
 		queryFn: async () => {
-			const { data, error } = await supabase
-				.from("categories")
-				.select("*, products:products(id)")
-				.order("name");
+			try {
+				const { data, error } = await supabase
+					.from("categories")
+					.select("*")
+					.order("created_at", { ascending: false });
 
-			if (error) {
+				if (error) throw error;
+
+				// Transform data to match our Category type
+				return (data || []).map((item) =>
+					mapToCategoryModel(item as SupabaseCategory),
+				);
+			} catch (error) {
 				console.error("Error fetching categories:", error);
-				throw new Error(error.message);
+				toast({
+					title: "Error",
+					description:
+						"Failed to fetch categories. Please try again.",
+					variant: "destructive",
+				});
+				return [];
 			}
-
-			// Calculate products_count for each category
-			return data.map((category) => ({
-				...category,
-				products_count: category.products
-					? category.products.length
-					: 0,
-			}));
 		},
 	});
 
-	// Format date helper function
-	const formatDate = (dateString: string) => {
-		const date = new Date(dateString);
-		return date.toLocaleDateString(undefined, {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-		});
-	};
-
 	// Filter categories based on search query
-	const filteredCategories = categories.filter(
-		(category) => {
-			if (!searchQuery) return true;
+	useEffect(() => {
+		if (!categories) return;
 
-			const nameMatch = category.name
-				.toLowerCase()
-				.includes(searchQuery.toLowerCase());
+		if (!searchQuery) {
+			setFilteredCategories(categories);
+			return;
+		}
 
-			// Use type assertion to Category to safely access description
-			const descriptionMatch = (category as Category)
-				.description
-				? (category as Category).description
-						.toLowerCase()
-						.includes(searchQuery.toLowerCase())
-				: false;
+		const filtered = categories.filter(
+			(category) =>
+				category.name
+					.toLowerCase()
+					.includes(searchQuery.toLowerCase()) ||
+				category.description
+					.toLowerCase()
+					.includes(searchQuery.toLowerCase()),
+		);
 
-			return nameMatch || descriptionMatch;
-		},
-	);
+		setFilteredCategories(filtered);
+	}, [categories, searchQuery]);
 
 	// Create a new category
 	const createCategoryMutation = useMutation({
-		mutationFn: async (
-			newCategory: Omit<
-				Category,
-				| "id"
-				| "created_at"
-				| "updated_at"
-				| "products_count"
-			>,
-		) => {
-			const { data, error } = await supabase
-				.from("categories")
-				.insert([
-					{
-						name: newCategory.name,
-						slug:
-							newCategory.slug ||
-							generateSlug(newCategory.name),
-						description: newCategory.description,
-						image_url: newCategory.image_url,
-						parent_id: newCategory.parent_id || null,
-						name_ar: newCategory.name_ar,
-						description_ar: newCategory.description_ar,
-					},
-				])
-				.select()
-				.single();
+		mutationFn: async (formData: CategoryFormValues) => {
+			try {
+				const slug = generateSlug(formData.name);
 
-			if (error) {
-				console.error("Error creating category:", error);
-				throw new Error(error.message);
+				// Map to database format - include name_ar which is required by the DB
+				const dbData = {
+					name: formData.name,
+					name_ar: formData.name, // Default to same as name
+					slug: slug,
+					image: formData.image,
+					created_at: new Date().toISOString(),
+					updated_at: new Date().toISOString(),
+				};
+
+				const { data, error } = await supabase
+					.from("categories")
+					.insert(dbData)
+					.select()
+					.single();
+
+				if (error) throw error;
+
+				// Map DB response back to our app model
+				const mappedCategory = mapToCategoryModel(
+					data as SupabaseCategory,
+				);
+
+				// Add description from form data (since it's not in the DB but needed in our app)
+				mappedCategory.description = formData.description;
+
+				return mappedCategory;
+			} catch (error: unknown) {
+				const errorMessage =
+					error instanceof Error
+						? error.message
+						: "Failed to create category";
+				throw new Error(errorMessage);
 			}
-
-			return data;
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -126,7 +167,6 @@ const useCategories = (): CategoriesData => {
 			});
 		},
 		onError: (error: Error) => {
-			setError(error.message);
 			toast({
 				title: "Error",
 				description:
@@ -140,32 +180,48 @@ const useCategories = (): CategoriesData => {
 	const updateCategoryMutation = useMutation({
 		mutationFn: async ({
 			id,
-			category,
+			formData,
 		}: {
 			id: string;
-			category: Partial<
-				Omit<Category, "id" | "created_at" | "updated_at">
-			>;
+			formData: CategoryFormValues;
 		}) => {
-			// Generate slug if name is provided but slug is not
-			const updateData = { ...category };
-			if (category.name && !category.slug) {
-				updateData.slug = generateSlug(category.name);
+			try {
+				const slug = generateSlug(formData.name);
+
+				// Map to database format - include name_ar which is required by the DB
+				const dbData = {
+					name: formData.name,
+					name_ar: formData.name, // Default to same as name
+					slug: slug,
+					image: formData.image,
+					updated_at: new Date().toISOString(),
+				};
+
+				const { data, error } = await supabase
+					.from("categories")
+					.update(dbData)
+					.eq("id", id)
+					.select()
+					.single();
+
+				if (error) throw error;
+
+				// Map DB response back to our app model
+				const mappedCategory = mapToCategoryModel(
+					data as SupabaseCategory,
+				);
+
+				// Add description from form data (since it's not in the DB but needed in our app)
+				mappedCategory.description = formData.description;
+
+				return mappedCategory;
+			} catch (error: unknown) {
+				const errorMessage =
+					error instanceof Error
+						? error.message
+						: "Failed to update category";
+				throw new Error(errorMessage);
 			}
-
-			const { data, error } = await supabase
-				.from("categories")
-				.update(updateData)
-				.eq("id", id)
-				.select()
-				.single();
-
-			if (error) {
-				console.error("Error updating category:", error);
-				throw new Error(error.message);
-			}
-
-			return data;
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -177,7 +233,6 @@ const useCategories = (): CategoriesData => {
 			});
 		},
 		onError: (error: Error) => {
-			setError(error.message);
 			toast({
 				title: "Error",
 				description:
@@ -187,20 +242,24 @@ const useCategories = (): CategoriesData => {
 		},
 	});
 
-	// Delete an existing category
+	// Delete a category
 	const deleteCategoryMutation = useMutation({
 		mutationFn: async (id: string) => {
-			const { error } = await supabase
-				.from("categories")
-				.delete()
-				.eq("id", id);
+			try {
+				const { error } = await supabase
+					.from("categories")
+					.delete()
+					.eq("id", id);
 
-			if (error) {
-				console.error("Error deleting category:", error);
-				throw new Error(error.message);
+				if (error) throw error;
+				return id;
+			} catch (error: unknown) {
+				const errorMessage =
+					error instanceof Error
+						? error.message
+						: "Failed to delete category";
+				throw new Error(errorMessage);
 			}
-
-			return id;
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({
@@ -212,7 +271,6 @@ const useCategories = (): CategoriesData => {
 			});
 		},
 		onError: (error: Error) => {
-			setError(error.message);
 			toast({
 				title: "Error",
 				description:
@@ -224,29 +282,29 @@ const useCategories = (): CategoriesData => {
 
 	// Wrapper functions
 	const createCategory = async (
-		category: Omit<
-			Category,
-			"id" | "created_at" | "updated_at" | "products_count"
-		>,
+		formData: CategoryFormValues,
 	) => {
-		await createCategoryMutation.mutateAsync(category);
+		return createCategoryMutation.mutateAsync(formData);
 	};
 
 	const updateCategory = async (
 		id: string,
-		category: Partial<
-			Omit<Category, "id" | "created_at" | "updated_at">
-		>,
+		formData: CategoryFormValues,
 	) => {
-		await updateCategoryMutation.mutateAsync({
+		return updateCategoryMutation.mutateAsync({
 			id,
-			category,
+			formData,
 		});
 	};
 
 	const deleteCategory = async (id: string) => {
-		await deleteCategoryMutation.mutateAsync(id);
+		return deleteCategoryMutation.mutateAsync(id);
 	};
+
+	// Format date
+	const formatDate = useCallback((dateString: string) => {
+		return format(new Date(dateString), "MMM d, yyyy");
+	}, []);
 
 	return {
 		categories,
@@ -256,16 +314,15 @@ const useCategories = (): CategoriesData => {
 			createCategoryMutation.isPending ||
 			updateCategoryMutation.isPending ||
 			deleteCategoryMutation.isPending,
+		searchQuery,
 		selectedCategory,
+		setSearchQuery,
 		setSelectedCategory,
 		createCategory,
 		updateCategory,
 		deleteCategory,
-		error,
-		searchQuery,
-		setSearchQuery,
 		formatDate,
 	};
-};
+}
 
 export default useCategories;

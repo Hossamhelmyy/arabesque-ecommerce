@@ -34,6 +34,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { Loader2, Save } from "lucide-react";
 import { useSettings } from "@/features/admin/hooks/useSettings";
+import { ShippingSettings } from "@/features/admin/types";
 
 // Form schemas
 const storeSettingsSchema = z.object({
@@ -154,17 +155,39 @@ const Settings = () => {
 		if (settings) {
 			const storeValues = getStoreSettingsValues();
 			if (storeValues) {
-				storeSettingsForm.reset(storeValues);
+				storeSettingsForm.reset({
+					storeName: storeValues.store_name,
+					storeEmail: storeValues.contact_email,
+					storePhone: storeValues.contact_phone || "",
+					storeAddress: storeValues.address || "",
+					storeCurrency: storeValues.currency,
+					storeLanguage: "en", // Default language, not in the StoreSettings type
+				});
 			}
 
 			const emailValues = getEmailSettingsValues();
 			if (emailValues) {
-				emailSettingsForm.reset(emailValues);
+				emailSettingsForm.reset({
+					smtpHost: emailValues.smtp_host,
+					smtpPort: emailValues.smtp_port,
+					smtpUser: emailValues.smtp_user,
+					smtpPassword: emailValues.smtp_password,
+					senderName: emailValues.sender_name,
+					senderEmail: emailValues.sender_email,
+				});
 			}
 
 			const shippingValues = getShippingSettingsValues();
 			if (shippingValues) {
-				shippingSettingsForm.reset(shippingValues);
+				shippingSettingsForm.reset({
+					enableShipping: shippingValues.enable_shipping,
+					freeShippingThreshold:
+						shippingValues.free_shipping_threshold || "",
+					defaultShippingRate:
+						shippingValues.default_shipping_rate,
+					allowInternationalShipping:
+						shippingValues.allow_international_shipping,
+				});
 			}
 		}
 	}, [
@@ -182,12 +205,15 @@ const Settings = () => {
 		data: z.infer<typeof storeSettingsSchema>,
 	) => {
 		updateStoreSettings({
-			storeName: data.storeName,
-			storeEmail: data.storeEmail,
-			storePhone: data.storePhone || "",
-			storeAddress: data.storeAddress || "",
-			storeCurrency: data.storeCurrency,
-			storeLanguage: data.storeLanguage,
+			store_name: data.storeName,
+			contact_email: data.storeEmail,
+			contact_phone: data.storePhone || "",
+			address: data.storeAddress || "",
+			currency: data.storeCurrency,
+			// Include other required properties from StoreSettings
+			store_description: "",
+			logo_url: "",
+			favicon_url: "",
 		});
 	};
 
@@ -196,12 +222,14 @@ const Settings = () => {
 		data: z.infer<typeof emailSettingsSchema>,
 	) => {
 		updateEmailSettings({
-			smtpHost: data.smtpHost,
-			smtpPort: data.smtpPort,
-			smtpUser: data.smtpUser,
-			smtpPassword: data.smtpPassword,
-			senderName: data.senderName,
-			senderEmail: data.senderEmail,
+			smtp_host: data.smtpHost,
+			smtp_port: data.smtpPort,
+			smtp_user: data.smtpUser,
+			smtp_password: data.smtpPassword,
+			sender_name: data.senderName,
+			sender_email: data.senderEmail,
+			// Include optional properties
+			email_template: "",
 		});
 	};
 
@@ -209,14 +237,20 @@ const Settings = () => {
 	const onShippingSettingsSubmit = async (
 		data: z.infer<typeof shippingSettingsSchema>,
 	) => {
-		updateShippingSettings({
-			enableShipping: data.enableShipping,
-			freeShippingThreshold:
+		// Create an object with the correct property names
+		const settingsData: ShippingSettings = {
+			enable_shipping: data.enableShipping,
+			free_shipping_threshold:
 				data.freeShippingThreshold || "",
-			defaultShippingRate: data.defaultShippingRate,
-			allowInternationalShipping:
+			default_shipping_rate: data.defaultShippingRate,
+			allow_international_shipping:
 				data.allowInternationalShipping,
-		});
+			shipping_countries: [],
+			shipping_zones: [],
+		};
+
+		// Update settings with the properly typed object
+		updateShippingSettings(settingsData);
 	};
 
 	if (isLoading) {

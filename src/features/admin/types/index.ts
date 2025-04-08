@@ -1,24 +1,25 @@
-import { User } from "@/features/auth/types";
+import { User as AuthUser } from "@/features/auth/types";
+import { User as SupabaseUser } from "@supabase/supabase-js";
 
 export type Address = {
-	address: string;
+	street: string;
 	city: string;
-	postal_code: string;
+	state: string;
+	postalCode: string;
 	country: string;
-} | null;
+};
 
 export type UserProfile = {
 	id: string;
-	first_name: string | null;
-	last_name: string | null;
-	phone: string | null;
-	avatar_url: string | null;
+	userId: string;
+	firstName: string;
+	lastName: string;
+	email: string;
 	address: Address;
-};
-
-export type AdminUser = User & {
-	orders_count?: number;
-	total_spent?: number;
+	phoneNumber: string;
+	avatar: string;
+	createdAt: string;
+	updatedAt: string;
 };
 
 export type ShippingAddress = {
@@ -43,28 +44,75 @@ export type OrderItem = {
 	id: string;
 	order_id: string;
 	product_id: string;
-	price: number;
+	product: Product;
 	quantity: number;
-	product: {
-		name: string;
-		image: string;
-		slug: string;
-	};
+	unit_price: number;
+	total_price: number;
 };
 
 export type Order = {
 	id: string;
-	created_at: string;
-	updated_at: string | null;
 	user_id: string;
 	status: string;
 	total: number;
-	payment_method: string;
-	shipping_address:
-		| ShippingAddress
-		| Record<string, unknown>;
-	user?: OrderUser | null;
-	items?: OrderItem[];
+	items: OrderItem[];
+	shipping_address: ShippingAddress;
+	created_at: string;
+	updated_at: string;
+};
+
+export type Category = {
+	id: string;
+	name: string;
+	slug: string;
+	description: string;
+	image: string;
+	created_at: string;
+	updated_at: string;
+};
+
+export interface Product {
+	id: string;
+	name: string;
+	name_ar?: string;
+	description?: string;
+	description_ar?: string;
+	price: number;
+	original_price?: number | null;
+	stock_quantity: number;
+	image: string;
+	images?: string[] | Record<string, string>;
+	category_id: string | null;
+	is_featured?: boolean;
+	is_new?: boolean;
+	is_on_sale?: boolean;
+	created_at: string;
+	updated_at?: string;
+}
+
+export type Profile = {
+	id: string;
+	user_id: string;
+	first_name?: string;
+	last_name?: string;
+	address?: {
+		address?: string;
+		city?: string;
+		postal_code?: string;
+		country?: string;
+	};
+	phone?: string;
+	avatar_url?: string;
+	created_at: string;
+	updated_at: string;
+};
+
+export type AdminUser = SupabaseUser & {
+	profile?: Profile;
+	orders?: Order[];
+	orders_count?: number;
+	total_spent?: number;
+	role?: string;
 };
 
 export type BannerItem = {
@@ -82,6 +130,8 @@ export type Promotion = {
 	title: string;
 	description: string;
 	code: string;
+	image?: string;
+	discount?: string;
 	startDate: string;
 	endDate: string;
 	active: boolean;
@@ -92,6 +142,11 @@ export type DashboardStats = {
 	totalProducts: number;
 	totalOrders: number;
 	totalRevenue: number;
+	totalSales?: number;
+	revenue?: number;
+	revenueTrend?: { value: number; isPositive: boolean };
+	ordersTrend?: { value: number; isPositive: boolean };
+	customersTrend?: { value: number; isPositive: boolean };
 };
 
 export type OrderStatusOption = {
@@ -111,159 +166,110 @@ export type ProductPerformancePoint = {
 	revenue: number;
 };
 
-export interface OrdersData {
-	orders: Order[];
-	filteredOrders: Order[];
-	selectedOrder: Order | null;
-	orderItems: OrderItem[];
-	isLoading: boolean;
-	isSubmitting: boolean;
-	isItemsLoading: boolean;
-	statusFilter: string;
-	searchQuery: string;
-	setSelectedOrder: (order: Order | null) => void;
-	setSearchQuery: (query: string) => void;
-	setStatusFilter: (status: string) => void;
-	fetchOrderItems: (
-		orderId: string,
-	) => Promise<OrderItem[]>;
-	viewOrderDetails: (order: Order) => Promise<void>;
-	updateOrderStatus: (
-		orderId: string,
-		status: string,
-	) => Promise<void>;
-	getShippingAddressProperty: (
-		order: Order,
-		property: keyof ShippingAddress,
-		fallback?: string,
-	) => string;
-	formatDate: (dateString: string) => string;
-	formatTime: (dateString: string) => string;
-	formatCurrency: (value: number) => string;
-	getStatusBadge: (status: string) => JSX.Element;
-	handleSearch: (query: string) => void;
-	handleStatusFilter: (status: string) => void;
-}
-
-export interface UsersData {
-	users: AdminUser[];
-	selectedUser: AdminUser | null;
-	isLoading: boolean;
-	isSubmitting: boolean;
-	searchQuery: string;
-	setSelectedUser: (user: AdminUser | null) => void;
-	setSearchQuery: (query: string) => void;
-	viewUserDetails: (user: AdminUser) => Promise<void>;
-	updateUserRole: (
-		userId: string,
-		role: string,
-	) => Promise<void>;
-	userOrders: Order[];
-	isOrdersLoading: boolean;
-	formatDate: (dateString: string) => string;
-	formatCurrency: (value: number) => string;
-	getInitials: (user: AdminUser) => string;
-	getFullName: (user: AdminUser) => string;
-	filteredUsers?: AdminUser[];
-	getUserInitials?: (user: AdminUser) => string;
-	getUserFullName?: (user: AdminUser) => string;
-	isLoadingOrders?: boolean;
-}
-
-export interface DashboardData {
-	stats: DashboardStats;
-	isLoading: boolean;
-	salesData: SalesDataPoint[];
-	productPerformance: ProductPerformancePoint[];
-	formatCurrency: (value: number) => string;
-}
-
-export interface ProductsData {
-	products: Product[];
-	categories: Category[];
-	filteredProducts: Product[];
-	isLoading: boolean;
-	isSubmitting: boolean;
-	selectedProduct: Product | null;
-	searchQuery: string;
-	categoryFilter: string;
-	handleSearch: (query: string) => void;
-	handleCategoryFilter: (categoryId: string) => void;
-	setSelectedProduct: (product: Product | null) => void;
-	setSearchQuery: (query: string) => void;
-	createProduct: (
-		productData: Omit<
-			Product,
-			"id" | "created_at" | "updated_at" | "slug"
-		>,
-	) => Promise<void>;
-	updateProduct: (
-		id: string,
-		productData: Partial<Product>,
-	) => Promise<void>;
-	deleteProduct: (id: string) => Promise<void>;
-	formatDate: (date: string) => string;
-	formatPrice: (price: number) => string;
-}
-
-export interface Category {
-	id: string;
+export type ProductFormData = {
 	name: string;
-	slug: string;
-	description?: string;
-	image_url?: string;
-	created_at: string;
-	updated_at: string;
-	parent_id?: string;
-	products_count?: number;
-	name_ar?: string;
-	description_ar?: string;
-}
-
-export interface Product {
-	id: string;
-	name: string;
-	name_ar?: string;
-	slug: string;
-	description: string;
-	description_ar?: string;
 	price: number;
-	original_price?: number | null;
-	stock_quantity?: number;
+	description: string;
 	category_id: string;
-	image: string;
-	images?: string[] | Record<string, string>;
-	in_stock?: boolean;
-	is_featured?: boolean;
-	is_new?: boolean;
-	is_on_sale?: boolean;
-	created_at: string;
-	updated_at: string | null;
-	category?: Category;
+	image?: File;
+	stock: number;
+};
+
+export type CategoryFormData = {
+	name: string;
+	description: string;
+	image?: File;
+};
+
+export type UseProductsOptions = {
+	initialProducts?: Product[];
+	initialCategories?: Category[];
+};
+
+export type UseProductTableOptions = {
+	products: Product[];
+	isLoading: boolean;
+	formatDate: (date: string) => string;
+};
+
+export interface OrderStatus {
+	value: string;
+	label: string;
+	icon?: React.ReactNode;
 }
 
-export interface CategoriesData {
-	categories: Category[];
-	filteredCategories: Category[];
-	isLoading: boolean;
-	selectedCategory: Category | null;
-	setSelectedCategory: (category: Category | null) => void;
-	createCategory: (
-		category: Omit<
-			Category,
-			"id" | "created_at" | "updated_at" | "products_count"
-		>,
-	) => Promise<void>;
-	updateCategory: (
-		id: string,
-		category: Partial<
-			Omit<Category, "id" | "created_at" | "updated_at">
-		>,
-	) => Promise<void>;
-	deleteCategory: (id: string) => Promise<void>;
-	isSubmitting: boolean;
-	error: string | null;
-	searchQuery: string;
-	setSearchQuery: (query: string) => void;
-	formatDate: (date: string) => string;
+export interface RecentOrder {
+	id: string;
+	orderNumber: string;
+	customerName: string;
+	date: string;
+	total: number;
+	status: string;
 }
+
+// Dashboard Types
+export interface ChartData {
+	name: string;
+	total: number;
+}
+
+export interface TopProduct {
+	id: string;
+	name: string;
+	price: number;
+	quantity: number;
+	total: number;
+	image: string;
+}
+
+// User Types
+export interface User {
+	id: string;
+	name: string;
+	email: string;
+	role: string;
+	avatar?: string;
+	lastLogin?: string;
+	createdAt: string;
+	profiles?: {
+		first_name?: string;
+		last_name?: string;
+		avatar_url?: string;
+	};
+}
+
+export type StoreSettings = {
+	store_name: string;
+	store_description?: string;
+	contact_email: string;
+	contact_phone?: string;
+	address?: string;
+	logo_url?: string;
+	favicon_url?: string;
+	currency: string;
+};
+
+export type EmailSettings = {
+	smtp_host: string;
+	smtp_port: string;
+	smtp_user: string;
+	smtp_password: string;
+	sender_name: string;
+	sender_email: string;
+	email_template?: string;
+};
+
+export type ShippingSettings = {
+	enable_shipping: boolean;
+	free_shipping_threshold?: string;
+	default_shipping_rate: string;
+	allow_international_shipping: boolean;
+	shipping_countries?: string[];
+	shipping_zones?: ShippingZone[];
+};
+
+export type ShippingZone = {
+	name: string;
+	countries: string[];
+	rate: string;
+};
