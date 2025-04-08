@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	CardHeader,
 	CardContent,
@@ -7,87 +9,104 @@ import {
 	CardTitle,
 	CardDescription,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuthActions } from "../hooks";
-import { AuthFormValues } from "../types";
+import {
+	signInSchema,
+	SignInFormValues,
+} from "../schemas/sign-in-schema";
 
 const SignInForm: React.FC = () => {
 	const { t } = useTranslation();
 	const { signIn, isLoading } = useAuthActions();
-	const [formValues, setFormValues] =
-		useState<AuthFormValues>({
+
+	const form = useForm<SignInFormValues>({
+		resolver: zodResolver(signInSchema),
+		defaultValues: {
 			email: "",
 			password: "",
+		},
+		mode: "onChange",
+	});
+
+	const handleSubmit = async (values: SignInFormValues) => {
+		await signIn({
+			email: values.email.trim(),
+			password: values.password,
 		});
-
-	const handleInputChange = (
-		e: React.ChangeEvent<HTMLInputElement>,
-	) => {
-		const { id, value } = e.target;
-		setFormValues((prev) => ({
-			...prev,
-			[id]: value,
-		}));
-	};
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		await signIn(formValues);
 	};
 
 	return (
-		<form onSubmit={handleSubmit}>
-			<CardHeader>
-				<CardTitle>{t("auth.signIn")}</CardTitle>
-				<CardDescription>
-					{t("auth.signInDescription")}
-				</CardDescription>
-			</CardHeader>
-			<CardContent className="space-y-4">
-				<div className="space-y-2">
-					<Label htmlFor="email">{t("auth.email")}</Label>
-					<Input
-						id="email"
-						type="email"
-						placeholder="name@example.com"
-						value={formValues.email}
-						onChange={handleInputChange}
-						required
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(handleSubmit)}>
+				<CardHeader>
+					<CardTitle>{t("auth.signIn")}</CardTitle>
+					<CardDescription>
+						{t("auth.signInDescription")}
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<FormField
+						control={form.control}
+						name="email"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>{t("auth.email")}</FormLabel>
+								<FormControl>
+									<Input
+										placeholder="name@example.com"
+										type="email"
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-				</div>
-				<div className="space-y-2">
-					<div className="flex items-center justify-between">
-						<Label htmlFor="password">
-							{t("auth.password")}
-						</Label>
-						<Button
-							variant="link"
-							className="p-0 h-auto text-xs">
-							{t("auth.forgotPassword")}
-						</Button>
-					</div>
-					<Input
-						id="password"
-						type="password"
-						value={formValues.password}
-						onChange={handleInputChange}
-						required
+					<FormField
+						control={form.control}
+						name="password"
+						render={({ field }) => (
+							<FormItem>
+								<div className="flex items-center justify-between">
+									<FormLabel>
+										{t("auth.password")}
+									</FormLabel>
+									<Button
+										variant="link"
+										className="p-0 h-auto text-xs">
+										{t("auth.forgotPassword")}
+									</Button>
+								</div>
+								<FormControl>
+									<Input type="password" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-				</div>
-			</CardContent>
-			<CardFooter>
-				<Button
-					type="submit"
-					className="w-full"
-					disabled={isLoading}>
-					{isLoading
-						? t("auth.signingIn")
-						: t("auth.signIn")}
-				</Button>
-			</CardFooter>
-		</form>
+				</CardContent>
+				<CardFooter>
+					<Button
+						type="submit"
+						className="w-full"
+						disabled={isLoading || !form.formState.isValid}>
+						{isLoading
+							? t("auth.signingIn")
+							: t("auth.signIn")}
+					</Button>
+				</CardFooter>
+			</form>
+		</Form>
 	);
 };
 

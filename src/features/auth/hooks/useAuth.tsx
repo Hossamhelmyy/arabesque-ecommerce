@@ -69,6 +69,12 @@ export const useAuthActions = () => {
 			const { error } = await supabase.auth.signUp({
 				email,
 				password,
+				options: {
+					data: {
+						role: "user",
+						email: email,
+					},
+				},
 			});
 
 			if (error) {

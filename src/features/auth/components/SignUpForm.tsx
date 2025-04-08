@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	CardHeader,
 	CardContent,
@@ -7,82 +9,95 @@ import {
 	CardTitle,
 	CardDescription,
 } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import {
+	Form,
+	FormControl,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuthActions } from "../hooks";
-import { AuthFormValues } from "../types";
+import {
+	signUpSchema,
+	SignUpFormValues,
+} from "../schemas/sign-up-schema";
 
 const SignUpForm: React.FC = () => {
 	const { t } = useTranslation();
 	const { signUp, isLoading } = useAuthActions();
-	const [formValues, setFormValues] =
-		useState<AuthFormValues>({
+
+	const form = useForm<SignUpFormValues>({
+		resolver: zodResolver(signUpSchema),
+		defaultValues: {
 			email: "",
 			password: "",
+		},
+		mode: "onChange",
+	});
+
+	const handleSubmit = async (values: SignUpFormValues) => {
+		await signUp({
+			email: values.email.trim(),
+			password: values.password,
 		});
-
-	const handleInputChange = (
-		e: React.ChangeEvent<HTMLInputElement>,
-	) => {
-		const { id, value } = e.target;
-		setFormValues((prev) => ({
-			...prev,
-			[id.replace("-signup", "")]: value,
-		}));
-	};
-
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		await signUp(formValues);
 	};
 
 	return (
-		<form onSubmit={handleSubmit}>
-			<CardHeader>
-				<CardTitle>{t("auth.signUp")}</CardTitle>
-				<CardDescription>
-					{t("auth.signUpDescription")}
-				</CardDescription>
-			</CardHeader>
-			<CardContent className="space-y-4">
-				<div className="space-y-2">
-					<Label htmlFor="email-signup">
-						{t("auth.email")}
-					</Label>
-					<Input
-						id="email-signup"
-						type="email"
-						placeholder="name@example.com"
-						value={formValues.email}
-						onChange={handleInputChange}
-						required
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(handleSubmit)}>
+				<CardHeader>
+					<CardTitle>{t("auth.signUp")}</CardTitle>
+					<CardDescription>
+						{t("auth.signUpDescription")}
+					</CardDescription>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<FormField
+						control={form.control}
+						name="email"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>{t("auth.email")}</FormLabel>
+								<FormControl>
+									<Input
+										placeholder="name@example.com"
+										type="email"
+										{...field}
+									/>
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-				</div>
-				<div className="space-y-2">
-					<Label htmlFor="password-signup">
-						{t("auth.password")}
-					</Label>
-					<Input
-						id="password-signup"
-						type="password"
-						value={formValues.password}
-						onChange={handleInputChange}
-						required
+					<FormField
+						control={form.control}
+						name="password"
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>{t("auth.password")}</FormLabel>
+								<FormControl>
+									<Input type="password" {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
 					/>
-				</div>
-			</CardContent>
-			<CardFooter>
-				<Button
-					type="submit"
-					className="w-full"
-					disabled={isLoading}>
-					{isLoading
-						? t("auth.signingUp")
-						: t("auth.signUp")}
-				</Button>
-			</CardFooter>
-		</form>
+				</CardContent>
+				<CardFooter>
+					<Button
+						type="submit"
+						className="w-full"
+						disabled={isLoading || !form.formState.isValid}>
+						{isLoading
+							? t("auth.signingUp")
+							: t("auth.signUp")}
+					</Button>
+				</CardFooter>
+			</form>
+		</Form>
 	);
 };
 
