@@ -1,6 +1,6 @@
 import type { Product } from "@/features/products/types";
 
-export type CartItemDetail = {
+export interface CartItemDetail {
 	id?: string;
 	product_id: string;
 	quantity: number;
@@ -9,29 +9,29 @@ export type CartItemDetail = {
 	price: number;
 	image: string;
 	product?: Product;
-};
+}
 
-export type CartSummary = {
+export interface CartSummary {
 	subtotal: number;
 	shipping: number;
 	tax: number;
 	total: number;
-};
+}
 
-export type CartState = {
+export interface CartState {
 	items: CartItemDetail[];
 	summary: CartSummary;
-};
+}
 
-export type CartUpdateAction = {
+export interface CartUpdateAction {
 	product_id: string;
 	quantity: number;
-};
+}
 
-export type CartContextType = {
+export interface CartContextType {
 	cartItems: CartItemDetail[];
 	addToCart: (
-		item: Omit<CartItemDetail, "id">,
+		product: Omit<CartItemDetail, "id">,
 	) => Promise<void>;
 	removeFromCart: (productId: string) => Promise<void>;
 	updateCartItemQuantity: (
@@ -40,4 +40,7 @@ export type CartContextType = {
 	) => Promise<void>;
 	clearCart: () => Promise<void>;
 	isLoading: boolean;
-};
+}
+
+// Re-export all types
+export type { CartItemDetail as CartItem } from "./cart-item";

@@ -17,36 +17,25 @@ import {
 	ImageIcon,
 	Check,
 } from "lucide-react";
+import { type Product } from "@/features/products/types";
 
-export type ProductCardProps = {
-	product: {
-		id: string;
-		name: string;
-		name_ar: string;
-		price: number;
-		original_price: number | null;
-		image: string;
-		images?: string[] | null;
-		slug: string;
-		is_new?: boolean | null;
-		is_on_sale?: boolean | null;
-		category_id?: string | null;
-	};
+interface ProductCardProps {
+	product: Product;
 	onAddToCart: () => void;
-	onAddToWishlist?: () => void;
-	isInWishlist?: boolean;
+	onAddToWishlist: () => void;
+	isInWishlist: boolean;
 	imagePriority?: boolean;
 	className?: string;
-};
+}
 
-export const ProductCard = ({
+export function ProductCard({
 	product,
 	onAddToCart,
 	onAddToWishlist,
-	isInWishlist = false,
+	isInWishlist,
 	imagePriority = false,
 	className,
-}: ProductCardProps) => {
+}: ProductCardProps) {
 	const { t, i18n } = useTranslation();
 	const { isRTL } = useLanguage();
 	const [isHovered, setIsHovered] = useState(false);
@@ -171,12 +160,7 @@ export const ProductCard = ({
 									)}
 								/>
 							) : (
-								<ShoppingCart
-									className={cn(
-										"h-4 w-4",
-										isRTL ? "ml-2" : "mr-2",
-									)}
-								/>
+								<ShoppingCart className={cn("h-4 w-4")} />
 							)}
 							<span className="sr-only">
 								{t("product.addToCart")}
@@ -286,7 +270,7 @@ export const ProductCard = ({
 			</Link>
 		</Card>
 	);
-};
+}
 
 // Helper function to get all product images
 function getProductImages(

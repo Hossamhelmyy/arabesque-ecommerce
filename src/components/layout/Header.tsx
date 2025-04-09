@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/context/LanguageContext";
@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import Cookies from "js-cookie";
 
 interface HeaderProps {
 	isAdmin?: boolean;
@@ -51,7 +52,10 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 	const { t } = useTranslation();
 	const { currentLanguage, changeLanguage, isRTL } =
 		useLanguage();
-	const [isDarkMode, setIsDarkMode] = useState(false);
+	const [isDarkMode, setIsDarkMode] = useState(() => {
+		const theme = Cookies.get("theme");
+		return theme === "dark";
+	});
 	const isMobile = useIsMobile();
 	const { cartItems } = useCart();
 	const { user, signOut } = useAuth();
@@ -59,9 +63,21 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 	// Get cart count from actual cart items
 	const cartCount = cartItems.length;
 
+	useEffect(() => {
+		// Apply theme from cookie on mount
+		const theme = Cookies.get("theme") || "light";
+		setIsDarkMode(theme === "dark");
+		document.documentElement.classList.toggle(
+			"dark",
+			theme === "dark",
+		);
+	}, []);
+
 	const toggleTheme = () => {
+		const newTheme = !isDarkMode ? "dark" : "light";
 		setIsDarkMode(!isDarkMode);
 		document.documentElement.classList.toggle("dark");
+		Cookies.set("theme", newTheme, { expires: 365 });
 	};
 
 	// Check if user is admin

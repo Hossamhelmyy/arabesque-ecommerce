@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	Tabs,
@@ -17,6 +17,7 @@ import {
 	ProductActions,
 	RelatedProducts,
 } from "@/features/products/components/product-detail";
+import { ProductDetailSkeleton } from "@/features/products/components/product-detail/ProductDetailSkeleton";
 import { useProductDetails } from "@/features/products/hooks";
 
 interface BreadcrumbItem {
@@ -32,11 +33,7 @@ const ModernProductDetailPage = () => {
 		useProductDetails();
 
 	if (isLoading) {
-		return (
-			<div className="container py-16 flex items-center justify-center">
-				<Loader2 className="h-8 w-8 animate-spin text-primary" />
-			</div>
-		);
+		return <ProductDetailSkeleton />;
 	}
 
 	if (error || !product) {

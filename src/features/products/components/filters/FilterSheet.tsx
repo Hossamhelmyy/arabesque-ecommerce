@@ -209,7 +209,7 @@ const FilterSheet = ({
 							className="flex-1"
 							onClick={clearFilters}
 							disabled={countActiveFilters() === 0}>
-							<X className="h-4 w-4 mr-2 rtl:ml-2 rtl:mr-0" />
+							<X className="h-4 w-4 mr-2mx-2" />
 							{t("filters.clearAll")}
 						</Button>
 						<SheetClose asChild>

@@ -23,6 +23,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import type { User } from "../../types";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface UserListProps {
 	users: User[];
@@ -38,7 +39,7 @@ export const UserList = ({
 	formatDate,
 }: UserListProps) => {
 	const { t } = useTranslation();
-
+	const { isRTL } = useLanguage();
 	const getRoleBadge = (role: string) => {
 		switch (role?.toLowerCase()) {
 			case "admin":
@@ -171,8 +172,9 @@ export const UserList = ({
 								) : (
 									users.map((user) => (
 										<TableRow key={user.id}>
-											<TableCell>
-												<div className="flex items-center space-x-3">
+											<TableCell
+												dir={isRTL ? "rtl" : "ltr"}>
+												<div className="flex items-center gap-3">
 													<Avatar className="flex-shrink-0">
 														<AvatarImage
 															src={user.avatar}
@@ -182,7 +184,7 @@ export const UserList = ({
 															{getInitials(user.name)}
 														</AvatarFallback>
 													</Avatar>
-													<div className="font-medium max-w-[120px] truncate">
+													<div className="font-medium  truncate">
 														{user.name}
 													</div>
 												</div>

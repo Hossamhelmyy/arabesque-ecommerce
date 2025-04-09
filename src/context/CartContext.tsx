@@ -1,89 +1,259 @@
-import React, {
-	createContext,
-	useContext,
-	useState,
-	useEffect,
-} from "react";
+import React, { createContext, useContext } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import type {
+	CartItemDetail,
+	CartContextType,
+} from "@/features/cart/types/index";
 import {
-	type CartItemDetail,
-	type CartContextType,
-} from "@/features/cart/types";
+	useQuery,
+	useMutation,
+	useQueryClient,
+} from "@tanstack/react-query";
+
+const CART_QUERY_KEY = ["cart"] as const;
 
 const CartContext = createContext<
 	CartContextType | undefined
 >(undefined);
 
+interface CartProduct {
+	name: string;
+	name_ar: string;
+	price: number;
+	image: string;
+}
+
+interface CartItem {
+	id: string;
+	product_id: string;
+	quantity: number;
+	products: CartProduct;
+}
+
+type SupabaseCartResponse = {
+	id: string;
+	product_id: string;
+	quantity: number;
+	products: {
+		name: string;
+		name_ar: string;
+		price: number;
+		image: string;
+	};
+}[];
+
+// API functions
+const fetchCartItemsFromAPI = async (userId: string) => {
+	const { data, error } = await supabase
+		.from("cart")
+		.select(
+			`
+			id,
+			product_id,
+			quantity,
+			products (
+				name,
+				name_ar,
+				price,
+				image
+			)
+		`,
+		)
+		.eq("user_id", userId);
+
+	if (error) throw error;
+
+	// Safe type assertion for Supabase response
+	const cartData = data as unknown as SupabaseCartResponse;
+	return (
+		cartData?.map((item) => ({
+			id: item.id,
+			product_id: item.product_id,
+			quantity: item.quantity,
+			name: item.products.name,
+			name_ar: item.products.name_ar,
+			price: item.products.price,
+			image: item.products.image,
+		})) ?? []
+	);
+};
+
 export const CartProvider: React.FC<{
 	children: React.ReactNode;
 }> = ({ children }) => {
-	const [cartItems, setCartItems] = useState<
-		CartItemDetail[]
-	>([]);
-	const [isLoading, setIsLoading] = useState(false);
 	const { user } = useAuth();
+	const queryClient = useQueryClient();
 
-	// Fetch cart items when user changes
-	useEffect(() => {
-		if (user) {
-			fetchCartItems();
-		} else {
-			setCartItems([]);
-		}
-	}, [user]);
+	// Query for cart items
+	const { data: cartItems = [], isLoading } = useQuery({
+		queryKey: CART_QUERY_KEY,
+		queryFn: () =>
+			user ? fetchCartItemsFromAPI(user.id) : [],
+		enabled: !!user,
+	});
 
-	const fetchCartItems = async () => {
-		if (!user) return;
+	// Add to cart mutation
+	const addToCartMutation = useMutation({
+		mutationFn: async (
+			product: Omit<CartItemDetail, "id">,
+		) => {
+			if (!user) throw new Error("User not authenticated");
 
-		setIsLoading(true);
-		try {
-			const { data, error } = await supabase
-				.from("cart")
-				.select(
-					`
-          id,
-          product_id,
-          quantity,
-          products (
-            name,
-            name_ar,
-            price,
-            image
-          )
-        `,
-				)
-				.eq("user_id", user.id);
+			const existingItem = cartItems.find(
+				(item) => item.product_id === product.product_id,
+			);
 
-			if (error) {
-				throw error;
+			if (existingItem) {
+				const { error } = await supabase
+					.from("cart")
+					.update({
+						quantity:
+							existingItem.quantity + product.quantity,
+					})
+					.eq("user_id", user.id)
+					.eq("product_id", product.product_id);
+
+				if (error) throw error;
+			} else {
+				const { error } = await supabase
+					.from("cart")
+					.insert({
+						user_id: user.id,
+						product_id: product.product_id,
+						quantity: product.quantity,
+					});
+
+				if (error) throw error;
 			}
-
-			if (data) {
-				const formattedCartItems = data.map((item) => ({
-					id: item.id,
-					product_id: item.product_id,
-					quantity: item.quantity,
-					name: item.products.name,
-					name_ar: item.products.name_ar,
-					price: item.products.price,
-					image: item.products.image,
-				}));
-
-				setCartItems(formattedCartItems);
-			}
-		} catch (error) {
-			console.error("Error fetching cart items:", error);
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: CART_QUERY_KEY,
+			});
+			toast({
+				title: "Added to cart",
+				description: "Item has been added to your cart",
+			});
+		},
+		onError: (error) => {
+			console.error("Error adding to cart:", error);
 			toast({
 				title: "Error",
-				description: "Failed to load your cart items",
+				description: "Failed to add item to cart",
 				variant: "destructive",
 			});
-		} finally {
-			setIsLoading(false);
-		}
-	};
+		},
+	});
+
+	// Remove from cart mutation
+	const removeFromCartMutation = useMutation({
+		mutationFn: async (productId: string) => {
+			if (!user) throw new Error("User not authenticated");
+
+			const { error } = await supabase
+				.from("cart")
+				.delete()
+				.eq("user_id", user.id)
+				.eq("product_id", productId);
+
+			if (error) throw error;
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: CART_QUERY_KEY,
+			});
+			toast({
+				title: "Removed from cart",
+				description: "Item has been removed from your cart",
+			});
+		},
+		onError: (error) => {
+			console.error("Error removing from cart:", error);
+			toast({
+				title: "Error",
+				description: "Failed to remove item from cart",
+				variant: "destructive",
+			});
+		},
+	});
+
+	// Update quantity mutation
+	const updateQuantityMutation = useMutation({
+		mutationFn: async ({
+			productId,
+			quantity,
+		}: {
+			productId: string;
+			quantity: number;
+		}) => {
+			if (!user) throw new Error("User not authenticated");
+
+			if (quantity <= 0) {
+				return removeFromCartMutation.mutateAsync(
+					productId,
+				);
+			}
+
+			const { error } = await supabase
+				.from("cart")
+				.update({ quantity })
+				.eq("user_id", user.id)
+				.eq("product_id", productId);
+
+			if (error) throw error;
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: CART_QUERY_KEY,
+			});
+			toast({
+				title: "Cart updated",
+				description: "Item quantity has been updated",
+			});
+		},
+		onError: (error) => {
+			console.error("Error updating cart:", error);
+			toast({
+				title: "Error",
+				description: "Failed to update cart",
+				variant: "destructive",
+			});
+		},
+	});
+
+	// Clear cart mutation
+	const clearCartMutation = useMutation({
+		mutationFn: async () => {
+			if (!user) throw new Error("User not authenticated");
+
+			const { error } = await supabase
+				.from("cart")
+				.delete()
+				.eq("user_id", user.id);
+
+			if (error) throw error;
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: CART_QUERY_KEY,
+			});
+			toast({
+				title: "Cart cleared",
+				description:
+					"All items have been removed from your cart",
+			});
+		},
+		onError: (error) => {
+			console.error("Error clearing cart:", error);
+			toast({
+				title: "Error",
+				description: "Failed to clear cart",
+				variant: "destructive",
+			});
+		},
+	});
 
 	const addToCart = async (
 		product: Omit<CartItemDetail, "id">,
@@ -97,87 +267,12 @@ export const CartProvider: React.FC<{
 			});
 			return;
 		}
-
-		setIsLoading(true);
-		try {
-			// Check if product already exists in cart
-			const existingItem = cartItems.find(
-				(item) => item.product_id === product.product_id,
-			);
-
-			if (existingItem) {
-				// Update quantity
-				await updateCartItemQuantity(
-					product.product_id,
-					existingItem.quantity + product.quantity,
-				);
-			} else {
-				// Add new item
-				const { error, data } = await supabase
-					.from("cart")
-					.insert({
-						user_id: user.id,
-						product_id: product.product_id,
-						quantity: product.quantity,
-					})
-					.select();
-
-				if (error) throw error;
-
-				// Refresh cart items
-				await fetchCartItems();
-
-				toast({
-					title: "Added to cart",
-					description: "Item has been added to your cart",
-				});
-			}
-		} catch (error) {
-			console.error("Error adding to cart:", error);
-			toast({
-				title: "Error",
-				description: "Failed to add item to cart",
-				variant: "destructive",
-			});
-		} finally {
-			setIsLoading(false);
-		}
+		await addToCartMutation.mutateAsync(product);
 	};
 
 	const removeFromCart = async (productId: string) => {
 		if (!user) return;
-
-		setIsLoading(true);
-		try {
-			const { error } = await supabase
-				.from("cart")
-				.delete()
-				.eq("user_id", user.id)
-				.eq("product_id", productId);
-
-			if (error) throw error;
-
-			// Update local state
-			setCartItems(
-				cartItems.filter(
-					(item) => item.product_id !== productId,
-				),
-			);
-
-			toast({
-				title: "Removed from cart",
-				description: "Item has been removed from your cart",
-			});
-		} catch (error) {
-			console.error("Error removing from cart:", error);
-			toast({
-				title: "Error",
-				description: "Failed to remove item from cart",
-				variant: "destructive",
-			});
-		} finally {
-			setIsLoading(false);
-		}
+		await removeFromCartMutation.mutateAsync(productId);
 	};
 
 	const updateCartItemQuantity = async (
@@ -185,75 +280,15 @@ export const CartProvider: React.FC<{
 		quantity: number,
 	) => {
 		if (!user) return;
-
-		if (quantity <= 0) {
-			return removeFromCart(productId);
-		}
-
-		setIsLoading(true);
-		try {
-			const { error } = await supabase
-				.from("cart")
-				.update({ quantity })
-				.eq("user_id", user.id)
-				.eq("product_id", productId);
-
-			if (error) throw error;
-
-			// Update local state
-			setCartItems(
-				cartItems.map((item) =>
-					item.product_id === productId
-						? { ...item, quantity }
-						: item,
-				),
-			);
-
-			toast({
-				title: "Cart updated",
-				description: "Item quantity has been updated",
-			});
-		} catch (error) {
-			console.error("Error updating cart:", error);
-			toast({
-				title: "Error",
-				description: "Failed to update cart",
-				variant: "destructive",
-			});
-		} finally {
-			setIsLoading(false);
-		}
+		await updateQuantityMutation.mutateAsync({
+			productId,
+			quantity,
+		});
 	};
 
 	const clearCart = async () => {
 		if (!user) return;
-
-		setIsLoading(true);
-		try {
-			const { error } = await supabase
-				.from("cart")
-				.delete()
-				.eq("user_id", user.id);
-
-			if (error) throw error;
-
-			setCartItems([]);
-
-			toast({
-				title: "Cart cleared",
-				description:
-					"All items have been removed from your cart",
-			});
-		} catch (error) {
-			console.error("Error clearing cart:", error);
-			toast({
-				title: "Error",
-				description: "Failed to clear cart",
-				variant: "destructive",
-			});
-		} finally {
-			setIsLoading(false);
-		}
+		await clearCartMutation.mutateAsync();
 	};
 
 	return (

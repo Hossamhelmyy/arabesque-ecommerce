@@ -430,7 +430,7 @@ export function ProductForm({
 									control={form.control}
 									name="is_featured"
 									render={({ field }) => (
-										<FormItem className="flex flex-row items-start space-x-3 space-y-0 gap-2">
+										<FormItem className="flex flex-row items-start  gap-3 space-y-0">
 											<FormControl>
 												<Checkbox
 													checked={field.value || false}
@@ -450,7 +450,7 @@ export function ProductForm({
 									control={form.control}
 									name="is_new"
 									render={({ field }) => (
-										<FormItem className="flex flex-row items-start space-x-3 space-y-0 gap-2">
+										<FormItem className="flex flex-row items-start  gap-3 space-y-0">
 											<FormControl>
 												<Checkbox
 													checked={field.value || false}
@@ -470,7 +470,7 @@ export function ProductForm({
 									control={form.control}
 									name="is_on_sale"
 									render={({ field }) => (
-										<FormItem className="flex flex-row items-start space-x-3 space-y-0 gap-2">
+										<FormItem className="flex flex-row items-start  gap-3 space-y-0">
 											<FormControl>
 												<Checkbox
 													checked={field.value || false}

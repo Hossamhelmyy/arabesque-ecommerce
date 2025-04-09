@@ -18,7 +18,15 @@ type AuthError = {
 	message: string;
 	[key: string]: unknown;
 };
-
+export const useAuth = () => {
+	const context = useContext(AuthContext);
+	if (context === undefined) {
+		throw new Error(
+			"useAuth must be used within an AuthProvider",
+		);
+	}
+	return context;
+};
 // Create a safer navigation function
 const useSafeNavigate = () => {
 	try {
@@ -69,7 +77,6 @@ export const AuthProvider: React.FC<{
 					...profile,
 				});
 			}
-
 			setIsLoading(false);
 		};
 
@@ -197,13 +204,4 @@ export const AuthProvider: React.FC<{
 			{children}
 		</AuthContext.Provider>
 	);
-};
-export const useAuth = () => {
-	const context = useContext(AuthContext);
-	if (context === undefined) {
-		throw new Error(
-			"useAuth must be used within an AuthProvider",
-		);
-	}
-	return context;
 };

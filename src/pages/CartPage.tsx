@@ -1,19 +1,19 @@
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { useAuth } from "@/context/AuthContext";
-import {
-	CartList,
-	CartSummary,
-	EmptyCart,
-} from "@/features/cart";
-import {
-	CartItemDetail,
-	CartSummaryData,
-} from "@/features/cart";
+import CartList from "@/features/cart/components/CartList";
+import CartSummary from "@/features/cart/components/CartSummary";
+import EmptyCart from "@/features/cart/components/EmptyCart";
+import { CartPageSkeleton } from "@/features/cart/components/CartPageSkeleton";
+import type { CartItemDetail } from "@/features/cart/types";
+
+interface CartSummaryData {
+	subtotal: number;
+	shipping: number;
+	tax: number;
+	total: number;
+}
 
 const CartPage = () => {
 	const { t } = useTranslation();
@@ -24,20 +24,7 @@ const CartPage = () => {
 		updateCartItemQuantity,
 		isLoading: cartLoading,
 	} = useCart();
-	const { user } = useAuth();
 	const navigate = useNavigate();
-
-	useEffect(() => {
-		// If user is not logged in, redirect to auth page
-		if (!user && !cartLoading) {
-			toast({
-				title: t("common.authRequired"),
-				description: t("cart.loginToView"),
-				variant: "destructive",
-			});
-			navigate("/auth");
-		}
-	}, [user, cartLoading, navigate, toast, t]);
 
 	const handleRemoveItem = (id: string) => {
 		removeFromCart(id);
@@ -81,21 +68,10 @@ const CartPage = () => {
 	};
 
 	if (cartLoading) {
-		return (
-			<div className="container py-16 flex flex-col items-center justify-center">
-				<Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-				<p className="text-muted-foreground">
-					{t("common.loading")}
-				</p>
-			</div>
-		);
+		return <CartPageSkeleton />;
 	}
 
-	if (!user) {
-		return null; // Redirect handled in useEffect
-	}
-
-	if (cartItems.length === 0) {
+	if (cartItems.length === 0 && !cartLoading) {
 		return (
 			<div className="container py-8 md:py-12">
 				<h1 className="text-2xl md:text-3xl font-bold mb-6">
@@ -114,13 +90,11 @@ const CartPage = () => {
 
 			<div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 				<div className="lg:col-span-2">
-					<div className="bg-card rounded-lg shadow-sm p-4">
-						<CartList
-							items={cartItems}
-							onUpdateQuantity={handleQuantityChange}
-							onRemove={handleRemoveItem}
-						/>
-					</div>
+					<CartList
+						items={cartItems}
+						onUpdateQuantity={handleQuantityChange}
+						onRemove={handleRemoveItem}
+					/>
 				</div>
 
 				<div className="lg:col-span-1">

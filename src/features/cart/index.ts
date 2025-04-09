@@ -1,12 +1,14 @@
 // Export components
 export * from "./components";
 
-// Export types with renamed exports to avoid collisions
+// Export all types from types/index.ts
 export type {
 	CartItemDetail,
+	CartSummary,
 	CartState,
 	CartUpdateAction,
-} from "./types";
+	CartContextType,
+} from "./types/index";
 
-// Re-export the CartSummary type with a different name to avoid collision
-export type { CartSummary as CartSummaryData } from "./types";
+// Export CartSummaryData as an alias of CartSummary
+export type { CartSummary as CartSummaryData } from "./types/index";

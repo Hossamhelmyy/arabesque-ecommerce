@@ -80,19 +80,35 @@ const App = () => (
 										/>
 										<Route
 											path="/checkout"
-											element={<CheckoutPage />}
+											element={
+												<ProtectedRoute>
+													<CheckoutPage />
+												</ProtectedRoute>
+											}
 										/>
 										<Route
 											path="/profile"
-											element={<ProfilePage />}
+											element={
+												<ProtectedRoute>
+													<ProfilePage />
+												</ProtectedRoute>
+											}
 										/>
 										<Route
 											path="/favorites"
-											element={<FavoritesPage />}
+											element={
+												<ProtectedRoute>
+													<FavoritesPage />
+												</ProtectedRoute>
+											}
 										/>
 										<Route
 											path="/cart"
-											element={<CartPage />}
+											element={
+												<ProtectedRoute>
+													<CartPage />
+												</ProtectedRoute>
+											}
 										/>
 										<Route
 											path="/auth"
