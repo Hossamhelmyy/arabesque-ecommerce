@@ -1,4 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
+import {
+	Link,
+	useLocation,
+	useNavigate,
+} from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import {
@@ -43,6 +47,8 @@ const AdminSidebar = ({
 		const theme = Cookies.get("theme");
 		return theme === "dark";
 	});
+	const [isSheetOpen, setIsSheetOpen] = useState(false);
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const theme = Cookies.get("theme") || "light";
@@ -58,6 +64,11 @@ const AdminSidebar = ({
 		setIsDarkMode(!isDarkMode);
 		document.documentElement.classList.toggle("dark");
 		Cookies.set("theme", newTheme, { expires: 365 });
+	};
+
+	const handleNavigation = (path: string) => {
+		setIsSheetOpen(false);
+		navigate(path);
 	};
 
 	const isActive = (path: string) =>
@@ -109,11 +120,11 @@ const AdminSidebar = ({
 	const renderNavItems = () => (
 		<div className="space-y-1">
 			{navItems.map((item) => (
-				<Link
+				<button
 					key={item.href}
-					to={item.href}
+					onClick={() => handleNavigation(item.href)}
 					className={cn(
-						"admin-sidebar-item group relative",
+						"admin-sidebar-item group relative w-full text-start",
 						isActive(item.href)
 							? "admin-sidebar-item-active"
 							: "admin-sidebar-item-inactive sidebar-hover-effect",
@@ -122,28 +133,29 @@ const AdminSidebar = ({
 					<span>{item.label}</span>
 					{item.badge && (
 						<Badge
-							dir={isRTL ? "rtl" : "ltr"}
 							variant="secondary"
-							className="absolute ltr:right-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+							className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity">
 							{item.badge}
 						</Badge>
 					)}
 					{isActive(item.href) && (
 						<ChevronRight className="absolute right-2 h-4 w-4 text-primary" />
 					)}
-				</Link>
+				</button>
 			))}
 		</div>
 	);
 
 	if (isMobile) {
 		return (
-			<Sheet>
+			<Sheet
+				open={isSheetOpen}
+				onOpenChange={setIsSheetOpen}>
 				<SheetTrigger asChild>
 					<Button
 						variant="ghost"
 						size="icon"
-						className="lg:hidden me-3">
+						className="lg:hidden mx-[6px]">
 						<Menu className="h-5 w-5" />
 						<span className="sr-only">
 							{t("admin.menu")}
@@ -157,17 +169,17 @@ const AdminSidebar = ({
 					<nav className="flex-1 py-8 px-4">
 						{renderNavItems()}
 
-						<Link
-							to={"/"}
-							className="admin-sidebar-item admin-sidebar-item-inactive sidebar-hover-effect group relative">
+						<button
+							onClick={() => handleNavigation("/")}
+							className="admin-sidebar-item admin-sidebar-item-inactive sidebar-hover-effect group relative w-full text-start">
 							<Home className="h-5 w-5" />
 							<span>{t("common.home")}</span>
 							<Badge
 								variant="outline"
-								className="absolute ltr:right-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+								className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity">
 								{t("admin.storefront")}
 							</Badge>
-						</Link>
+						</button>
 
 						<Separator className="my-6" />
 

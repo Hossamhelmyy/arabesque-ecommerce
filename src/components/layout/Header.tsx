@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/context/LanguageContext";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
 	Sheet,
 	SheetContent,
@@ -63,9 +62,11 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 		const theme = Cookies.get("theme");
 		return theme === "dark";
 	});
+	const [isSheetOpen, setIsSheetOpen] = useState(false);
 	const isMobile = useIsMobile();
 	const { cartItems } = useCart();
 	const { user, signOut } = useAuth();
+	const navigate = useNavigate();
 
 	const cartCount = cartItems.length;
 
@@ -87,12 +88,19 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 
 	const isUserAdmin = user?.role === "admin";
 
+	const handleNavigation = (path: string) => {
+		setIsSheetOpen(false);
+		navigate(path);
+	};
+
 	return (
 		<header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
 			<div className="container flex h-16 items-center justify-between sm:px-6 px-2">
 				<div className="flex items-center gap-4">
 					{!isAdmin && (
-						<Sheet>
+						<Sheet
+							open={isSheetOpen}
+							onOpenChange={setIsSheetOpen}>
 							<SheetTrigger asChild>
 								<Button
 									variant="ghost"
@@ -110,40 +118,50 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 								<Separator />
 								<nav className="flex flex-col py-8 px-4">
 									<div className="space-y-1">
-										<Link
-											to={
-												isAdmin ? "/admin/dashboard" : "/"
+										<button
+											onClick={() =>
+												handleNavigation(
+													isAdmin
+														? "/admin/dashboard"
+														: "/",
+												)
 											}
-											className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+											className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect w-full text-start">
 											<Home className="h-5 w-5" />
 											<span>
 												{isAdmin
 													? t("admin.dashboard")
 													: t("common.home")}
 											</span>
-										</Link>
+										</button>
 
-										<Link
-											to="/products"
-											className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+										<button
+											onClick={() =>
+												handleNavigation("/products")
+											}
+											className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect w-full text-start">
 											<Package className="h-5 w-5" />
 											<span>{t("common.products")}</span>
-										</Link>
+										</button>
 
-										<Link
-											to="/categories"
-											className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+										<button
+											onClick={() =>
+												handleNavigation("/categories")
+											}
+											className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect w-full text-start">
 											<LayoutGrid className="h-5 w-5" />
 											<span>{t("common.categories")}</span>
-										</Link>
+										</button>
 
 										{isUserAdmin && !isAdmin && (
-											<Link
-												to="/admin"
-												className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+											<button
+												onClick={() =>
+													handleNavigation("/admin")
+												}
+												className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect w-full text-start">
 												<LayoutDashboard className="h-5 w-5" />
 												<span>{t("admin.dashboard")}</span>
-											</Link>
+											</button>
 										)}
 									</div>
 
@@ -152,23 +170,29 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 									<div className="space-y-1">
 										{user ? (
 											<>
-												<Link
-													to="/profile"
-													className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+												<button
+													onClick={() =>
+														handleNavigation("/profile")
+													}
+													className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect w-full text-start">
 													<User className="h-5 w-5" />
 													<span>{t("common.profile")}</span>
-												</Link>
-												<Link
-													to="/favorites"
-													className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+												</button>
+												<button
+													onClick={() =>
+														handleNavigation("/favorites")
+													}
+													className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect w-full text-start">
 													<Heart className="h-5 w-5" />
 													<span>
 														{t("common.favorites")}
 													</span>
-												</Link>
-												<Link
-													to="/cart"
-													className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+												</button>
+												<button
+													onClick={() =>
+														handleNavigation("/cart")
+													}
+													className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect w-full text-start">
 													<ShoppingCart className="h-5 w-5" />
 													<span>{t("common.cart")}</span>
 													{cartCount > 0 && (
@@ -178,15 +202,17 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 															{cartCount}
 														</Badge>
 													)}
-												</Link>
+												</button>
 											</>
 										) : (
-											<Link
-												to="/auth"
-												className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+											<button
+												onClick={() =>
+													handleNavigation("/auth")
+												}
+												className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect w-full text-start">
 												<User className="h-5 w-5" />
 												<span>{t("common.signIn")}</span>
-											</Link>
+											</button>
 										)}
 									</div>
 
@@ -269,12 +295,11 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 									{user && (
 										<>
 											<Separator className="my-4" />
-											<Button
-												variant="ghost"
+											<button
 												onClick={signOut}
-												className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect text-destructive">
+												className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect text-destructive w-full text-start">
 												<span>{t("common.signOut")}</span>
-											</Button>
+											</button>
 										</>
 									)}
 								</nav>

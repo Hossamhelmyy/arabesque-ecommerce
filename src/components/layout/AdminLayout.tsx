@@ -18,7 +18,7 @@ const AdminLayout = () => {
 	return (
 		<div className="flex min-h-screen flex-col">
 			<div className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur flex items-center">
-				<div className="container flex h-16 items-center">
+				<div className="container flex h-16 items-center justify-between sm:px-6 px-2">
 					{isMobile && <AdminSidebar isMobile={true} />}
 					<Header isAdmin={true} />
 				</div>
