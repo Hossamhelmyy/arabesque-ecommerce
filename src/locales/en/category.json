@@ -1,0 +1,12 @@
+{
+	"backToCategories": "Back to Categories",
+	"notFound": "Category Not Found",
+	"notFoundDescription": "The category you're looking for doesn't exist or has been removed.",
+	"productsCount": "{{count}} products",
+	"noProducts": "No products in this category yet",
+	"noProductsDescription": "We'll be adding products to this category soon. Check back later or browse our other categories.",
+	"browseAllProducts": "Browse All Products",
+	"subcategories": "Subcategories",
+	"noFilteredProducts": "No products match your filters",
+	"noFilteredProductsDescription": "Try adjusting your filters or browse all products in this category."
+}

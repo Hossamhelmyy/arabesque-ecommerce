@@ -1,0 +1,12 @@
+{
+	"backToCategories": "العودة إلى الفئات",
+	"notFound": "الفئة غير موجودة",
+	"notFoundDescription": "الفئة التي تبحث عنها غير موجودة أو تمت إزالتها.",
+	"productsCount": "{{count}} منتج",
+	"noProducts": "لا توجد منتجات في هذه الفئة حتى الآن",
+	"noProductsDescription": "سنضيف منتجات إلى هذه الفئة قريبًا. تحقق لاحقًا أو تصفح فئاتنا الأخرى.",
+	"browseAllProducts": "تصفح جميع المنتجات",
+	"subcategories": "الفئات الفرعية",
+	"noFilteredProducts": "لا توجد منتجات تطابق الفلاتر الخاصة بك",
+	"noFilteredProductsDescription": "حاول تعديل الفلاتر الخاصة بك أو تصفح جميع المنتجات في هذه الفئة."
+}

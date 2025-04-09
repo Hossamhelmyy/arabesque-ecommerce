@@ -24,7 +24,7 @@ import type {
 } from "@/features/products/types";
 
 const ModernCategoryPage = () => {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
 	const {
 		category,
 		products,
@@ -33,6 +33,7 @@ const ModernCategoryPage = () => {
 		sort,
 		setSort,
 	} = useCategoryDetails();
+	const isArabic = i18n.language === "ar";
 
 	const { wishlistItems } = useWishlistContext();
 	const { addToCart } = useCart();
@@ -130,7 +131,7 @@ const ModernCategoryPage = () => {
 					</Link>
 					<span className="mx-2">/</span>
 					<span className="text-foreground font-medium">
-						{category.name}
+						{isArabic ? category.name_ar : category.name}
 					</span>
 				</div>
 			</div>
@@ -140,11 +141,13 @@ const ModernCategoryPage = () => {
 				<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 					<div>
 						<h1 className="text-3xl font-bold">
-							{category.name}
+							{isArabic ? category.name_ar : category.name}
 						</h1>
 						{category.description && (
 							<p className="mt-2 text-muted-foreground">
-								{category.description}
+								{isArabic
+									? category.description_ar
+									: category.description}
 							</p>
 						)}
 					</div>

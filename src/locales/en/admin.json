@@ -67,6 +67,11 @@
 		"delivered": "Delivered",
 		"cancelled": "Cancelled"
 	},
+	"recentOrders": "Recent Orders",
+	"noRecentOrders": "No recent orders found",
+	"orderId": "Order ID",
+	"total": "Total",
+	"status": "Status",
 	"topProducts": "Top Products",
 	"topProductsDesc": "Best-selling products by revenue",
 	"product": "Product",

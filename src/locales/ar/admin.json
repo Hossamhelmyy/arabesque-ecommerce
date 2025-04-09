@@ -67,6 +67,11 @@
 		"delivered": "تم التوصيل",
 		"cancelled": "ملغي"
 	},
+	"recentOrders": "أحدث الطلبات",
+	"noRecentOrders": "لا توجد طلبات حديثة",
+	"orderId": "رقم الطلب",
+	"total": "الإجمالي",
+	"status": "الحالة",
 	"topProducts": "أفضل المنتجات",
 	"topProductsDesc": "المنتجات الأكثر مبيعًا حسب الإيرادات",
 	"product": "المنتج",
