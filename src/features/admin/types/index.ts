@@ -171,6 +171,11 @@ export type DashboardStats = {
 	revenueTrend: { value: number; isPositive: boolean };
 	ordersTrend: { value: number; isPositive: boolean };
 	customersTrend: { value: number; isPositive: boolean };
+	pendingOrders?: number;
+	processingOrders?: number;
+	shippedOrders?: number;
+	deliveredOrders?: number;
+	cancelledOrders?: number;
 };
 
 export type OrderStatusOption = {

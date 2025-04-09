@@ -75,6 +75,11 @@ export const useDashboard = () => {
 		revenueTrend: { value: 0, isPositive: true },
 		ordersTrend: { value: 0, isPositive: true },
 		customersTrend: { value: 0, isPositive: true },
+		pendingOrders: 0,
+		processingOrders: 0,
+		shippedOrders: 0,
+		deliveredOrders: 0,
+		cancelledOrders: 0,
 	});
 	const [isLoading, setIsLoading] = useState(true);
 	const [recentOrders, setRecentOrders] = useState<
@@ -188,7 +193,9 @@ export const useDashboard = () => {
 
 			// Fetch total orders and revenue
 			const { data: allOrders, error: allOrdersError } =
-				await supabase.from("orders").select("total");
+				await supabase
+					.from("orders")
+					.select("total, status");
 
 			if (allOrdersError) throw allOrdersError;
 
@@ -196,6 +203,34 @@ export const useDashboard = () => {
 				(sum, order) => sum + (order.total || 0),
 				0,
 			);
+
+			// Count orders by status
+			const orderStatusCounts = {
+				pendingOrders: 0,
+				processingOrders: 0,
+				shippedOrders: 0,
+				deliveredOrders: 0,
+				cancelledOrders: 0,
+			};
+
+			interface OrderWithStatus {
+				total: number | null;
+				status: string | null;
+			}
+
+			allOrders.forEach((order: OrderWithStatus) => {
+				const status = order.status || "pending";
+				if (status === "pending")
+					orderStatusCounts.pendingOrders++;
+				else if (status === "processing")
+					orderStatusCounts.processingOrders++;
+				else if (status === "shipped")
+					orderStatusCounts.shippedOrders++;
+				else if (status === "delivered")
+					orderStatusCounts.deliveredOrders++;
+				else if (status === "cancelled")
+					orderStatusCounts.cancelledOrders++;
+			});
 
 			setStats({
 				totalUsers: currentUsersCount || 0,
@@ -216,6 +251,7 @@ export const useDashboard = () => {
 					value: customersTrend,
 					isPositive: customersTrend >= 0,
 				},
+				...orderStatusCounts,
 			});
 		} catch (error) {
 			console.error(

@@ -22,6 +22,7 @@ import {
 	Settings,
 	Bell,
 	LayoutDashboard,
+	Home,
 } from "lucide-react";
 import {
 	DropdownMenu,
@@ -68,87 +69,89 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 
 	return (
 		<header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">
-			<div className="container flex h-16 items-center justify-between">
+			<div className="container flex h-16 items-center justify-between sm:px-6 px-0">
 				<div className="flex items-center gap-4">
-					<Sheet>
-						<SheetTrigger asChild>
-							<Button
-								variant="ghost"
-								size="icon"
-								className="md:hidden">
-								<Menu className="h-5 w-5" />
-								<span className="sr-only">
-									{t("common.menu")}
-								</span>
-							</Button>
-						</SheetTrigger>
-						<SheetContent
-							side={isRTL ? "right" : "left"}
-							className="w-[80vw] sm:w-[350px]">
-							<nav className="flex flex-col gap-4 py-8">
-								<Link
-									to={isAdmin ? "/admin/dashboard" : "/"}
-									className="px-2 py-1 text-lg font-medium">
-									{isAdmin
-										? t("admin.dashboard")
-										: t("common.home")}
-								</Link>
-
-								<>
-									<Link
-										to="/products"
-										className="px-2 py-1 text-lg font-medium">
-										{t("common.products")}
-									</Link>
-									<Link
-										to="/categories"
-										className="px-2 py-1 text-lg font-medium">
-										{t("common.categories")}
-									</Link>
-									{isUserAdmin && !isAdmin && (
-										<Link
-											to="/admin"
-											className="px-2 py-1 text-lg font-medium">
-											{t("admin.dashboard")}
-										</Link>
-									)}
-									<div className="border-t my-2"></div>
-									{user ? (
-										<>
-											<Link
-												to="/profile"
-												className="px-2 py-1 text-lg font-medium">
-												{t("common.profile")}
-											</Link>
-											<Link
-												to="/favorites"
-												className="px-2 py-1 text-lg font-medium">
-												{t("common.favorites")}
-											</Link>
-											<Link
-												to="/cart"
-												className="px-2 py-1 text-lg font-medium">
-												{t("common.cart")}
-											</Link>
-										</>
-									) : (
-										<Link
-											to="/auth"
-											className="px-2 py-1 text-lg font-medium">
-											{t("common.signIn")}
-										</Link>
-									)}
-								</>
-
+					{!isAdmin && (
+						<Sheet>
+							<SheetTrigger asChild>
 								<Button
 									variant="ghost"
-									onClick={signOut}
-									className="justify-start px-2 py-1 h-auto font-medium">
-									{t("common.signOut")}
+									size="icon"
+									className="md:hidden">
+									<Menu className="h-5 w-5" />
+									<span className="sr-only">
+										{t("common.menu")}
+									</span>
 								</Button>
-							</nav>
-						</SheetContent>
-					</Sheet>
+							</SheetTrigger>
+							<SheetContent
+								side={isRTL ? "right" : "left"}
+								className="w-[80vw] sm:w-[350px]">
+								<nav className="flex flex-col gap-4 py-8">
+									<Link
+										to={isAdmin ? "/admin/dashboard" : "/"}
+										className="px-2 py-1 text-lg font-medium">
+										{isAdmin
+											? t("admin.dashboard")
+											: t("common.home")}
+									</Link>
+
+									<>
+										<Link
+											to="/products"
+											className="px-2 py-1 text-lg font-medium">
+											{t("common.products")}
+										</Link>
+										<Link
+											to="/categories"
+											className="px-2 py-1 text-lg font-medium">
+											{t("common.categories")}
+										</Link>
+										{isUserAdmin && !isAdmin && (
+											<Link
+												to="/admin"
+												className="px-2 py-1 text-lg font-medium">
+												{t("admin.dashboard")}
+											</Link>
+										)}
+										<div className="border-t my-2"></div>
+										{user ? (
+											<>
+												<Link
+													to="/profile"
+													className="px-2 py-1 text-lg font-medium">
+													{t("common.profile")}
+												</Link>
+												<Link
+													to="/favorites"
+													className="px-2 py-1 text-lg font-medium">
+													{t("common.favorites")}
+												</Link>
+												<Link
+													to="/cart"
+													className="px-2 py-1 text-lg font-medium">
+													{t("common.cart")}
+												</Link>
+											</>
+										) : (
+											<Link
+												to="/auth"
+												className="px-2 py-1 text-lg font-medium">
+												{t("common.signIn")}
+											</Link>
+										)}
+									</>
+
+									<Button
+										variant="ghost"
+										onClick={signOut}
+										className="justify-start px-2 py-1 h-auto font-medium">
+										{t("common.signOut")}
+									</Button>
+								</nav>
+							</SheetContent>
+						</Sheet>
+					)}
 
 					<Link
 						to={isAdmin ? "/admin/dashboard" : "/"}

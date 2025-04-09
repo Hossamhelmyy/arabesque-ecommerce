@@ -37,7 +37,15 @@ import {
 } from "recharts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import {
+	Download,
+	BarChart3,
+	PieChart as PieChartIcon,
+	FileText,
+} from "lucide-react";
+import { ShoppingCart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import type { BadgeProps } from "@/components/ui/badge";
 
 export const DashboardView = () => {
 	const { t } = useTranslation();
@@ -107,18 +115,37 @@ export const DashboardView = () => {
 			/>
 
 			{/* Tabs */}
-			<Tabs defaultValue="overview" className="space-y-4">
-				<TabsList>
-					<TabsTrigger value="overview">
-						{t("admin.overview")}
-					</TabsTrigger>
-					<TabsTrigger value="analytics">
-						{t("admin.analytics")}
-					</TabsTrigger>
-					<TabsTrigger value="reports">
-						{t("admin.reports")}
-					</TabsTrigger>
-				</TabsList>
+			<Tabs defaultValue="overview" className="space-y-6">
+				<div className="border-b">
+					<div className="container px-4 py-2 mx-auto">
+						<TabsList className="h-12 w-full max-w-md mx-auto rounded-md bg-background border grid grid-cols-3 p-1 gap-1">
+							<TabsTrigger
+								value="overview"
+								className="rounded-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex items-center gap-2">
+								<BarChart3 className="h-4 w-4" />
+								<span className="hidden sm:inline">
+									{t("admin.overview")}
+								</span>
+							</TabsTrigger>
+							<TabsTrigger
+								value="analytics"
+								className="rounded-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex items-center gap-2">
+								<PieChartIcon className="h-4 w-4" />
+								<span className="hidden sm:inline">
+									{t("admin.analytics")}
+								</span>
+							</TabsTrigger>
+							<TabsTrigger
+								value="reports"
+								className="rounded-sm data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all flex items-center gap-2">
+								<FileText className="h-4 w-4" />
+								<span className="hidden sm:inline">
+									{t("admin.reports")}
+								</span>
+							</TabsTrigger>
+						</TabsList>
+					</div>
+				</div>
 
 				<TabsContent value="overview" className="space-y-4">
 					<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
@@ -354,7 +381,7 @@ export const DashboardView = () => {
 						{/* Sales Report */}
 						<Card>
 							<CardHeader>
-								<div className="flex items-center justify-between">
+								<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 									<div className="space-y-1">
 										<CardTitle>
 											{t("admin.salesReport")}
@@ -363,7 +390,9 @@ export const DashboardView = () => {
 											{t("admin.salesReportDescription")}
 										</CardDescription>
 									</div>
-									<Button size="sm">
+									<Button
+										size="sm"
+										className="w-full sm:w-auto">
 										<Download className="h-4 w-4 mr-2" />
 										{t("admin.downloadReport")}
 									</Button>
@@ -371,9 +400,9 @@ export const DashboardView = () => {
 							</CardHeader>
 							<CardContent>
 								<div className="space-y-4">
-									<div className="grid gap-4 md:grid-cols-3">
-										<Card>
-											<CardHeader>
+									<div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+										<Card className="shadow-sm">
+											<CardHeader className="pb-2">
 												<CardTitle className="text-sm">
 													{t("admin.totalSales")}
 												</CardTitle>
@@ -386,8 +415,8 @@ export const DashboardView = () => {
 												</div>
 											</CardContent>
 										</Card>
-										<Card>
-											<CardHeader>
+										<Card className="shadow-sm">
+											<CardHeader className="pb-2">
 												<CardTitle className="text-sm">
 													{t("admin.averageOrderValue")}
 												</CardTitle>
@@ -401,8 +430,8 @@ export const DashboardView = () => {
 												</div>
 											</CardContent>
 										</Card>
-										<Card>
-											<CardHeader>
+										<Card className="shadow-sm sm:col-span-2 md:col-span-1">
+											<CardHeader className="pb-2">
 												<CardTitle className="text-sm">
 													{t("admin.conversionRate")}
 												</CardTitle>
@@ -418,6 +447,180 @@ export const DashboardView = () => {
 											</CardContent>
 										</Card>
 									</div>
+
+									{/* Order Status Distribution */}
+									<Card className="shadow-sm mt-4">
+										<CardHeader className="pb-2">
+											<CardTitle className="text-base">
+												{t("admin.orderStatusDistribution")}
+											</CardTitle>
+										</CardHeader>
+										<CardContent>
+											{isLoading ? (
+												<Skeleton className="h-[200px] w-full" />
+											) : (
+												<div className="w-full h-[250px]">
+													<ResponsiveContainer
+														width="100%"
+														height={250}>
+														<PieChart>
+															<Pie
+																data={[
+																	{
+																		name: t(
+																			"admin.orderStatus.pending",
+																		),
+																		value:
+																			stats.pendingOrders ||
+																			0,
+																	},
+																	{
+																		name: t(
+																			"admin.orderStatus.processing",
+																		),
+																		value:
+																			stats.processingOrders ||
+																			0,
+																	},
+																	{
+																		name: t(
+																			"admin.orderStatus.shipped",
+																		),
+																		value:
+																			stats.shippedOrders ||
+																			0,
+																	},
+																	{
+																		name: t(
+																			"admin.orderStatus.delivered",
+																		),
+																		value:
+																			stats.deliveredOrders ||
+																			0,
+																	},
+																	{
+																		name: t(
+																			"admin.orderStatus.cancelled",
+																		),
+																		value:
+																			stats.cancelledOrders ||
+																			0,
+																	},
+																]}
+																cx="50%"
+																cy="50%"
+																outerRadius={80}
+																fill="hsl(var(--primary))"
+																dataKey="value"
+																nameKey="name"
+																label={({
+																	name,
+																	percent,
+																}) =>
+																	`${name}: ${formatPercentage(
+																		percent * 100,
+																	)}`
+																}>
+																<Cell fill="#FFB74D" />{" "}
+																{/* Pending */}
+																<Cell fill="#64B5F6" />{" "}
+																{/* Processing */}
+																<Cell fill="#4DD0E1" />{" "}
+																{/* Shipped */}
+																<Cell fill="#81C784" />{" "}
+																{/* Delivered */}
+																<Cell fill="#E57373" />{" "}
+																{/* Cancelled */}
+															</Pie>
+															<Tooltip
+																formatter={(value) => [
+																	value,
+																	t("admin.orders"),
+																]}
+															/>
+														</PieChart>
+													</ResponsiveContainer>
+												</div>
+											)}
+										</CardContent>
+									</Card>
+
+									{/* Recent Activity */}
+									<Card className="shadow-sm mt-4">
+										<CardHeader className="pb-2">
+											<CardTitle className="text-base">
+												{t("admin.recentActivity")}
+											</CardTitle>
+										</CardHeader>
+										<CardContent>
+											<div className="space-y-4">
+												{isLoading ? (
+													<div className="space-y-3">
+														{Array.from({ length: 3 }).map(
+															(_, i) => (
+																<div
+																	key={i}
+																	className="flex items-center gap-3">
+																	<Skeleton className="h-10 w-10 rounded-full" />
+																	<div className="space-y-1 flex-1">
+																		<Skeleton className="h-4 w-full" />
+																		<Skeleton className="h-3 w-2/3" />
+																	</div>
+																</div>
+															),
+														)}
+													</div>
+												) : (
+													<div className="space-y-3">
+														{recentOrders
+															.slice(0, 3)
+															.map((order) => (
+																<div
+																	key={order.id}
+																	className="flex items-center gap-3 border-b pb-3 last:border-0">
+																	<div className="flex-shrink-0 h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+																		<ShoppingCart className="h-5 w-5 text-primary" />
+																	</div>
+																	<div className="space-y-1 flex-1">
+																		<p className="text-sm font-medium">
+																			{t("admin.newOrder", {
+																				id: order.orderNumber,
+																			})}
+																		</p>
+																		<p className="text-xs text-muted-foreground">
+																			{formatDate(
+																				order.date,
+																			)}{" "}
+																			-{" "}
+																			{formatCurrency(
+																				order.total,
+																			)}
+																		</p>
+																	</div>
+																	{getStatusBadge(
+																		order.status,
+																	).status && (
+																		<Badge
+																			variant={
+																				getStatusBadge(
+																					order.status,
+																				)
+																					.variant as BadgeProps["variant"]
+																			}>
+																			{
+																				getStatusBadge(
+																					order.status,
+																				).status
+																			}
+																		</Badge>
+																	)}
+																</div>
+															))}
+													</div>
+												)}
+											</div>
+										</CardContent>
+									</Card>
 								</div>
 							</CardContent>
 						</Card>
