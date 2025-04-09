@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/context/LanguageContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
 	ArrowRight,
 	Loader2,
@@ -160,8 +161,22 @@ const CategoriesPage = () => {
 		);
 	}
 
+	// Define breadcrumb items
+	const breadcrumbItems = [
+		{
+			href: "/categories",
+			translationKey: "common.categories",
+		},
+	];
+
 	return (
 		<div className="container py-8 md:py-12">
+			{/* Breadcrumb */}
+			<Breadcrumbs
+				items={breadcrumbItems}
+				className="mb-6"
+			/>
+
 			<div className="text-center mb-12">
 				<h1 className="text-3xl md:text-4xl font-bold mb-3">
 					{t("categories.title")}

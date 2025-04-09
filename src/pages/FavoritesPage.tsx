@@ -449,18 +449,6 @@ const FavoritesPage = () => {
 	if (!favorites || favorites.length === 0) {
 		return (
 			<div className="container py-12">
-				<div className="flex items-center mb-6">
-					<Button
-						variant="ghost"
-						size="sm"
-						className="mr-2"
-						asChild>
-						<Link to="/products">
-							<ArrowLeft className="h-4 w-4 mr-2" />
-							{t("products.title")}
-						</Link>
-					</Button>
-				</div>
 				<div className="text-center py-16">
 					<div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
 						<Heart className="h-8 w-8 text-muted-foreground" />
@@ -485,18 +473,6 @@ const FavoritesPage = () => {
 		<div className="container py-8 md:py-12">
 			<div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
 				<div>
-					<div className="flex items-center">
-						<Button
-							variant="ghost"
-							size="sm"
-							className="mr-2 -ml-2 mb-2"
-							asChild>
-							<Link to="/products">
-								<ArrowLeft className="h-4 w-4 mr-2" />
-								{t("products.title")}
-							</Link>
-						</Button>
-					</div>
 					<h1 className="text-3xl font-bold mb-2">
 						{t("favorites.title")}
 					</h1>

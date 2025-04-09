@@ -10,6 +10,7 @@ import {
 	TabsTrigger,
 } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
 	ProductGallery,
 	ProductInfo,
@@ -17,6 +18,12 @@ import {
 	RelatedProducts,
 } from "@/features/products/components/product-detail";
 import { useProductDetails } from "@/features/products/hooks";
+
+interface BreadcrumbItem {
+	href: string;
+	label?: string;
+	translationKey?: string;
+}
 
 const ModernProductDetailPage = () => {
 	const { t, i18n } = useTranslation();
@@ -53,40 +60,41 @@ const ModernProductDetailPage = () => {
 		);
 	}
 
+	// Define breadcrumb items
+	const breadcrumbItems: BreadcrumbItem[] = [
+		{
+			href: "/products",
+			translationKey: "products.title",
+		},
+	];
+
+	// Add category to breadcrumbs if available
+	if (product.categories) {
+		breadcrumbItems.push({
+			href: `/category/${product.categories.slug}`,
+			label:
+				isArabic && product.categories.name_ar
+					? product.categories.name_ar
+					: product.categories.name,
+		});
+	}
+
+	// Add current product as the last breadcrumb item
+	breadcrumbItems.push({
+		href: `/product/${product.slug}`,
+		label:
+			isArabic && product.name_ar
+				? product.name_ar
+				: product.name,
+	});
+
 	return (
 		<div className="container py-12">
 			{/* Breadcrumb */}
-			<div className="mb-6">
-				<div className="flex items-center text-sm text-muted-foreground">
-					<Link to="/" className="hover:text-primary">
-						{t("common.home")}
-					</Link>
-					<span className="mx-2">/</span>
-					<Link
-						to="/products"
-						className="hover:text-primary">
-						{t("products.title")}
-					</Link>
-					<span className="mx-2">/</span>
-					{product.categories && (
-						<>
-							<Link
-								to={`/category/${product.categories.slug}`}
-								className="hover:text-primary">
-								{isArabic && product.categories.name_ar
-									? product.categories.name_ar
-									: product.categories.name}
-							</Link>
-							<span className="mx-2">/</span>
-						</>
-					)}
-					<span className="text-foreground font-medium">
-						{isArabic && product.name_ar
-							? product.name_ar
-							: product.name}
-					</span>
-				</div>
-			</div>
+			<Breadcrumbs
+				items={breadcrumbItems}
+				className="mb-6"
+			/>
 
 			<div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
 				{/* Product Gallery */}
@@ -103,7 +111,7 @@ const ModernProductDetailPage = () => {
 					<ProductActions product={product} />
 
 					{/* Additional tabs */}
-					<Tabs defaultValue="details" className="mt-8">
+					{/* <Tabs defaultValue="details" className="mt-8">
 						<TabsList>
 							<TabsTrigger value="details">
 								{t("product.details")}
@@ -130,7 +138,7 @@ const ModernProductDetailPage = () => {
 								{t("product.returnsTab")}
 							</div>
 						</TabsContent>
-					</Tabs>
+					</Tabs> */}
 				</div>
 			</div>
 

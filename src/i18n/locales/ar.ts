@@ -448,6 +448,7 @@ export default {
 		freeShipping: "شحن مجاني",
 		sale: "تخفيض",
 		new: "جديد",
+		off: "خصم",
 		addedToCart: "تمت الإضافة إلى السلة",
 		addedToCartDescription:
 			"تمت إضافة المنتج إلى سلة التسوق الخاصة بك",

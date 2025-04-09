@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/context/LanguageContext";
 import { ProductsGrid } from "@/features/products/components/product-grid";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import {
 	FilterBadges,
 	SearchBar,
@@ -69,8 +70,22 @@ const ProductsPage = () => {
 		);
 	}
 
+	// Define breadcrumb items
+	const breadcrumbItems = [
+		{
+			href: "/products",
+			translationKey: "products.title",
+		},
+	];
+
 	return (
 		<div className="container py-8 md:py-12">
+			{/* Breadcrumb */}
+			<Breadcrumbs
+				items={breadcrumbItems}
+				className="mb-6"
+			/>
+
 			<h1 className="text-3xl font-bold mb-8">
 				{t("products.title")}
 			</h1>
