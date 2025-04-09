@@ -36,6 +36,7 @@ type SupabaseCartResponse = {
 	id: string;
 	product_id: string;
 	quantity: number;
+	created_at: string;
 	products: {
 		name: string;
 		name_ar: string;
@@ -53,6 +54,7 @@ const fetchCartItemsFromAPI = async (userId: string) => {
 			id,
 			product_id,
 			quantity,
+			created_at,
 			products (
 				name,
 				name_ar,
@@ -61,12 +63,16 @@ const fetchCartItemsFromAPI = async (userId: string) => {
 			)
 		`,
 		)
-		.eq("user_id", userId);
+		.eq("user_id", userId)
+		.order("created_at", { ascending: true });
 
 	if (error) throw error;
 
 	// Safe type assertion for Supabase response
-	const cartData = data as unknown as SupabaseCartResponse;
+	const cartData =
+		data as unknown as (SupabaseCartResponse[0] & {
+			created_at: string;
+		})[];
 	return (
 		cartData?.map((item) => ({
 			id: item.id,
@@ -76,6 +82,7 @@ const fetchCartItemsFromAPI = async (userId: string) => {
 			name_ar: item.products.name_ar,
 			price: item.products.price,
 			image: item.products.image,
+			created_at: item.created_at,
 		})) ?? []
 	);
 };
@@ -198,7 +205,10 @@ export const CartProvider: React.FC<{
 
 			const { error } = await supabase
 				.from("cart")
-				.update({ quantity })
+				.update({
+					quantity,
+					updated_at: new Date().toISOString(),
+				})
 				.eq("user_id", user.id)
 				.eq("product_id", productId);
 

@@ -153,12 +153,7 @@ export function ProductCard({
 							className="h-9 w-9 rounded-full shadow-md bg-background/80 backdrop-blur-sm hover:bg-background"
 							onClick={handleAddToCart}>
 							{addedToCart ? (
-								<Check
-									className={cn(
-										"h-4 w-4",
-										isRTL ? "ml-2" : "mr-2",
-									)}
-								/>
+								<Check className={cn("h-4 w-4")} />
 							) : (
 								<ShoppingCart className={cn("h-4 w-4")} />
 							)}
@@ -246,12 +241,7 @@ export function ProductCard({
 						onClick={handleAddToCart}>
 						{addedToCart ? (
 							<>
-								<Check
-									className={cn(
-										"mr-2 h-4 w-4",
-										isRTL ? "ml-2" : "mr-2",
-									)}
-								/>
+								<Check className={cn("mr-2 h-4 w-4")} />
 								{t("product.addedToCart")}
 							</>
 						) : (

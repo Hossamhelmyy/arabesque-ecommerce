@@ -1,8 +1,13 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { useLanguage } from "@/context/LanguageContext";
 
 export const CartItemSkeleton = () => {
+	const { isRTL } = useLanguage();
+
 	return (
-		<div className="group relative flex flex-col sm:flex-row items-start gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4">
+		<div
+			dir={isRTL ? "rtl" : "ltr"}
+			className="group relative flex flex-col sm:flex-row items-start gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4">
 			{/* Product Image Skeleton */}
 			<Skeleton className="relative aspect-square h-20 w-20 sm:h-24 sm:w-24 rounded-md" />
 

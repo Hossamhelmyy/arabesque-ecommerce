@@ -60,16 +60,16 @@ const AdminSidebar = ({
 			icon: <Users className="h-5 w-5" />,
 			label: t("admin.users"),
 		},
-		{
-			href: "/admin/content",
-			icon: <FileText className="h-5 w-5" />,
-			label: t("admin.content"),
-		},
-		{
-			href: "/admin/settings",
-			icon: <Settings className="h-5 w-5" />,
-			label: t("admin.settings"),
-		},
+		// {
+		// 	href: "/admin/content",
+		// 	icon: <FileText className="h-5 w-5" />,
+		// 	label: t("admin.content"),
+		// },
+		// {
+		// 	href: "/admin/settings",
+		// 	icon: <Settings className="h-5 w-5" />,
+		// 	label: t("admin.settings"),
+		// },
 	];
 
 	const renderNavItems = () => (
