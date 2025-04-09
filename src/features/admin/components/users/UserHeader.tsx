@@ -29,7 +29,7 @@ export const UserHeader = ({
 					{t("admin.users")}
 				</h1>
 				<p className="text-muted-foreground">
-					{t("admin.manageUsersDesc")}
+					{t("admin.manageUsers")}
 				</p>
 			</div>
 			<div className="w-full md:w-auto">
