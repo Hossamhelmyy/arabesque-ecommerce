@@ -127,7 +127,7 @@ const useProducts = (): ProductsData => {
 		queryKey: ["products", filters, sort],
 		queryFn: async () => {
 			let query = supabase.from("products").select("*");
-			console.log(query, "query");
+
 			if (filters.search) {
 				query = query.or(
 					`name.ilike.%${filters.search}%,name_ar.ilike.%${filters.search}%`,
@@ -185,7 +185,7 @@ const useProducts = (): ProductsData => {
 			}
 
 			const { data, error } = await query;
-			console.log(data, "data");
+
 			if (error) {
 				toast({
 					title: t("common.error"),
