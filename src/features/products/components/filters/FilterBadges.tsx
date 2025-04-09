@@ -24,7 +24,7 @@ const FilterBadges = ({
 			typeof value === "string"
 				? value !== ""
 				: typeof value === "number"
-				? value > 0 && value < 1000
+				? value > 0 && value < 10000
 				: value === true,
 	);
 
@@ -74,7 +74,7 @@ const FilterBadges = ({
 			)}
 
 			{(filters.minPrice > 0 ||
-				filters.maxPrice < 1000) && (
+				filters.maxPrice < 10000) && (
 				<Badge
 					variant="secondary"
 					className="gap-1 px-3 py-1.5 text-sm">
@@ -86,7 +86,7 @@ const FilterBadges = ({
 						className="h-4 w-4 p-0 hover:bg-transparent"
 						onClick={() => {
 							handleFilterChange("minPrice", 0);
-							handleFilterChange("maxPrice", 1000);
+							handleFilterChange("maxPrice", 10000);
 						}}>
 						<X className="h-3 w-3" />
 					</Button>

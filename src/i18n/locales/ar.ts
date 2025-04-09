@@ -823,6 +823,9 @@ export default {
 		shippingTab: "الشحن",
 		returnsTab: "الإرجاع والاسترداد",
 		search: "بحث",
+		categories: "الفئات",
+		allCategories: "جميع الفئات",
+		category: "الفئة",
 	},
 	settings: {
 		title: "الإعدادات",

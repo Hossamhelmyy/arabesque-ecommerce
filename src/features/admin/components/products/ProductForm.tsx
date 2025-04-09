@@ -108,7 +108,23 @@ export function ProductForm({
 					description: t("admin.productUpdatedMessage"),
 				});
 			} else {
-				await createProduct(values);
+				const productData = {
+					name: values.name,
+					name_ar: values.name_ar || "",
+					description: values.description || "",
+					description_ar: values.description_ar || "",
+					price: values.price,
+					original_price: values.original_price,
+					stock_quantity: values.stock_quantity || 0,
+					image: values.image,
+					images: values.images || [],
+					category_id: values.category_id || null,
+					is_featured: values.is_featured || false,
+					is_new: values.is_new || false,
+					is_on_sale: values.is_on_sale || false,
+				};
+
+				await createProduct(productData);
 				toast({
 					title: t("admin.productCreated"),
 					description: t("admin.productCreatedMessage"),

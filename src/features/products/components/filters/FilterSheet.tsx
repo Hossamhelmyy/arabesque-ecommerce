@@ -111,7 +111,7 @@ const FilterSheet = ({
 									filters.minPrice,
 									filters.maxPrice,
 								]}
-								max={1000}
+								max={10000}
 								min={0}
 								step={10}
 								value={[filters.minPrice, filters.maxPrice]}

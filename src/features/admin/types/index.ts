@@ -104,6 +104,7 @@ export interface Product {
 	is_on_sale?: boolean;
 	created_at: string;
 	updated_at?: string;
+	slug?: string;
 }
 
 export type Profile = {
@@ -360,4 +361,32 @@ export interface OrdersData {
 	formatCurrency: (value: number) => string;
 	handleSearch: (query: string) => void;
 	handleStatusFilter: (status: string) => void;
+}
+
+export interface ProductsData {
+	products: Product[];
+	categories: Category[];
+	filteredProducts: Product[];
+	isLoading: boolean;
+	isSubmitting: boolean;
+	selectedProduct: Product | null;
+	searchQuery: string;
+	categoryFilter: string;
+	handleSearch: (query: string) => void;
+	handleCategoryFilter: (categoryId: string) => void;
+	setSelectedProduct: (product: Product | null) => void;
+	setSearchQuery: (query: string) => void;
+	createProduct: (
+		productData: Omit<
+			Product,
+			"id" | "created_at" | "updated_at" | "slug"
+		>,
+	) => Promise<void>;
+	updateProduct: (
+		id: string,
+		productData: Partial<Product>,
+	) => Promise<void>;
+	deleteProduct: (id: string) => Promise<void>;
+	formatDate: (dateString: string) => string;
+	formatPrice: (price: number) => string;
 }

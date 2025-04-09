@@ -67,11 +67,7 @@ const useSafeSearchParams = () => {
 		} as unknown as URLSearchParams;
 
 		// Return dummy implementations that won't throw
-		return [
-			mockParams,
-			// eslint-disable-next-line @typescript-eslint/no-empty-function
-			() => {},
-		] as const;
+		return [mockParams, () => {}] as const;
 	}
 };
 
@@ -93,7 +89,8 @@ const useProducts = (): ProductsData => {
 		search: initialSearch,
 		category: initialCategory,
 		minPrice: Number(searchParams.get("min_price")) || 0,
-		maxPrice: Number(searchParams.get("max_price")) || 1000,
+		maxPrice:
+			Number(searchParams.get("max_price")) || 10000,
 		isNew: initialFilters?.includes("new") || false,
 		isOnSale: initialFilters?.includes("sale") || false,
 		isFeatured:
@@ -130,7 +127,7 @@ const useProducts = (): ProductsData => {
 		queryKey: ["products", filters, sort],
 		queryFn: async () => {
 			let query = supabase.from("products").select("*");
-
+			console.log(query, "query");
 			if (filters.search) {
 				query = query.or(
 					`name.ilike.%${filters.search}%,name_ar.ilike.%${filters.search}%`,
@@ -188,7 +185,7 @@ const useProducts = (): ProductsData => {
 			}
 
 			const { data, error } = await query;
-
+			console.log(data, "data");
 			if (error) {
 				toast({
 					title: t("common.error"),
@@ -201,6 +198,9 @@ const useProducts = (): ProductsData => {
 			return data as Product[];
 		},
 		enabled: !!categories,
+		refetchInterval: 60000,
+		refetchOnWindowFocus: true,
+		staleTime: 30000,
 	});
 
 	// Query to fetch wishlist items
@@ -351,7 +351,7 @@ const useProducts = (): ProductsData => {
 					"min_price",
 					filters.minPrice.toString(),
 				);
-			if (filters.maxPrice < 1000)
+			if (filters.maxPrice < 10000)
 				params.set(
 					"max_price",
 					filters.maxPrice.toString(),
@@ -396,7 +396,7 @@ const useProducts = (): ProductsData => {
 			search: "",
 			category: "",
 			minPrice: 0,
-			maxPrice: 1000,
+			maxPrice: 10000,
 			isNew: false,
 			isOnSale: false,
 			isFeatured: false,
@@ -425,7 +425,7 @@ const useProducts = (): ProductsData => {
 		if (filters.search) count++;
 		if (filters.category) count++;
 		if (filters.minPrice > 0) count++;
-		if (filters.maxPrice < 1000) count++;
+		if (filters.maxPrice < 10000) count++;
 		if (filters.isNew) count++;
 		if (filters.isOnSale) count++;
 		if (filters.isFeatured) count++;

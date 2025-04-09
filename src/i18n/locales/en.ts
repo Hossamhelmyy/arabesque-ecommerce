@@ -673,6 +673,9 @@ export default {
 		shippingTab: "Shipping",
 		returnsTab: "Returns & Refunds",
 		search: "Search",
+		categories: "Categories",
+		allCategories: "All Categories",
+		category: "Category",
 	},
 	settings: {
 		title: "Settings",
