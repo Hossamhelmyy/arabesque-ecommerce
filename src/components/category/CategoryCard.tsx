@@ -71,7 +71,10 @@ export const CategoryCard = ({
 									"w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
 									isHovered && "scale-105",
 								)}
-								loading={imagePriority ? "eager" : "lazy"}
+								onError={(e) => {
+									(e.target as HTMLImageElement).src =
+										"/placeholder.svg";
+								}}
 							/>
 						</div>
 					) : (

@@ -3,9 +3,16 @@ export type Category = {
 	name: string;
 	name_ar: string;
 	slug: string;
-	description?: string | null;
-	description_ar?: string | null;
-	image?: string | null;
+	image: string | null;
+	parent_id: string | null;
+	products_count?: number;
+};
+
+export type CategoryListProps = {
+	categories: Category[];
+	isLoading?: boolean;
+	onSearch?: (term: string) => void;
+	searchTerm?: string;
 };
 
 export type CategoryContextType = {

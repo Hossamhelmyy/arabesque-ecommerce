@@ -31,16 +31,6 @@ export const OrderSummary = ({
 }: OrderSummaryProps) => {
 	const { t } = useTranslation();
 	const { isRTL } = useLanguage();
-	const [loadedImages, setLoadedImages] = useState<
-		Record<string, boolean>
-	>({});
-
-	const handleImageLoad = (itemId: string) => {
-		setLoadedImages((prev) => ({
-			...prev,
-			[itemId]: true,
-		}));
-	};
 
 	const container = {
 		hidden: { opacity: 0 },
@@ -81,18 +71,14 @@ export const OrderSummary = ({
 								variants={itemVariant}
 								className="group flex items-start gap-3 sm:gap-4 rounded-lg p-2 transition-colors hover:bg-muted/50">
 								<div className="relative h-16 w-16 sm:h-20 sm:w-20 overflow-hidden rounded-md border bg-muted">
-									{!loadedImages[item.id] && (
-										<Skeleton className="absolute inset-0 h-full w-full" />
-									)}
 									<img
 										src={item.product.image_url}
 										alt={item.product.name}
-										className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-110 ${
-											!loadedImages[item.id]
-												? "opacity-0"
-												: "opacity-100"
-										}`}
-										onLoad={() => handleImageLoad(item.id)}
+										className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-110`}
+										onError={(e) => {
+											(e.target as HTMLImageElement).src =
+												"/placeholder.svg";
+										}}
 									/>
 								</div>
 								<div className="flex flex-1 flex-col space-y-1 sm:space-y-2">
