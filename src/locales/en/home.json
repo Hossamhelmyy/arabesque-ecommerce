@@ -1,0 +1,9 @@
+{
+	"testimonials": "What Our Customers Say",
+	"stayUpdated": "Stay Updated",
+	"newsletter": {
+		"description": "Subscribe to our newsletter and be the first to know about new products, special offers, and upcoming events.",
+		"emailPlaceholder": "Your email address",
+		"subscribe": "Subscribe"
+	}
+}

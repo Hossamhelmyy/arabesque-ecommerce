@@ -90,22 +90,20 @@ const Index = () => {
 							{t("home.stayUpdated")}
 						</h2>
 						<p className="text-white/80 mb-8">
-							Subscribe to our newsletter and be the first
-							to know about new products, special offers,
-							and upcoming events.
+							{t("home.newsletter.description")}
 						</p>
 						<form className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
 							<input
 								type="email"
 								placeholder={t(
-									"newsletter.emailPlaceholder",
+									"home.newsletter.emailPlaceholder",
 								)}
 								className="flex h-10 w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arabesque-gold"
 							/>
 							<button
 								type="submit"
 								className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-arabesque-gold px-4 py-2 text-sm font-medium text-white shadow hover:bg-arabesque-gold/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arabesque-gold">
-								{t("newsletter.subscribe")}
+								{t("home.newsletter.subscribe")}
 							</button>
 						</form>
 					</div>

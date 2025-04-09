@@ -19,7 +19,8 @@ import {
 import { useProductDetails } from "@/features/products/hooks";
 
 const ModernProductDetailPage = () => {
-	const { t } = useTranslation();
+	const { t, i18n } = useTranslation();
+	const isArabic = i18n.language === "ar";
 	const { product, isLoading, error, relatedProducts } =
 		useProductDetails();
 
@@ -72,13 +73,15 @@ const ModernProductDetailPage = () => {
 							<Link
 								to={`/categories/${product.categories.slug}`}
 								className="hover:text-primary">
-								{t(product.categories.name)}
+								{isArabic
+									? product.categories.name_ar
+									: product.categories.name}
 							</Link>
 						</>
 					)}
 					<span className="mx-2">/</span>
 					<span className="text-foreground font-medium">
-						{product.name}
+						{isArabic ? product.name_ar : product.name}
 					</span>
 				</div>
 			</div>

@@ -38,7 +38,7 @@ export default {
 			"Curating authentic treasures from around the world, delivered with care to your doorstep.",
 	},
 	admin: {
-		title: "Admin Dashboard",
+		title: "Arabesque",
 		dashboard: "Dashboard",
 		products: "Products",
 		orders: "Orders",
