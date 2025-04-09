@@ -66,6 +66,7 @@ export default {
 		orderDetails: "Order Details",
 		customerDetails: "Customer Details",
 		statusPending: "Pending",
+		all: "All",
 		statusProcessing: "Processing",
 		statusCompleted: "Completed",
 		statusCancelled: "Cancelled",
@@ -246,6 +247,14 @@ export default {
 			"Upload up to 6 images. The first image will be used as the main product image.",
 		noOrders: "No Orders Found",
 		orderId: "Order ID",
+		orderStatus: {
+			pending: "Pending",
+			processing: "Processing",
+			shipped: "Shipped",
+			delivered: "Delivered",
+			cancelled: "Cancelled",
+			all: "All Orders",
+		},
 	},
 	auth: {
 		signIn: "Sign In",
@@ -669,5 +678,47 @@ export default {
 		shippingTab: "Shipping",
 		returnsTab: "Returns & Refunds",
 		search: "Search",
+	},
+	settings: {
+		title: "Settings",
+		storeSettings: "Store Settings",
+		storeSettingsDesc:
+			"Configure your store information and preferences",
+		emailSettings: "Email Settings",
+		emailSettingsDesc:
+			"Configure your email server for notifications and customer communications",
+		shippingSettings: "Shipping Settings",
+		shippingSettingsDesc:
+			"Configure your store's shipping options and rates",
+		store: "Store",
+		email: "Email",
+		shipping: "Shipping",
+		storeName: "Store Name",
+		storeEmail: "Store Email",
+		storePhone: "Store Phone",
+		storeAddress: "Store Address",
+		currency: "Currency",
+		language: "Language",
+		smtpHost: "SMTP Host",
+		smtpPort: "SMTP Port",
+		smtpUsername: "SMTP Username",
+		smtpPassword: "SMTP Password",
+		senderName: "Sender Name",
+		senderEmail: "Sender Email",
+		enableShipping: "Enable Shipping",
+		enableShippingDesc:
+			"Enable shipping options for your products",
+		defaultShippingRate: "Default Shipping Rate",
+		defaultShippingRateDesc:
+			"The default shipping rate for orders",
+		freeShippingThreshold: "Free Shipping Threshold",
+		freeShippingThresholdDesc:
+			"Orders above this amount qualify for free shipping",
+		allowInternationalShipping:
+			"Allow International Shipping",
+		allowInternationalShippingDesc:
+			"Allow shipping to international destinations",
+		saveSettings: "Save Settings",
+		saving: "Saving...",
 	},
 };

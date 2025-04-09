@@ -11,8 +11,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { formatPrice } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import type {
 	CartItem,
 	OrderSummary as OrderSummaryType,
@@ -29,6 +31,16 @@ export const OrderSummary = ({
 }: OrderSummaryProps) => {
 	const { t } = useTranslation();
 	const { isRTL } = useLanguage();
+	const [loadedImages, setLoadedImages] = useState<
+		Record<string, boolean>
+	>({});
+
+	const handleImageLoad = (itemId: string) => {
+		setLoadedImages((prev) => ({
+			...prev,
+			[itemId]: true,
+		}));
+	};
 
 	const container = {
 		hidden: { opacity: 0 },
@@ -68,11 +80,19 @@ export const OrderSummary = ({
 								key={item.id}
 								variants={itemVariant}
 								className="group flex items-start gap-4  rounded-lg p-2 transition-colors hover:bg-muted/50">
-								<div className="relative h-20 w-20 overflow-hidden rounded-md border">
+								<div className="relative h-20 w-20 overflow-hidden rounded-md border bg-muted">
+									{!loadedImages[item.id] && (
+										<Skeleton className="absolute inset-0 h-full w-full" />
+									)}
 									<img
 										src={item.product.image_url}
 										alt={item.product.name}
-										className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+										className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-110 ${
+											!loadedImages[item.id]
+												? "opacity-0"
+												: "opacity-100"
+										}`}
+										onLoad={() => handleImageLoad(item.id)}
 									/>
 								</div>
 								<div className="flex flex-1 flex-col space-y-2">

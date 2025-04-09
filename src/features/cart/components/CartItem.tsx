@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
 import { formatPrice } from "@/lib/utils";
 import { type CartItemDetail } from "../types";
 import { useLanguage } from "@/context/LanguageContext";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CartItemProps {
 	item: CartItemDetail;
@@ -29,6 +30,7 @@ const CartItem: React.FC<CartItemProps> = ({
 }) => {
 	const { t } = useTranslation();
 	const { isRTL } = useLanguage();
+	const [imageLoaded, setImageLoaded] = useState(false);
 
 	const handleIncrement = (e: React.MouseEvent) => {
 		e.preventDefault();
@@ -55,11 +57,17 @@ const CartItem: React.FC<CartItemProps> = ({
 			dir={isRTL ? "rtl" : "ltr"}
 			className="group relative flex flex-col sm:flex-row items-start gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4 hover:bg-muted/50 transition-colors">
 			{/* Product Image */}
-			<div className="relative aspect-square h-20 w-20 sm:h-24 sm:w-24 overflow-hidden rounded-md">
+			<div className="relative aspect-square h-20 w-20 sm:h-24 sm:w-24 overflow-hidden rounded-md bg-muted">
+				{!imageLoaded && (
+					<Skeleton className="absolute inset-0 h-full w-full" />
+				)}
 				<img
 					src={item.image}
 					alt={item.name}
-					className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+					className={`h-full w-full object-cover transition-transform duration-300 group-hover:scale-110 ${
+						!imageLoaded ? "opacity-0" : "opacity-100"
+					}`}
+					onLoad={() => setImageLoaded(true)}
 				/>
 				{item.sale_price &&
 					item.sale_price < item.price && (

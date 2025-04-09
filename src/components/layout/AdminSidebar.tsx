@@ -70,12 +70,6 @@ const AdminSidebar = ({
 			icon: <Settings className="h-5 w-5" />,
 			label: t("admin.settings"),
 		},
-		{
-			href: "/",
-			icon: <Home className="h-5 w-5" />,
-			label: t("common.home"),
-			isExternal: true,
-		},
 	];
 
 	const renderNavItems = () => (
@@ -86,7 +80,7 @@ const AdminSidebar = ({
 					to={item.href}
 					className={cn(
 						"admin-sidebar-item",
-						isActive(item.href) && !item.isExternal
+						isActive(item.href)
 							? "admin-sidebar-item-active"
 							: "admin-sidebar-item-inactive sidebar-hover-effect",
 					)}>
@@ -116,6 +110,14 @@ const AdminSidebar = ({
 					className="w-[80vw] sm:w-[350px] p-0">
 					<nav className="flex-1 py-8 px-4">
 						{renderNavItems()}
+						<Link
+							to={"/"}
+							className={cn(
+								"admin-sidebar-item admin-sidebar-item-inactive sidebar-hover-effect",
+							)}>
+							<Home className="h-5 w-5" />
+							<span>{t("common.home")}</span>
+						</Link>
 					</nav>
 				</SheetContent>
 			</Sheet>

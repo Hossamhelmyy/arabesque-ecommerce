@@ -65,7 +65,8 @@
 		"processing": "قيد المعالجة",
 		"shipped": "تم الشحن",
 		"delivered": "تم التسليم",
-		"cancelled": "ملغي"
+		"cancelled": "ملغي",
+		"all": "الكل"
 	},
 	"recentOrders": "الطلبات الأخيرة",
 	"noRecentOrders": "لا توجد طلبات حديثة",

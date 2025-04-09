@@ -46,7 +46,7 @@ export const OrderHeader = ({
 				<Select
 					value={statusFilter}
 					onValueChange={onStatusChange}>
-					<SelectTrigger className="h-8 w-[130px]">
+					<SelectTrigger className="h-8 w-[200px]">
 						<SelectValue
 							placeholder={t("admin.filterByStatus")}
 						/>

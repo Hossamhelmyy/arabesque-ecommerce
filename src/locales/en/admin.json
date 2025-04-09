@@ -65,7 +65,8 @@
 		"processing": "Processing",
 		"shipped": "Shipped",
 		"delivered": "Delivered",
-		"cancelled": "Cancelled"
+		"cancelled": "Cancelled",
+		"all": "All"
 	},
 	"recentOrders": "Recent Orders",
 	"noRecentOrders": "No recent orders found",
