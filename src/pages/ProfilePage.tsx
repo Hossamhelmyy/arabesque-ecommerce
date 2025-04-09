@@ -9,12 +9,13 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Loader2, User } from "lucide-react";
+import { User } from "lucide-react";
 import { ProfileSidebar } from "@/features/profile/components/ProfileSidebar";
 import { ProfileForm } from "@/features/profile/components/ProfileForm";
 import { PasswordForm } from "@/features/profile/components/PasswordForm";
 import { OrdersList } from "@/features/profile/components/OrdersList";
 import { AddressesList } from "@/features/profile/components/AddressesList";
+import { ProfilePageSkeleton } from "@/features/profile/components/ProfilePageSkeleton";
 import {
 	fetchProfile,
 	fetchOrders,
@@ -106,14 +107,7 @@ const ProfilePage = () => {
 	};
 
 	if (profileLoading) {
-		return (
-			<div className="container py-16 flex flex-col items-center justify-center">
-				<Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-				<p className="text-muted-foreground">
-					{t("common.loading")}
-				</p>
-			</div>
-		);
+		return <ProfilePageSkeleton />;
 	}
 
 	if (!user && !profileLoading) {
@@ -150,7 +144,7 @@ const ProfilePage = () => {
 		<div className="container py-8 md:py-12">
 			<div className="flex flex-col md:flex-row gap-8">
 				{/* Sidebar */}
-				<div className="md:w-auto">
+				<div className="md:w-[45%]">
 					<ProfileSidebar
 						profile={profile}
 						activeTab={activeTab}

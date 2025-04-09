@@ -361,14 +361,14 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 								</span>
 							</Button>
 
-							<Link to="/admin/settings">
+							{/* <Link to="/admin/settings">
 								<Button variant="ghost" size="icon">
 									<Settings className="h-5 w-5" />
 									<span className="sr-only">
 										{t("admin.settings")}
 									</span>
 								</Button>
-							</Link>
+							</Link> */}
 						</>
 					) : (
 						<>
@@ -422,11 +422,11 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 												{t("admin.profile")}
 											</Link>
 										</DropdownMenuItem>
-										<DropdownMenuItem asChild>
+										{/* <DropdownMenuItem asChild>
 											<Link to="/admin/settings">
 												{t("admin.settings")}
 											</Link>
-										</DropdownMenuItem>
+										</DropdownMenuItem> */}
 									</>
 								) : (
 									<>
