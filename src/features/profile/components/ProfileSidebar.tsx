@@ -53,7 +53,7 @@ export const ProfileSidebar = ({
 							)}
 						</AvatarFallback>
 					</Avatar>
-					<h2 className="text-xl font-bold">
+					<h2 className="text-xl font-bold max-w-[300px] truncate">
 						{profile?.first_name && profile?.last_name
 							? `${profile.first_name} ${profile.last_name}`
 							: user?.email}

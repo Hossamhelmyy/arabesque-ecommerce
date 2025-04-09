@@ -8,10 +8,11 @@ import { Input } from "@/components/ui/input";
 import {
 	Sheet,
 	SheetContent,
+	SheetHeader,
+	SheetTitle,
 	SheetTrigger,
 } from "@/components/ui/sheet";
 import {
-	Search,
 	Menu,
 	ShoppingCart,
 	Heart,
@@ -19,16 +20,21 @@ import {
 	Sun,
 	Moon,
 	Globe,
-	Settings,
-	Bell,
+	// Settings,
+	// Bell,
 	LayoutDashboard,
 	Home,
+	// ChevronRight,
+	Package,
+	LayoutGrid,
 } from "lucide-react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
+	DropdownMenuSeparator,
+	DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -43,6 +49,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import Cookies from "js-cookie";
+import { Separator } from "@/components/ui/separator";
 
 interface HeaderProps {
 	isAdmin?: boolean;
@@ -60,11 +67,9 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 	const { cartItems } = useCart();
 	const { user, signOut } = useAuth();
 
-	// Get cart count from actual cart items
 	const cartCount = cartItems.length;
 
 	useEffect(() => {
-		// Apply theme from cookie on mount
 		const theme = Cookies.get("theme") || "light";
 		setIsDarkMode(theme === "dark");
 		document.documentElement.classList.toggle(
@@ -80,12 +85,11 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 		Cookies.set("theme", newTheme, { expires: 365 });
 	};
 
-	// Check if user is admin
 	const isUserAdmin = user?.role === "admin";
 
 	return (
-		<header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">
-			<div className="container flex h-16 items-center justify-between sm:px-6 px-0">
+		<header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+			<div className="container flex h-16 items-center justify-between sm:px-6 px-2">
 				<div className="flex items-center gap-4">
 					{!isAdmin && (
 						<Sheet>
@@ -102,68 +106,177 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 							</SheetTrigger>
 							<SheetContent
 								side={isRTL ? "right" : "left"}
-								className="w-[80vw] sm:w-[350px]">
-								<nav className="flex flex-col gap-4 py-8">
-									<Link
-										to={isAdmin ? "/admin/dashboard" : "/"}
-										className="px-2 py-1 text-lg font-medium">
-										{isAdmin
-											? t("admin.dashboard")
-											: t("common.home")}
-									</Link>
+								className="w-[80vw] sm:w-[350px] p-0">
+								<Separator />
+								<nav className="flex flex-col py-8 px-4">
+									<div className="space-y-1">
+										<Link
+											to={
+												isAdmin ? "/admin/dashboard" : "/"
+											}
+											className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+											<Home className="h-5 w-5" />
+											<span>
+												{isAdmin
+													? t("admin.dashboard")
+													: t("common.home")}
+											</span>
+										</Link>
 
-									<>
 										<Link
 											to="/products"
-											className="px-2 py-1 text-lg font-medium">
-											{t("common.products")}
+											className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+											<Package className="h-5 w-5" />
+											<span>{t("common.products")}</span>
 										</Link>
+
 										<Link
 											to="/categories"
-											className="px-2 py-1 text-lg font-medium">
-											{t("common.categories")}
+											className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+											<LayoutGrid className="h-5 w-5" />
+											<span>{t("common.categories")}</span>
 										</Link>
+
 										{isUserAdmin && !isAdmin && (
 											<Link
 												to="/admin"
-												className="px-2 py-1 text-lg font-medium">
-												{t("admin.dashboard")}
+												className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+												<LayoutDashboard className="h-5 w-5" />
+												<span>{t("admin.dashboard")}</span>
 											</Link>
 										)}
-										<div className="border-t my-2"></div>
+									</div>
+
+									<Separator className="my-4" />
+
+									<div className="space-y-1">
 										{user ? (
 											<>
 												<Link
 													to="/profile"
-													className="px-2 py-1 text-lg font-medium">
-													{t("common.profile")}
+													className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+													<User className="h-5 w-5" />
+													<span>{t("common.profile")}</span>
 												</Link>
 												<Link
 													to="/favorites"
-													className="px-2 py-1 text-lg font-medium">
-													{t("common.favorites")}
+													className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+													<Heart className="h-5 w-5" />
+													<span>
+														{t("common.favorites")}
+													</span>
 												</Link>
 												<Link
 													to="/cart"
-													className="px-2 py-1 text-lg font-medium">
-													{t("common.cart")}
+													className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+													<ShoppingCart className="h-5 w-5" />
+													<span>{t("common.cart")}</span>
+													{cartCount > 0 && (
+														<Badge
+															variant="secondary"
+															className="absolute right-2">
+															{cartCount}
+														</Badge>
+													)}
 												</Link>
 											</>
 										) : (
 											<Link
 												to="/auth"
-												className="px-2 py-1 text-lg font-medium">
-												{t("common.signIn")}
+												className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect">
+												<User className="h-5 w-5" />
+												<span>{t("common.signIn")}</span>
 											</Link>
 										)}
-									</>
+									</div>
 
-									<Button
-										variant="ghost"
-										onClick={signOut}
-										className="justify-start px-2 py-1 h-auto font-medium">
-										{t("common.signOut")}
-									</Button>
+									<Separator className="my-4" />
+
+									{/* Language and Theme Controls */}
+									<div className="space-y-6 px-2">
+										<div className="space-y-3">
+											<div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+												<Globe className="h-4 w-4" />
+												{t("common.language")}
+											</div>
+											<div className="grid grid-cols-2 gap-2">
+												<Button
+													variant={
+														currentLanguage === "en"
+															? "default"
+															: "outline"
+													}
+													size="sm"
+													onClick={() =>
+														changeLanguage("en")
+													}
+													className={cn(
+														"w-full transition-all",
+														currentLanguage === "en" &&
+															"shadow-md",
+													)}>
+													English
+												</Button>
+												<Button
+													variant={
+														currentLanguage === "ar"
+															? "default"
+															: "outline"
+													}
+													size="sm"
+													onClick={() =>
+														changeLanguage("ar")
+													}
+													className={cn(
+														"w-full transition-all",
+														currentLanguage === "ar" &&
+															"shadow-md",
+													)}>
+													العربية
+												</Button>
+											</div>
+										</div>
+
+										<div className="space-y-3">
+											<div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+												{isDarkMode ? (
+													<Moon className="h-4 w-4" />
+												) : (
+													<Sun className="h-4 w-4" />
+												)}
+												{t("common.theme")}
+											</div>
+											<Button
+												variant="outline"
+												size="sm"
+												onClick={toggleTheme}
+												className="w-full justify-start gap-2">
+												{isDarkMode ? (
+													<>
+														<Sun className="h-4 w-4" />
+														{t("common.lightMode")}
+													</>
+												) : (
+													<>
+														<Moon className="h-4 w-4" />
+														{t("common.darkMode")}
+													</>
+												)}
+											</Button>
+										</div>
+									</div>
+
+									{user && (
+										<>
+											<Separator className="my-4" />
+											<Button
+												variant="ghost"
+												onClick={signOut}
+												className="admin-sidebar-item group relative admin-sidebar-item-inactive sidebar-hover-effect text-destructive">
+												<span>{t("common.signOut")}</span>
+											</Button>
+										</>
+									)}
 								</nav>
 							</SheetContent>
 						</Sheet>
@@ -172,7 +285,7 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 					<Link
 						to={isAdmin ? "/admin/dashboard" : "/"}
 						className="flex items-center space-x-2 rtl:space-x-reverse">
-						<span className="md:text-2xl text-lg font-heading font-bold text-primary">
+						<span className="md:text-2xl text-lg font-heading font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
 							{isAdmin
 								? t("admin.title")
 								: t("common.appName")}
@@ -354,21 +467,12 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 
 					{isAdmin ? (
 						<>
-							<Button variant="ghost" size="icon">
+							{/* <Button variant="ghost" size="icon">
 								<Bell className="h-5 w-5" />
 								<span className="sr-only">
 									{t("admin.notifications")}
 								</span>
-							</Button>
-
-							{/* <Link to="/admin/settings">
-								<Button variant="ghost" size="icon">
-									<Settings className="h-5 w-5" />
-									<span className="sr-only">
-										{t("admin.settings")}
-									</span>
-								</Button>
-							</Link> */}
+							</Button> */}
 						</>
 					) : (
 						<>
@@ -414,40 +518,56 @@ const Header = ({ isAdmin = false }: HeaderProps) => {
 									</span>
 								</Button>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
+							<DropdownMenuContent
+								align="end"
+								className="w-56">
+								<DropdownMenuLabel>
+									{user.email}
+								</DropdownMenuLabel>
+								<DropdownMenuSeparator />
 								{isAdmin ? (
 									<>
 										<DropdownMenuItem asChild>
-											<Link to="/admin/profile">
+											<Link
+												to="/admin/profile"
+												className="flex items-center">
+												<User className="h-4 w-4 mr-2" />
 												{t("admin.profile")}
 											</Link>
 										</DropdownMenuItem>
-										{/* <DropdownMenuItem asChild>
-											<Link to="/admin/settings">
-												{t("admin.settings")}
-											</Link>
-										</DropdownMenuItem> */}
 									</>
 								) : (
 									<>
 										<DropdownMenuItem asChild>
-											<Link to="/profile">
+											<Link
+												to="/profile"
+												className="flex items-center">
+												<User className="h-4 w-4 mr-2" />
 												{t("common.profile")}
 											</Link>
 										</DropdownMenuItem>
 										<DropdownMenuItem asChild>
-											<Link to="/cart">
+											<Link
+												to="/cart"
+												className="flex items-center">
+												<ShoppingCart className="h-4 w-4 mr-2" />
 												{t("common.cart")}
 											</Link>
 										</DropdownMenuItem>
 										<DropdownMenuItem asChild>
-											<Link to="/favorites">
+											<Link
+												to="/favorites"
+												className="flex items-center">
+												<Heart className="h-4 w-4 mr-2" />
 												{t("common.favorites")}
 											</Link>
 										</DropdownMenuItem>
 									</>
 								)}
-								<DropdownMenuItem onClick={signOut}>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem
+									onClick={signOut}
+									className="text-destructive">
 									{t("common.signOut")}
 								</DropdownMenuItem>
 							</DropdownMenuContent>
