@@ -81,11 +81,11 @@ const SignInForm: React.FC = () => {
 									<FormLabel>
 										{t("auth.password")}
 									</FormLabel>
-									<Button
+									{/* <Button
 										variant="link"
 										className="p-0 h-auto text-xs">
 										{t("auth.forgotPassword")}
-									</Button>
+									</Button> */}
 								</div>
 								<FormControl>
 									<Input type="password" {...field} />
