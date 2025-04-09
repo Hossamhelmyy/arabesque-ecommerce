@@ -236,6 +236,9 @@ export default {
 			"Create a new category to organize your products",
 		originalPriceDescription: "For products on sale",
 		productImages: "Product Images",
+		firstImageMain:
+			"The first image will be used as the main product image",
+		imageRequired: "At least one image is required",
 	},
 	auth: {
 		signIn: "Sign In",
@@ -770,5 +773,6 @@ export default {
 		senderEmailRequired: "Sender email is required",
 		defaultShippingRateRequired:
 			"Default shipping rate is required",
+		atLeastOneImage: "At least one image is required",
 	},
 };

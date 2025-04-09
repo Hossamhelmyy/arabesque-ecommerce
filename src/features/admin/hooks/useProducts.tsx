@@ -101,7 +101,7 @@ export const useProducts = (): ProductsData => {
 					price: productData.price,
 					original_price: productData.original_price,
 					stock_quantity: productData.stock_quantity || 0,
-					image: productData.image,
+					images: productData.images,
 					category_id: productData.category_id,
 					is_featured: productData.is_featured || false,
 					is_new: productData.is_new || false,

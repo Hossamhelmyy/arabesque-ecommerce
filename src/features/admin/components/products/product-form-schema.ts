@@ -10,21 +10,20 @@ export const productSchema = z.object({
 	}),
 	description: z.string().optional(),
 	description_ar: z.string().optional(),
-	price: z.coerce.number().min(0, {
+	price: z.coerce.number().min(1, {
 		message: "validation.positiveNumber",
 	}),
 	original_price: z.coerce
 		.number()
-		.min(0)
+		.min(1)
 		.optional()
 		.nullable(),
 	stock_quantity: z.coerce.number().min(0, {
 		message: "validation.positiveNumber",
 	}),
-	image: z
-		.string()
-		.url({ message: "validation.invalidUrl" }),
-	images: z.array(z.string().url()).optional(),
+	images: z.array(z.string().url()).min(1, {
+		message: "validation.atLeastOneImage",
+	}),
 	category_id: z.string().optional().nullable(),
 	is_featured: z.boolean().optional().nullable(),
 	is_new: z.boolean().optional().nullable(),

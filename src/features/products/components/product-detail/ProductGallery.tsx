@@ -27,7 +27,7 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
 			Boolean,
 		);
 	};
-
+	console.log(product);
 	const images = getImageArray(product);
 	const selectedImage =
 		images[selectedImageIndex] || "/placeholder.png";

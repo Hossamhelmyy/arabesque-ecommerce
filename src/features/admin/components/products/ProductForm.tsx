@@ -32,6 +32,7 @@ import {
 } from "./product-form-schema";
 import { useProducts } from "../../hooks/useProducts";
 import { toast } from "@/components/ui/use-toast";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ProductFormProps {
 	selectedProduct: Product | null;
@@ -48,7 +49,7 @@ export function ProductForm({
 	const { createProduct, updateProduct, isSubmitting } =
 		useProducts();
 	const [loading, setLoading] = useState(false);
-
+	const { isRTL } = useLanguage();
 	const form = useForm<ProductFormValues>({
 		resolver: zodResolver(productSchema),
 		defaultValues: selectedProduct
@@ -63,12 +64,14 @@ export function ProductForm({
 						selectedProduct.original_price || null,
 					stock_quantity:
 						selectedProduct.stock_quantity || 0,
-					image: selectedProduct.image,
-					images: Array.isArray(selectedProduct.images)
-						? selectedProduct.images
-						: selectedProduct.images
-						? Object.values(selectedProduct.images)
-						: [],
+					images: [
+						selectedProduct.image,
+						...(Array.isArray(selectedProduct.images)
+							? selectedProduct.images
+							: selectedProduct.images
+							? Object.values(selectedProduct.images)
+							: []),
+					].filter(Boolean),
 					category_id: selectedProduct.category_id,
 					is_featured: selectedProduct.is_featured || false,
 					is_new: selectedProduct.is_new || false,
@@ -82,7 +85,6 @@ export function ProductForm({
 					price: 0,
 					original_price: null,
 					stock_quantity: 0,
-					image: "",
 					images: [],
 					category_id: null,
 					is_featured: false,
@@ -101,8 +103,22 @@ export function ProductForm({
 		try {
 			setLoading(true);
 
+			if (values.images.length === 0) {
+				toast({
+					title: t("common.error"),
+					description: t("admin.imageRequired"),
+					variant: "destructive",
+				});
+				setLoading(false);
+				return;
+			}
+
 			if (selectedProduct) {
-				await updateProduct(selectedProduct.id, values);
+				await updateProduct(selectedProduct.id, {
+					...values,
+					image: values.images[0],
+					images: values.images.slice(1),
+				});
 				toast({
 					title: t("admin.productUpdated"),
 					description: t("admin.productUpdatedMessage"),
@@ -116,8 +132,8 @@ export function ProductForm({
 					price: values.price,
 					original_price: values.original_price,
 					stock_quantity: values.stock_quantity || 0,
-					image: values.image,
-					images: values.images || [],
+					image: values.images[0],
+					images: values.images.slice(1),
 					category_id: values.category_id || null,
 					is_featured: values.is_featured || false,
 					is_new: values.is_new || false,
@@ -260,23 +276,12 @@ export function ProductForm({
 							</FormLabel>
 							<FormControl>
 								<FileUpload
-									value={[
-										form.watch("image"),
-										...(form.watch("images") || []),
-									].filter(Boolean)}
+									value={form.watch("images")}
 									onChange={(urls) => {
 										if (typeof urls === "string") {
-											form.setValue("image", urls);
-											form.setValue("images", []);
-										} else if (urls.length > 0) {
-											form.setValue("image", urls[0]);
-											form.setValue(
-												"images",
-												urls.slice(1),
-											);
+											form.setValue("images", [urls]);
 										} else {
-											form.setValue("image", "");
-											form.setValue("images", []);
+											form.setValue("images", urls);
 										}
 									}}
 									onFilesAdded={async (files) => {
@@ -289,6 +294,9 @@ export function ProductForm({
 									maxFiles={6}
 								/>
 							</FormControl>
+							<FormDescription>
+								{t("admin.firstImageMain")}
+							</FormDescription>
 							<FormMessage />
 						</FormItem>
 					)}
@@ -399,7 +407,9 @@ export function ProductForm({
 												<SelectItem
 													key={category.id}
 													value={category.id}>
-													{category.name}
+													{isRTL
+														? category.name_ar
+														: category.name}
 												</SelectItem>
 											))}
 										</SelectContent>

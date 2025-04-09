@@ -383,6 +383,9 @@ export default {
 		productImages: "صور المنتج",
 		productImagesDescription:
 			"قم بتحميل ما يصل إلى 6 صور. سيتم استخدام الصورة الأولى كصورة رئيسية للمنتج",
+		firstImageMain:
+			"سيتم استخدام الصورة الأولى كصورة رئيسية للمنتج",
+		imageRequired: "مطلوب صورة واحدة على الأقل",
 		noOrders: "لا توجد طلبات",
 		orderId: "رقم الطلب",
 		noProducts: "لا توجد منتجات متاحة",
@@ -916,5 +919,6 @@ export default {
 		senderEmailRequired: "بريد المرسل الإلكتروني مطلوب",
 		defaultShippingRateRequired:
 			"معدل الشحن الافتراضي مطلوب",
+		atLeastOneImage: "مطلوب صورة واحدة على الأقل",
 	},
 };
