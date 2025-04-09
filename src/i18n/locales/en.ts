@@ -241,6 +241,8 @@ export default {
 			"Upload up to 6 images. The first image will be used as the main product image.",
 	},
 	auth: {
+		signIn: "Sign In",
+		signUp: "Sign Up",
 		email: "Email",
 		password: "Password",
 		confirmPassword: "Confirm Password",
@@ -581,5 +583,18 @@ export default {
 		addMore: "Add More Files",
 		uploadedFile: "Uploaded file {{number}}",
 		remove: "Remove",
+	},
+	products: {
+		title: "Products",
+		searchPlaceholder: "Search products...",
+		sortNewest: "Newest",
+		sortOldest: "Oldest",
+		sortPriceAsc: "Price: Low to High",
+		sortPriceDesc: "Price: High to Low",
+		sort: "Sort",
+		detailsTab: "Details",
+		shippingTab: "Shipping",
+		returnsTab: "Returns & Refunds",
+		search: "Search",
 	},
 };
