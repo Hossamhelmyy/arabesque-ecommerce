@@ -596,7 +596,7 @@ export default {
 		expiryDatePlaceholder: "شهر/سنة",
 		cvv: "رمز التحقق",
 		cvvPlaceholder: "123",
-		cardholderName: "اسم حامل البطاقة",
+		cardholderName: "الاسم",
 		cardholderNamePlaceholder: "الاسم على البطاقة",
 		saveCard: "حفظ البطاقة للمشتريات المستقبلية",
 		saveAddress: "حفظ العنوان للمشتريات المستقبلية",

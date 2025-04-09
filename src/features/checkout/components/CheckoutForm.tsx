@@ -89,7 +89,7 @@ export function CheckoutForm({
 						</CardDescription>
 					</CardHeader>
 					<CardContent className="space-y-6">
-						<div className="grid grid-cols-2 gap-4">
+						<div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
 							<FormField
 								control={form.control}
 								name="firstName"
@@ -132,7 +132,7 @@ export function CheckoutForm({
 							/>
 						</div>
 
-						<div className="grid grid-cols-2 gap-4">
+						<div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
 							<FormField
 								control={form.control}
 								name="email"
@@ -218,7 +218,7 @@ export function CheckoutForm({
 							)}
 						/>
 
-						<div className="grid grid-cols-2 gap-4">
+						<div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
 							<FormField
 								control={form.control}
 								name="city"
@@ -261,7 +261,7 @@ export function CheckoutForm({
 							/>
 						</div>
 
-						<div className="grid grid-cols-2 gap-4">
+						<div className="grid sm:grid-cols-2 grid-cols-1 gap-4">
 							<FormField
 								control={form.control}
 								name="zipCode"
@@ -358,7 +358,7 @@ export function CheckoutForm({
 													<div className="font-medium">
 														{t("checkout.standardShipping")}
 													</div>
-													<div className="text-sm text-muted-foreground">
+													<div className="text-sm text-muted-foreground mt-1">
 														{t(
 															"checkout.estimatedDelivery",
 														)}
@@ -378,7 +378,7 @@ export function CheckoutForm({
 													<div className="font-medium">
 														{t("checkout.expressShipping")}
 													</div>
-													<div className="text-sm text-muted-foreground">
+													<div className="text-sm text-muted-foreground mt-1">
 														{t(
 															"checkout.estimatedDelivery",
 														)}
@@ -452,7 +452,7 @@ export function CheckoutForm({
 							)}
 						/>
 
-						<div className="grid grid-cols-3 gap-4">
+						<div className="grid sm:grid-cols-3 grid-cols-1 gap-4">
 							<FormField
 								control={form.control}
 								name="expiryDate"

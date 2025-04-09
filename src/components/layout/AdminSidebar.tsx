@@ -143,7 +143,7 @@ const AdminSidebar = ({
 					<Button
 						variant="ghost"
 						size="icon"
-						className="lg:hidden mx-3">
+						className="lg:hidden me-3">
 						<Menu className="h-5 w-5" />
 						<span className="sr-only">
 							{t("admin.menu")}
@@ -164,7 +164,7 @@ const AdminSidebar = ({
 							<span>{t("common.home")}</span>
 							<Badge
 								variant="outline"
-								className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+								className="absolute ltr:right-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
 								{t("admin.storefront")}
 							</Badge>
 						</Link>
