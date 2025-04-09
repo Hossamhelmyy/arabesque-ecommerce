@@ -6,6 +6,7 @@ import {
 	ProductsGrid,
 	ProductsGridSkeleton,
 } from "@/features/products/components";
+import { Skeleton } from "@/components/ui/skeleton";
 import type {
 	Product,
 	SortOptions,
@@ -78,8 +79,10 @@ const ModernCategoryPage = () => {
 		return (
 			<div className="container py-8 md:py-12">
 				<div className="mb-8">
-					<ProductsGridSkeleton count={12} />
+					<Skeleton className="h-10 w-[250px] mb-4" />
+					<Skeleton className="h-6 w-[150px]" />
 				</div>
+				<ProductsGridSkeleton count={12} />
 			</div>
 		);
 	}

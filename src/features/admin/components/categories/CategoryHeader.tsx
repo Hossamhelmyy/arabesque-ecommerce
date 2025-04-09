@@ -19,22 +19,32 @@ export const CategoryHeader = ({
 	const { t } = useTranslation();
 
 	return (
-		<div className="flex sm:items-center justify-between sm:flex-row items-start flex-col gap-3">
-			<div className="flex flex-1 items-center space-x-2">
-				<Input
-					placeholder={t("admin.searchCategories")}
-					value={searchQuery}
-					onChange={onSearch}
-					className="h-8 w-[150px] lg:w-[250px]"
-				/>
+		<>
+			<div>
+				<h1 className="text-3xl font-bold tracking-tight">
+					{t("admin.categories")}
+				</h1>
+				<p className="text-muted-foreground">
+					{t("admin.manageCategories")}
+				</p>
 			</div>
-			<Button
-				onClick={onAddNewClick}
-				size="sm"
-				className="h-8">
-				<Plus className="mr-2 h-4 w-4" />
-				{t("admin.addCategory")}
-			</Button>
-		</div>
+			<div className="flex sm:items-center justify-between sm:flex-row items-start flex-col gap-3">
+				<div className="flex flex-1 items-center space-x-2">
+					<Input
+						placeholder={t("admin.searchCategories")}
+						value={searchQuery}
+						onChange={onSearch}
+						className="h-8 w-[200px] lg:w-[250px]"
+					/>
+				</div>
+				<Button
+					onClick={onAddNewClick}
+					size="sm"
+					className="h-8">
+					<Plus className="mr-2 h-4 w-4" />
+					{t("admin.addCategory")}
+				</Button>
+			</div>
+		</>
 	);
 };

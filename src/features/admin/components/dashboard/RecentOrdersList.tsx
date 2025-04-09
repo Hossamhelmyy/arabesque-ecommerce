@@ -15,6 +15,10 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import {
+	ScrollArea,
+	ScrollBar,
+} from "@/components/ui/scroll-area";
 import type { RecentOrder } from "../../types";
 
 // Valid badge variants based on the UI components available
@@ -68,7 +72,7 @@ export const RecentOrdersList = ({
 				<CardTitle>{t("admin.recentOrders")}</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<div className="overflow-x-auto">
+				<ScrollArea className="w-full">
 					{isLoading ? (
 						<Table>
 							<TableHeader>
@@ -168,7 +172,8 @@ export const RecentOrdersList = ({
 							</TableBody>
 						</Table>
 					)}
-				</div>
+					<ScrollBar orientation="horizontal" />
+				</ScrollArea>
 			</CardContent>
 		</Card>
 	);

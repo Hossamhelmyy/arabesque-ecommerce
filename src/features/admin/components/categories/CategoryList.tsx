@@ -10,7 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Edit, Trash2, Image } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+	ScrollArea,
+	ScrollBar,
+} from "@/components/ui/scroll-area";
 import type { Category } from "../../types";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface CategoryListProps {
 	categories: Category[];
@@ -29,11 +34,14 @@ export const CategoryList = ({
 }: CategoryListProps) => {
 	const { t, i18n } = useTranslation();
 	const isArabic = i18n.language === "ar";
+	const { isRTL } = useLanguage();
 
 	if (isLoading) {
 		return (
 			<div className="rounded-md border">
-				<div className="overflow-x-auto w-full">
+				<ScrollArea
+					dir={isRTL ? "rtl" : "ltr"}
+					className="w-full">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -82,14 +90,17 @@ export const CategoryList = ({
 							))}
 						</TableBody>
 					</Table>
-				</div>
+					<ScrollBar orientation="horizontal" />
+				</ScrollArea>
 			</div>
 		);
 	}
 
 	return (
 		<div className="rounded-md border">
-			<div className="overflow-x-auto">
+			<ScrollArea
+				dir={isRTL ? "rtl" : "ltr"}
+				className="w-full">
 				<Table>
 					<TableHeader>
 						<TableRow>
@@ -197,7 +208,8 @@ export const CategoryList = ({
 						)}
 					</TableBody>
 				</Table>
-			</div>
+				<ScrollBar orientation="horizontal" />
+			</ScrollArea>
 		</div>
 	);
 };

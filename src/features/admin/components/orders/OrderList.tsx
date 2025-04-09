@@ -10,7 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Eye } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+	ScrollArea,
+	ScrollBar,
+} from "@/components/ui/scroll-area";
 import type { Order, ShippingAddress } from "../../types";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface OrderListProps {
 	orders: Order[];
@@ -38,11 +43,15 @@ export const OrderList = ({
 	getShippingAddressProperty,
 }: OrderListProps) => {
 	const { t } = useTranslation();
+	const { isRTL } = useLanguage();
 
 	if (isLoading) {
 		return (
 			<div className="rounded-md border">
-				<div className="overflow-x-auto">
+				<ScrollArea
+					dir={isRTL ? "rtl" : "ltr"}
+					className="w-full">
+					{" "}
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -93,14 +102,17 @@ export const OrderList = ({
 							))}
 						</TableBody>
 					</Table>
-				</div>
+					<ScrollBar orientation="horizontal" />
+				</ScrollArea>
 			</div>
 		);
 	}
 
 	return (
 		<div className="rounded-md border">
-			<div className="overflow-x-auto">
+			<ScrollArea
+				dir={isRTL ? "rtl" : "ltr"}
+				className="w-full">
 				<Table>
 					<TableHeader>
 						<TableRow>
@@ -179,7 +191,8 @@ export const OrderList = ({
 						)}
 					</TableBody>
 				</Table>
-			</div>
+				<ScrollBar orientation="horizontal" />
+			</ScrollArea>
 		</div>
 	);
 };

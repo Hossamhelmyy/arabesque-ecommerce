@@ -20,7 +20,12 @@ import {
 	AvatarFallback,
 	AvatarImage,
 } from "@/components/ui/avatar";
+import {
+	ScrollArea,
+	ScrollBar,
+} from "@/components/ui/scroll-area";
 import type { TopProduct } from "../../types";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface TopProductsListProps {
 	products: TopProduct[];
@@ -34,6 +39,7 @@ export const TopProductsList = ({
 	formatCurrency,
 }: TopProductsListProps) => {
 	const { t } = useTranslation();
+	const { isRTL } = useLanguage();
 
 	return (
 		<Card>
@@ -44,7 +50,9 @@ export const TopProductsList = ({
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<div className="overflow-x-auto">
+				<ScrollArea
+					dir={isRTL ? "rtl" : "ltr"}
+					className="w-full">
 					{isLoading ? (
 						<Table>
 							<TableHeader>
@@ -144,7 +152,8 @@ export const TopProductsList = ({
 							</TableBody>
 						</Table>
 					)}
-				</div>
+					<ScrollBar orientation="horizontal" />
+				</ScrollArea>
 			</CardContent>
 		</Card>
 	);

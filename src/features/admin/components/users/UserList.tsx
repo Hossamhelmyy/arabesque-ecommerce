@@ -24,6 +24,10 @@ import {
 } from "@/components/ui/table";
 import type { User } from "../../types";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+	ScrollArea,
+	ScrollBar,
+} from "@/components/ui/scroll-area";
 
 interface UserListProps {
 	users: User[];
@@ -40,6 +44,7 @@ export const UserList = ({
 }: UserListProps) => {
 	const { t } = useTranslation();
 	const { isRTL } = useLanguage();
+
 	const getRoleBadge = (role: string) => {
 		switch (role?.toLowerCase()) {
 			case "admin":
@@ -75,9 +80,6 @@ export const UserList = ({
 
 	return (
 		<Card>
-			<CardHeader>
-				<CardTitle>{t("admin.usersList")}</CardTitle>
-			</CardHeader>
 			<CardContent>
 				{isLoading ? (
 					<div className="space-y-4">
@@ -88,7 +90,9 @@ export const UserList = ({
 								<Skeleton className="h-4 w-[200px]" />
 							</div>
 						</div>
-						<div className="overflow-x-auto">
+						<ScrollArea
+							dir={isRTL ? "rtl" : "ltr"}
+							className="w-full">
 							<Table>
 								<TableHeader>
 									<TableRow>
@@ -136,10 +140,12 @@ export const UserList = ({
 									)}
 								</TableBody>
 							</Table>
-						</div>
+						</ScrollArea>
 					</div>
 				) : (
-					<div className="overflow-x-auto">
+					<ScrollArea
+						dir={isRTL ? "rtl" : "ltr"}
+						className="w-full">
 						<Table>
 							<TableHeader>
 								<TableRow>
@@ -214,7 +220,8 @@ export const UserList = ({
 								)}
 							</TableBody>
 						</Table>
-					</div>
+						<ScrollBar orientation="horizontal" />
+					</ScrollArea>
 				)}
 			</CardContent>
 		</Card>

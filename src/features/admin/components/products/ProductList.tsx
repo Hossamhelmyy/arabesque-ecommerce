@@ -10,9 +10,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
-
+import {
+	ScrollArea,
+	ScrollBar,
+} from "@/components/ui/scroll-area";
 import { Image, Edit, Trash2 } from "lucide-react";
 import type { Product, Category } from "../../types";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ProductListProps {
 	products: Product[];
@@ -34,6 +38,7 @@ export const ProductList = ({
 	formatPrice,
 }: ProductListProps) => {
 	const { t, i18n } = useTranslation();
+	const { isRTL } = useLanguage();
 
 	const getCategoryName = (
 		categoryId: string | null,
@@ -50,7 +55,9 @@ export const ProductList = ({
 
 	return (
 		<div className="rounded-md border shadow-sm bg-card">
-			<div className="relative w-full overflow-x-auto">
+			<ScrollArea
+				dir={isRTL ? "rtl" : "ltr"}
+				className="w-full">
 				<Table>
 					<TableHeader className="bg-muted/50">
 						<TableRow>
@@ -224,7 +231,8 @@ export const ProductList = ({
 						)}
 					</TableBody>
 				</Table>
-			</div>
+				<ScrollBar orientation="horizontal" />
+			</ScrollArea>
 		</div>
 	);
 };
