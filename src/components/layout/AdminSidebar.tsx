@@ -104,7 +104,7 @@ const AdminSidebar = ({
 					<Button
 						variant="ghost"
 						size="icon"
-						className="md:hidden">
+						className="lg:hidden mx-[6px]">
 						<Menu className="h-5 w-5" />
 						<span className="sr-only">
 							{t("admin.menu")}
@@ -123,7 +123,7 @@ const AdminSidebar = ({
 	}
 
 	return (
-		<div className="hidden md:flex md:w-64 lg:w-72 h-full bg-sidebar-background border-r border-sidebar-border flex-col">
+		<div className="hidden lg:flex md:w-64 lg:w-72 h-full bg-sidebar-background border-r border-sidebar-border flex-col">
 			<nav className="flex-1 py-8 px-4">
 				{renderNavItems()}
 			</nav>

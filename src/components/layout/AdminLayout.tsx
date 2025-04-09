@@ -14,7 +14,7 @@ const AdminLayout = () => {
 	}, []);
 
 	const isMobile = useIsMobile();
-
+	console.log(isMobile);
 	return (
 		<div className="flex min-h-screen flex-col">
 			<div className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur flex items-center">
