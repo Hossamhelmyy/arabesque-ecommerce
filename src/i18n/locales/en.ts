@@ -280,6 +280,7 @@ export default {
 		signUpDescription: "Create an account to get started",
 		signingIn: "Signing in...",
 		signingUp: "Creating account...",
+		emailPlaceholder: "Enter your email address",
 	},
 	home: {
 		hero: {

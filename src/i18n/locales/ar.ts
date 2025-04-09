@@ -384,7 +384,7 @@ export default {
 	},
 	auth: {
 		email: "البريد الإلكتروني",
-		emailPlaceholder: "name@example.com",
+		emailPlaceholder: "أدخل بريدك الإلكتروني",
 		password: "كلمة المرور",
 		confirmPassword: "تأكيد كلمة المرور",
 		name: "الاسم الكامل",
