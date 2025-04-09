@@ -63,7 +63,7 @@ const SignInForm: React.FC = () => {
 								<FormLabel>{t("auth.email")}</FormLabel>
 								<FormControl>
 									<Input
-										placeholder="name@example.com"
+										placeholder={t("auth.emailPlaceholder")}
 										type="email"
 										{...field}
 									/>

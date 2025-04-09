@@ -100,7 +100,7 @@ export const CategoryCard = ({
 								{displayName}
 							</h3>
 							<p className="text-sm text-muted-foreground">
-								{t("category.browseProducts")}
+								{t("categories.browseProducts")}
 							</p>
 						</div>
 						<Button

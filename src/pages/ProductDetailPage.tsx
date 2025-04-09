@@ -45,7 +45,7 @@ const ModernProductDetailPage = () => {
 					<Button asChild className="mt-6">
 						<Link to="/products">
 							<ArrowLeft className="mr-2 h-4 w-4" />
-							{t("product.backToProducts")}
+							{t("product.browseProducts")}
 						</Link>
 					</Button>
 				</div>
@@ -54,7 +54,7 @@ const ModernProductDetailPage = () => {
 	}
 
 	return (
-		<div className="container py-8 md:py-12">
+		<div className="container py-12">
 			{/* Breadcrumb */}
 			<div className="mb-6">
 				<div className="flex items-center text-sm text-muted-foreground">
@@ -65,23 +65,25 @@ const ModernProductDetailPage = () => {
 					<Link
 						to="/products"
 						className="hover:text-primary">
-						{t("common.products")}
+						{t("products.title")}
 					</Link>
+					<span className="mx-2">/</span>
 					{product.categories && (
 						<>
-							<span className="mx-2">/</span>
 							<Link
-								to={`/categories/${product.categories.slug}`}
+								to={`/category/${product.categories.slug}`}
 								className="hover:text-primary">
-								{isArabic
+								{isArabic && product.categories.name_ar
 									? product.categories.name_ar
 									: product.categories.name}
 							</Link>
+							<span className="mx-2">/</span>
 						</>
 					)}
-					<span className="mx-2">/</span>
 					<span className="text-foreground font-medium">
-						{isArabic ? product.name_ar : product.name}
+						{isArabic && product.name_ar
+							? product.name_ar
+							: product.name}
 					</span>
 				</div>
 			</div>

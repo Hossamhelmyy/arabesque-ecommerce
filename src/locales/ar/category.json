@@ -8,5 +8,6 @@
 	"browseAllProducts": "تصفح جميع المنتجات",
 	"subcategories": "الفئات الفرعية",
 	"noFilteredProducts": "لا توجد منتجات تطابق الفلاتر الخاصة بك",
-	"noFilteredProductsDescription": "حاول تعديل الفلاتر الخاصة بك أو تصفح جميع المنتجات في هذه الفئة."
+	"noFilteredProductsDescription": "حاول تعديل الفلاتر الخاصة بك أو تصفح جميع المنتجات في هذه الفئة.",
+	"browseProducts": "تصفح المنتجات"
 }

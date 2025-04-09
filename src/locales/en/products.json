@@ -1,7 +1,12 @@
 {
+	"title": "Products",
+	"searchPlaceholder": "Search products...",
 	"sortNewest": "Newest",
 	"sortOldest": "Oldest",
 	"sortPriceAsc": "Price: Low to High",
 	"sortPriceDesc": "Price: High to Low",
-	"sort": "Sort"
+	"sort": "Sort",
+	"detailsTab": "Details",
+	"shippingTab": "Shipping",
+	"returnsTab": "Returns & Refunds"
 }

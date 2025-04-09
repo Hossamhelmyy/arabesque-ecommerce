@@ -1,7 +1,12 @@
 {
+	"title": "المنتجات",
+	"searchPlaceholder": "البحث عن منتجات...",
 	"sortNewest": "الأحدث",
 	"sortOldest": "الأقدم",
 	"sortPriceAsc": "السعر: من الأقل إلى الأعلى",
 	"sortPriceDesc": "السعر: من الأعلى إلى الأقل",
-	"sort": "ترتيب"
+	"sort": "ترتيب",
+	"detailsTab": "التفاصيل",
+	"shippingTab": "الشحن",
+	"returnsTab": "الإرجاع والاسترداد"
 }

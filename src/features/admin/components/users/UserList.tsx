@@ -38,7 +38,7 @@ export const UserList = ({
 	formatDate,
 }: UserListProps) => {
 	const { t } = useTranslation();
-	console.log(users);
+
 	const getRoleBadge = (role: string) => {
 		switch (role?.toLowerCase()) {
 			case "admin":

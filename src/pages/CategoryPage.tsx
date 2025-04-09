@@ -14,6 +14,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { ProductsGrid } from "@/features/products/components/product-grid";
 import { useCategoryDetails } from "@/features/categories/hooks";
 import { useWishlistContext } from "@/context/WishlistContext";
@@ -115,37 +116,41 @@ const ModernCategoryPage = () => {
 		);
 	}
 
+	// Define breadcrumb items
+	const breadcrumbItems = [
+		{
+			href: "/categories",
+			translationKey: "common.categories",
+		},
+		{
+			href: `/category/${category.slug}`,
+			label:
+				isArabic && category.name_ar
+					? category.name_ar
+					: category.name,
+		},
+	];
+
 	return (
 		<div className="container py-8 md:py-12">
 			{/* Breadcrumb */}
-			<div className="mb-6">
-				<div className="flex items-center text-sm text-muted-foreground">
-					<Link to="/" className="hover:text-primary">
-						{t("common.home")}
-					</Link>
-					<span className="mx-2">/</span>
-					<Link
-						to="/categories"
-						className="hover:text-primary">
-						{t("common.categories")}
-					</Link>
-					<span className="mx-2">/</span>
-					<span className="text-foreground font-medium">
-						{isArabic ? category.name_ar : category.name}
-					</span>
-				</div>
-			</div>
+			<Breadcrumbs
+				items={breadcrumbItems}
+				className="mb-6"
+			/>
 
 			{/* Category header */}
 			<div className="mb-8">
 				<div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
 					<div>
 						<h1 className="text-3xl font-bold">
-							{isArabic ? category.name_ar : category.name}
+							{isArabic && category.name_ar
+								? category.name_ar
+								: category.name}
 						</h1>
 						{category.description && (
 							<p className="mt-2 text-muted-foreground">
-								{isArabic
+								{isArabic && category.description_ar
 									? category.description_ar
 									: category.description}
 							</p>

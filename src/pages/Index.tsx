@@ -96,14 +96,14 @@ const Index = () => {
 							<input
 								type="email"
 								placeholder={t(
-									"home.newsletter.emailPlaceholder",
+									"newsletter.emailPlaceholder",
 								)}
 								className="flex h-10 w-full rounded-md border border-white/20 bg-transparent px-3 py-2 text-sm placeholder:text-white/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arabesque-gold"
 							/>
 							<button
 								type="submit"
 								className="inline-flex items-center justify-center whitespace-nowrap rounded-md bg-arabesque-gold px-4 py-2 text-sm font-medium text-white shadow hover:bg-arabesque-gold/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-arabesque-gold">
-								{t("home.newsletter.subscribe")}
+								{t("newsletter.subscribe")}
 							</button>
 						</form>
 					</div>

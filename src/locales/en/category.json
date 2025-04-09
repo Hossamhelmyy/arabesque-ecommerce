@@ -8,5 +8,6 @@
 	"browseAllProducts": "Browse All Products",
 	"subcategories": "Subcategories",
 	"noFilteredProducts": "No products match your filters",
-	"noFilteredProductsDescription": "Try adjusting your filters or browse all products in this category."
+	"noFilteredProductsDescription": "Try adjusting your filters or browse all products in this category.",
+	"browseProducts": "Browse Products"
 }

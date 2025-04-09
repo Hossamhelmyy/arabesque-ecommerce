@@ -283,6 +283,12 @@ export default {
 		saleDesc: "Limited time deals and discounts",
 		testimonials: "What Our Customers Say",
 		stayUpdated: "Stay Updated",
+		newsletter: {
+			description:
+				"Subscribe to our newsletter and be the first to know about new products, special offers, and upcoming events.",
+			emailPlaceholder: "Your email address",
+			subscribe: "Subscribe",
+		},
 	},
 	product: {
 		product: "Product",
@@ -348,6 +354,10 @@ export default {
 			"The product you're looking for doesn't exist or has been removed.",
 		browseProducts: "Browse Products",
 		shipping: "Shipping",
+		returns: "Returns",
+		detailsTab: "Details",
+		shippingTab: "Shipping",
+		returnsTab: "Returns & Refunds",
 		saveAmount: "Save ${{amount}}",
 		previousImage: "Previous image",
 		nextImage: "Next image",
