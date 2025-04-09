@@ -81,7 +81,7 @@ export const OrderSummary = ({
 										}}
 									/>
 								</div>
-								<div className="flex flex-1 flex-col space-y-1 sm:space-y-2">
+								<div className="flex flex-1 flex-col space-y-2">
 									<div className="flex justify-between items-start">
 										<h3 className="font-semibold tracking-tight text-sm sm:text-base line-clamp-2">
 											{item.product.name}
@@ -90,7 +90,7 @@ export const OrderSummary = ({
 											{formatPrice(item.product.price)}
 										</p>
 									</div>
-									<div className="flex items-center justify-between max-[400px]:flex-col max-[400px]:items-start">
+									<div className="flex items-center justify-between max-[400px]:flex-col max-[400px]:items-start gap-2">
 										<Badge
 											variant="secondary"
 											className="text-xs sm:text-sm">
