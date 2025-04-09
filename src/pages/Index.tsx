@@ -31,12 +31,11 @@ const Index = () => {
 								</div>
 							</div>
 							<p className="italic text-muted-foreground mb-4">
-								"The quality of the handwoven rug I ordered
-								is exceptional. It's exactly as described
-								and adds the perfect touch to my living
-								room."
+								{t("home.testimonial1.text")}
 							</p>
-							<p className="font-medium">Sarah M.</p>
+							<p className="font-medium">
+								{t("home.testimonial1.author")}
+							</p>
 						</div>
 
 						{/* Testimonial 2 */}
@@ -51,12 +50,11 @@ const Index = () => {
 								</div>
 							</div>
 							<p className="italic text-muted-foreground mb-4">
-								"Fast shipping and beautiful packaging. The
-								ceramic pieces I ordered are even more
-								stunning in person. Will definitely shop
-								here again!"
+								{t("home.testimonial2.text")}
 							</p>
-							<p className="font-medium">Ahmed K.</p>
+							<p className="font-medium">
+								{t("home.testimonial2.author")}
+							</p>
 						</div>
 
 						{/* Testimonial 3 */}
@@ -71,12 +69,11 @@ const Index = () => {
 								</div>
 							</div>
 							<p className="italic text-muted-foreground mb-4">
-								"The spice set was a gift for my mother and
-								she absolutely loved it! The packaging is
-								beautiful and the spices are so fragrant and
-								fresh."
+								{t("home.testimonial3.text")}
 							</p>
-							<p className="font-medium">Leila T.</p>
+							<p className="font-medium">
+								{t("home.testimonial3.author")}
+							</p>
 						</div>
 					</div>
 				</div>

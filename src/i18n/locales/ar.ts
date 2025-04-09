@@ -5,16 +5,16 @@ export default {
 		loadingDescription:
 			"يرجى الانتظار بينما نحضر المحتوى لك",
 		error: "خطأ",
-		errorDescription: "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+		errorDescription: "حدث خطأ ما. يرجى المحاولة مرة أخرى",
 		serverError: "خطأ في الخادم",
 		serverErrorDescription:
-			"حدث خطأ في الخادم. يرجى المحاولة مرة أخرى.",
-		notFound: "لم يتم العثور على الصفحة",
+			"نواجه صعوبات تقنية. يرجى المحاولة مرة أخرى لاحقاً",
+		notFound: "الصفحة غير موجودة",
 		notFoundDescription:
-			"الصفحة التي تبحث عنها غير موجودة أو قد تم نقلها.",
+			"الصفحة التي تبحث عنها غير موجودة أو تم نقلها",
 		accessDenied: "تم رفض الوصول",
 		accessDeniedDescription:
-			"ليس لديك صلاحية للوصول إلى هذه الصفحة.",
+			"ليس لديك الصلاحيات الكافية للوصول إلى هذه الصفحة",
 		goBack: "العودة",
 		retry: "إعادة المحاولة",
 		goHome: "العودة للرئيسية",
@@ -92,15 +92,17 @@ export default {
 		backToCategories: "العودة إلى الفئات",
 		toggleTheme: "تبديل الوضع",
 		backToProducts: "العودة إلى المنتجات",
-		unknownError: "حدث خطأ غير معروف",
+		unknownError: "حدث خطأ غير متوقع",
+		unknownErrorDescription:
+			"حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى أو التواصل مع الدعم الفني إذا استمرت المشكلة",
 		image: "الصورة",
 		create: "إنشاء",
 		update: "تحديث",
 		updating: "جاري التحديث...",
 		creating: "جاري الإنشاء...",
-		uploadError: "خطأ في التحميل",
+		uploadError: "فشل الرفع",
 		uploadErrorDesc:
-			"حدثت مشكلة أثناء تحميل الملف. يرجى المحاولة مرة أخرى.",
+			"لم نتمكن من رفع ملفك. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى",
 		description:
 			"نجمع كنوزًا أصيلة من جميع أنحاء العالم، ونوصلها إليك بعناية.",
 		saving: "جاري الحفظ...",
@@ -242,6 +244,7 @@ export default {
 		parentCategory: "الفئة الأم",
 		slug: "الرابط المختصر",
 		addCategory: "إضافة فئة",
+		addCategoryDesc: "إنشاء فئة جديدة لتنظيم منتجاتك",
 		editCategory: "تعديل فئة",
 		deleteCategory: "حذف فئة",
 		confirmDeleteCategoryTitle: "حذف الفئة",
@@ -250,7 +253,6 @@ export default {
 		categoriesCount: "عدد الفئات",
 		productsCount: "عدد المنتجات",
 		addCategoryTitle: "إضافة فئة جديدة",
-		addCategoryDescription: "إنشاء فئة جديدة لمنتجاتك",
 		editCategoryTitle: "تعديل الفئة",
 		editCategoryDescription: "تحديث معلومات الفئة",
 		nameRequired: "الاسم مطلوب",
@@ -418,21 +420,33 @@ export default {
 	},
 	home: {
 		hero: {
-			title: "اكتشف كنوز أصيلة",
-			subtitle: "مصنوعة يدويًا بشغف، ومقدمة بعناية",
+			title: "اكتشف الكنوز الأصيلة",
+			subtitle: "مصنوعة يدوياً بشغف، وموصلة بعناية",
 			cta: "تسوق الآن",
 		},
-		featured: "منتجات مميزة",
+		featured: "المنتجات المميزة",
 		featuredDesc:
 			"اكتشف مجموعتنا المختارة من المنتجات الفريدة",
 		categories: "تسوق حسب الفئة",
-		trending: "المنتجات الرائجة",
-		trendingDesc: "المنتجات الأكثر شعبية في هذا الموسم",
-		newArrivals: "وصل حديثًا",
+		trending: "الأكثر رواجاً",
+		trendingDesc: "المنتجات الأكثر شعبية هذا الموسم",
+		newArrivals: "وصل حديثاً",
 		newArrivalsDesc: "أحدث الإضافات إلى مجموعتنا",
 		sale: "عروض خاصة",
-		saleDesc: "عروض وخصومات لفترة محدودة",
+		saleDesc: "صفقات وخصومات محدودة",
 		testimonials: "ماذا يقول عملاؤنا",
+		testimonial1: {
+			text: "جودة السجادة اليدوية التي طلبتها استثنائية. إنها تماماً كما وُصفت وتضيف لمسة مثالية لغرفة معيشتي.",
+			author: "سارة م.",
+		},
+		testimonial2: {
+			text: "شحن سريع وتغليف جميل. القطع الخزفية التي طلبتها أكثر روعة في الواقع. سأتسوق هنا بالتأكيد مرة أخرى!",
+			author: "أحمد ك.",
+		},
+		testimonial3: {
+			text: "مجموعة التوابل كانت هدية لأمي وهي تحبها كثيراً! التغليف جميل والتوابل عطرة وطازجة.",
+			author: "ليلى ت.",
+		},
 		stayUpdated: "ابق على اطلاع",
 		newsletter: {
 			description:
@@ -846,5 +860,57 @@ export default {
 			"السماح بالشحن إلى وجهات دولية",
 		saveSettings: "حفظ الإعدادات",
 		saving: "جاري الحفظ...",
+	},
+	validation: {
+		required: "هذا الحقل مطلوب",
+		email: "يرجى إدخال عنوان بريد إلكتروني صحيح",
+		minLength: "يجب أن يكون على الأقل {{min}} حرفًا",
+		maxLength: "يجب أن يكون على الأكثر {{max}} حرفًا",
+		passwordMinLength:
+			"يجب أن تكون كلمة المرور 6 أحرف على الأقل",
+		passwordsDoNotMatch: "كلمات المرور غير متطابقة",
+		invalidUrl: "يرجى إدخال رابط صحيح",
+		invalidPhone: "يرجى إدخال رقم هاتف صحيح",
+		invalidZipCode: "يرجى إدخال رمز بريدي صحيح",
+		invalidCardNumber: "يرجى إدخال رقم بطاقة صحيح",
+		invalidExpiryDate: "يرجى إدخال تاريخ انتهاء صحيح",
+		invalidCVV: "يرجى إدخال رمز CVV صحيح (3-4 أرقام)",
+		positiveNumber: "يجب أن يكون رقمًا موجبًا",
+		invalidAmount: "يرجى إدخال مبلغ صحيح",
+		invalidPort: "يجب أن يكون المنفذ رقمًا",
+		nameMinLength: "يجب أن يكون الاسم حرفين على الأقل",
+		arabicNameMinLength:
+			"يجب أن يكون الاسم العربي حرفين على الأقل",
+		firstNameMinLength:
+			"يجب أن يكون الاسم الأول حرفين على الأقل",
+		lastNameMinLength:
+			"يجب أن يكون اسم العائلة حرفين على الأقل",
+		addressMinLength:
+			"يجب أن يكون العنوان 5 أحرف على الأقل",
+		cityMinLength: "يجب أن تكون المدينة حرفين على الأقل",
+		stateMinLength:
+			"يجب أن تكون الولاية/المحافظة حرفين على الأقل",
+		countryMinLength: "يجب أن تكون الدولة حرفين على الأقل",
+		zipCodeMinLength:
+			"يجب أن يكون الرمز البريدي 3 أحرف على الأقل",
+		phoneMinLength:
+			"يجب أن يكون رقم الهاتف 5 أحرف على الأقل",
+		phoneMinDigits:
+			"يجب أن يكون رقم الهاتف 10 أرقام على الأقل",
+		cardholderNameRequired: "اسم حامل البطاقة مطلوب",
+		cardNumberRequired: "رقم البطاقة مطلوب",
+		expiryDateRequired: "تاريخ انتهاء الصلاحية مطلوب",
+		cvvRequired: "رمز CVV مطلوب",
+		storeNameRequired: "اسم المتجر مطلوب",
+		contactEmailRequired: "البريد الإلكتروني للاتصال مطلوب",
+		currencyRequired: "العملة مطلوبة",
+		smtpHostRequired: "خادم SMTP مطلوب",
+		smtpPortRequired: "منفذ SMTP مطلوب",
+		smtpUsernameRequired: "اسم مستخدم SMTP مطلوب",
+		smtpPasswordRequired: "كلمة مرور SMTP مطلوبة",
+		senderNameRequired: "اسم المرسل مطلوب",
+		senderEmailRequired: "بريد المرسل الإلكتروني مطلوب",
+		defaultShippingRateRequired:
+			"معدل الشحن الافتراضي مطلوب",
 	},
 };

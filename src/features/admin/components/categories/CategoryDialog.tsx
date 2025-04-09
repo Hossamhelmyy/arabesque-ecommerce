@@ -26,22 +26,22 @@ export function CategoryDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="p-0 w-[95vw] sm:max-w-[600px]">
-				<ScrollArea className="h-[80vh]">
-					<div className="p-6">
-						<DialogHeader className="pb-4">
-							<DialogTitle>
-								{selectedCategory
-									? t("admin.editCategory")
-									: t("admin.addCategory")}
-							</DialogTitle>
-							<DialogDescription>
-								{selectedCategory
-									? t("admin.editCategoryDesc")
-									: t("admin.addCategoryDesc")}
-							</DialogDescription>
-						</DialogHeader>
-
+			<DialogContent className="p-0 w-[100vw] sm:max-w-[600px]">
+				<div className="p-6">
+					<DialogHeader className="pb-4 !text-center">
+						{" "}
+						<DialogTitle>
+							{selectedCategory
+								? t("admin.editCategory")
+								: t("admin.addCategory")}
+						</DialogTitle>
+						<DialogDescription>
+							{selectedCategory
+								? t("admin.editCategoryDesc")
+								: t("admin.addCategoryDesc")}
+						</DialogDescription>
+					</DialogHeader>
+					<ScrollArea className="sm:h-[50dvh] h-[calc(100dvh-110px)] pe-3">
 						<CategoryForm
 							selectedCategory={selectedCategory}
 							onOpenChange={onOpenChange}
@@ -54,8 +54,8 @@ export function CategoryDialog({
 								</Button>
 							}
 						/>
-					</div>
-				</ScrollArea>
+					</ScrollArea>
+				</div>
 			</DialogContent>
 		</Dialog>
 	);

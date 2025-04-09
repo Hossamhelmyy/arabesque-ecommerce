@@ -73,17 +73,17 @@ export const OrderDetailsDialog = ({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="p-0 w-[95vw] sm:max-w-3xl">
-				<ScrollArea className="h-[80vh]">
-					<div className="p-6">
-						<DialogHeader className="pb-4">
-							<DialogTitle>
-								{t("admin.orderDetails", {
-									id: selectedOrder.id,
-								})}
-							</DialogTitle>
-						</DialogHeader>
-
+			<DialogContent className="p-0 w-[100vw] sm:max-w-3xl">
+				<div className="p-6">
+					<DialogHeader className="pb-4 !text-center">
+						{" "}
+						<DialogTitle>
+							{t("admin.orderDetails", {
+								id: selectedOrder.id,
+							})}
+						</DialogTitle>
+					</DialogHeader>
+					<ScrollArea className="sm:h-[70dvh] h-[calc(100dvh-110px)] pe-3">
 						<div className="grid gap-6">
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div>
@@ -265,8 +265,8 @@ export const OrderDetailsDialog = ({
 								</div>
 							</div>
 						</div>
-					</div>
-				</ScrollArea>
+					</ScrollArea>
+				</div>
 			</DialogContent>
 		</Dialog>
 	);

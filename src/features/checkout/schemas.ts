@@ -2,18 +2,16 @@ import { z } from "zod";
 
 export const checkoutFormSchema = z.object({
 	// Shipping Information
-	firstName: z.string().min(1, "First name is required"),
-	lastName: z.string().min(1, "Last name is required"),
-	email: z.string().email("Invalid email address"),
-	phone: z
-		.string()
-		.min(10, "Phone number must be at least 10 digits"),
-	address: z.string().min(1, "Address is required"),
+	firstName: z.string().min(1, "validation.required"),
+	lastName: z.string().min(1, "validation.required"),
+	email: z.string().email("validation.email"),
+	phone: z.string().min(10, "validation.phoneMinDigits"),
+	address: z.string().min(1, "validation.required"),
 	apartment: z.string().optional(),
-	city: z.string().min(1, "City is required"),
-	state: z.string().min(1, "State is required"),
-	zipCode: z.string().min(1, "ZIP code is required"),
-	country: z.string().min(1, "Country is required"),
+	city: z.string().min(1, "validation.required"),
+	state: z.string().min(1, "validation.required"),
+	zipCode: z.string().min(1, "validation.required"),
+	country: z.string().min(1, "validation.required"),
 	saveAddress: z.boolean().default(false),
 
 	// Shipping Method
@@ -23,15 +21,19 @@ export const checkoutFormSchema = z.object({
 
 	// Payment Information
 	sameAsBilling: z.boolean().default(true),
-	cardNumber: z.string().min(1, "Card number is required"),
-	expiryDate: z.string().min(1, "Expiry date is required"),
+	cardNumber: z
+		.string()
+		.min(1, "validation.cardNumberRequired"),
+	expiryDate: z
+		.string()
+		.min(1, "validation.expiryDateRequired"),
 	cvv: z
 		.string()
-		.min(3, "CVV is required")
-		.max(4, "CVV must be 3-4 digits"),
+		.min(3, "validation.cvvRequired")
+		.max(4, "validation.cvvRequired"),
 	cardholderName: z
 		.string()
-		.min(1, "Cardholder name is required"),
+		.min(1, "validation.cardholderNameRequired"),
 	saveCard: z.boolean().default(false),
 
 	// Additional Options

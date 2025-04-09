@@ -30,17 +30,25 @@ interface EmailSettingsFormProps {
 }
 
 const emailSettingsSchema = z.object({
-	smtp_host: z.string().min(1, "SMTP host is required"),
-	smtp_port: z.string().min(1, "SMTP port is required"),
-	smtp_user: z.string().min(1, "SMTP username is required"),
+	smtp_host: z
+		.string()
+		.min(1, "validation.smtpHostRequired"),
+	smtp_port: z
+		.string()
+		.min(1, "validation.smtpPortRequired"),
+	smtp_user: z
+		.string()
+		.min(1, "validation.smtpUsernameRequired"),
 	smtp_password: z
 		.string()
-		.min(1, "SMTP password is required"),
-	sender_name: z.string().min(1, "Sender name is required"),
+		.min(1, "validation.smtpPasswordRequired"),
+	sender_name: z
+		.string()
+		.min(1, "validation.senderNameRequired"),
 	sender_email: z
 		.string()
-		.email("Invalid email address")
-		.min(1, "Sender email is required"),
+		.email("validation.email")
+		.min(1, "validation.senderEmailRequired"),
 	email_template: z.string().optional(),
 });
 

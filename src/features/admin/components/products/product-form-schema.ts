@@ -3,15 +3,15 @@ import { z } from "zod";
 // Schema for product form validation
 export const productSchema = z.object({
 	name: z.string().min(2, {
-		message: "Name must be at least 2 characters.",
+		message: "validation.nameMinLength",
 	}),
 	name_ar: z.string().min(2, {
-		message: "Arabic name must be at least 2 characters.",
+		message: "validation.arabicNameMinLength",
 	}),
 	description: z.string().optional(),
 	description_ar: z.string().optional(),
 	price: z.coerce.number().min(0, {
-		message: "Price must be a positive number.",
+		message: "validation.positiveNumber",
 	}),
 	original_price: z.coerce
 		.number()
@@ -19,11 +19,11 @@ export const productSchema = z.object({
 		.optional()
 		.nullable(),
 	stock_quantity: z.coerce.number().min(0, {
-		message: "Stock quantity must be a positive number.",
+		message: "validation.positiveNumber",
 	}),
 	image: z
 		.string()
-		.url({ message: "Please enter a valid image URL." }),
+		.url({ message: "validation.invalidUrl" }),
 	images: z.array(z.string().url()).optional(),
 	category_id: z.string().optional().nullable(),
 	is_featured: z.boolean().optional().nullable(),

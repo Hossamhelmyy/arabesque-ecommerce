@@ -57,21 +57,21 @@ const storeSettingsSchema = z.object({
 const emailSettingsSchema = z.object({
 	smtpHost: z
 		.string()
-		.min(1, { message: "SMTP host is required." }),
+		.min(1, { message: "validation.smtpHostRequired" }),
 	smtpPort: z
 		.string()
-		.regex(/^\d+$/, { message: "Port must be a number." }),
+		.regex(/^\d+$/, { message: "validation.invalidPort" }),
 	smtpUser: z
 		.string()
-		.min(1, { message: "SMTP username is required." }),
+		.min(1, { message: "validation.smtpUsernameRequired" }),
 	smtpPassword: z
 		.string()
-		.min(1, { message: "SMTP password is required." }),
+		.min(1, { message: "validation.smtpPasswordRequired" }),
 	senderName: z
 		.string()
-		.min(1, { message: "Sender name is required." }),
+		.min(1, { message: "validation.senderNameRequired" }),
 	senderEmail: z.string().email({
-		message: "Please enter a valid email address.",
+		message: "validation.email",
 	}),
 });
 
@@ -80,13 +80,13 @@ const shippingSettingsSchema = z.object({
 	freeShippingThreshold: z
 		.string()
 		.regex(/^\d+(\.\d{1,2})?$/, {
-			message: "Please enter a valid amount.",
+			message: "validation.invalidAmount",
 		})
 		.optional(),
 	defaultShippingRate: z
 		.string()
 		.regex(/^\d+(\.\d{1,2})?$/, {
-			message: "Please enter a valid amount.",
+			message: "validation.invalidAmount",
 		}),
 	allowInternationalShipping: z.boolean(),
 });

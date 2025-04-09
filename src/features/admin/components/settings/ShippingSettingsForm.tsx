@@ -34,7 +34,7 @@ const shippingSettingsSchema = z.object({
 	free_shipping_threshold: z.string().optional(),
 	default_shipping_rate: z
 		.string()
-		.min(1, "Default shipping rate is required"),
+		.min(1, "validation.defaultShippingRateRequired"),
 	allow_international_shipping: z.boolean(),
 	shipping_countries: z.array(z.string()).optional(),
 	shipping_zones: z

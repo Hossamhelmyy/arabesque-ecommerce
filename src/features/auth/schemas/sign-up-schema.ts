@@ -3,13 +3,13 @@ import { z } from "zod";
 export const signUpSchema = z.object({
 	email: z
 		.string()
-		.min(1, { message: "Email is required" })
-		.email({ message: "Invalid email address" }),
+		.min(1, { message: "validation.required" })
+		.email({ message: "validation.email" }),
 	password: z
 		.string()
-		.min(1, { message: "Password is required" })
+		.min(1, { message: "validation.required" })
 		.min(6, {
-			message: "Password must be at least 6 characters",
+			message: "validation.passwordMinLength",
 		}),
 });
 

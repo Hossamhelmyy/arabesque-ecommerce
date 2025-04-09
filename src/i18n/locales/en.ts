@@ -3,6 +3,20 @@ export default {
 		appName: "Arabesque",
 		loading: "Loading...",
 		error: "Error",
+		errorDescription:
+			"Something went wrong. Please try again.",
+		serverError: "Server Error",
+		serverErrorDescription:
+			"We're experiencing technical difficulties. Please try again later.",
+		notFound: "Page Not Found",
+		notFoundDescription:
+			"The page you're looking for doesn't exist or has been moved.",
+		accessDenied: "Access Denied",
+		accessDeniedDescription:
+			"You don't have permission to access this page.",
+		unknownError: "Something went wrong",
+		unknownErrorDescription:
+			"An unexpected error occurred. Please try again or contact support if the problem persists.",
 		success: "Success",
 		saving: "Saving...",
 		updating: "Updating...",
@@ -30,20 +44,21 @@ export default {
 		apply: "Apply",
 		toggleTheme: "Toggle theme",
 		backToProducts: "Back to Products",
-		unknownError: "An unknown error occurred",
 		image: "Image",
 		create: "Create",
 		update: "Update",
 		creating: "Creating...",
-		uploadError: "Upload Error",
+		uploadError: "Upload Failed",
 		uploadErrorDesc:
-			"There was a problem uploading your file. Please try again.",
+			"We couldn't upload your file. Please check your connection and try again.",
 		description:
 			"Curating authentic treasures from around the world, delivered with care to your doorstep.",
 		authRequired: "Authentication Required",
 		lightMode: "Light Mode",
 		darkMode: "Dark Mode",
 		theme: "Theme",
+		arabic: "Arabic",
+		english: "English",
 	},
 	admin: {
 		title: "Arabesque",
@@ -217,6 +232,8 @@ export default {
 		createdAt: "Created At",
 		updatedAt: "Updated At",
 		addCategory: "Add Category",
+		addCategoryDesc:
+			"Create a new category to organize your products",
 	},
 	auth: {
 		signIn: "Sign In",
@@ -263,6 +280,18 @@ export default {
 		sale: "Special Offers",
 		saleDesc: "Limited time deals and discounts",
 		testimonials: "What Our Customers Say",
+		testimonial1: {
+			text: "The quality of the handwoven rug I ordered is exceptional. It's exactly as described and adds the perfect touch to my living room.",
+			author: "Sarah M.",
+		},
+		testimonial2: {
+			text: "Fast shipping and beautiful packaging. The ceramic pieces I ordered are even more stunning in person. Will definitely shop here again!",
+			author: "Ahmed K.",
+		},
+		testimonial3: {
+			text: "The spice set was a gift for my mother and she absolutely loved it! The packaging is beautiful and the spices are so fragrant and fresh.",
+			author: "Leila T.",
+		},
 		stayUpdated: "Stay Updated",
 		newsletter: {
 			description:
@@ -683,5 +712,57 @@ export default {
 			"Allow shipping to international destinations",
 		saveSettings: "Save Settings",
 		saving: "Saving...",
+	},
+	validation: {
+		required: "This field is required",
+		email: "Please enter a valid email address",
+		minLength: "Must be at least {{min}} characters",
+		maxLength: "Must be at most {{max}} characters",
+		passwordMinLength:
+			"Password must be at least 6 characters",
+		passwordsDoNotMatch: "Passwords do not match",
+		invalidUrl: "Please enter a valid URL",
+		invalidPhone: "Please enter a valid phone number",
+		invalidZipCode: "Please enter a valid ZIP code",
+		invalidCardNumber: "Please enter a valid card number",
+		invalidExpiryDate: "Please enter a valid expiry date",
+		invalidCVV: "Please enter a valid CVV (3-4 digits)",
+		positiveNumber: "Must be a positive number",
+		invalidAmount: "Please enter a valid amount",
+		invalidPort: "Port must be a number",
+		nameMinLength: "Name must be at least 2 characters",
+		arabicNameMinLength:
+			"Arabic name must be at least 2 characters",
+		firstNameMinLength:
+			"First name must be at least 2 characters",
+		lastNameMinLength:
+			"Last name must be at least 2 characters",
+		addressMinLength:
+			"Address must be at least 5 characters",
+		cityMinLength: "City must be at least 2 characters",
+		stateMinLength: "State must be at least 2 characters",
+		countryMinLength:
+			"Country must be at least 2 characters",
+		zipCodeMinLength:
+			"ZIP code must be at least 3 characters",
+		phoneMinLength:
+			"Phone number must be at least 5 characters",
+		phoneMinDigits:
+			"Phone number must be at least 10 digits",
+		cardholderNameRequired: "Cardholder name is required",
+		cardNumberRequired: "Card number is required",
+		expiryDateRequired: "Expiry date is required",
+		cvvRequired: "CVV is required",
+		storeNameRequired: "Store name is required",
+		contactEmailRequired: "Contact email is required",
+		currencyRequired: "Currency is required",
+		smtpHostRequired: "SMTP host is required",
+		smtpPortRequired: "SMTP port is required",
+		smtpUsernameRequired: "SMTP username is required",
+		smtpPasswordRequired: "SMTP password is required",
+		senderNameRequired: "Sender name is required",
+		senderEmailRequired: "Sender email is required",
+		defaultShippingRateRequired:
+			"Default shipping rate is required",
 	},
 };

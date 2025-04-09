@@ -3,10 +3,10 @@ import { z } from "zod";
 // Schema for category form validation - making fields optional to match CategoryFormValues in useCategories.ts
 export const categorySchema = z.object({
 	name: z.string().min(2, {
-		message: "Name must be at least 2 characters.",
+		message: "validation.nameMinLength",
 	}),
 	name_ar: z.string().min(2, {
-		message: "Arabic name must be at least 2 characters.",
+		message: "validation.arabicNameMinLength",
 	}),
 	description: z.string().optional().nullable(),
 	description_ar: z.string().optional().nullable(),

@@ -27,29 +27,28 @@ export const ProductDialog = ({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="p-0 w-[95vw] sm:max-w-3xl">
-				<ScrollArea className="h-[80vh]">
-					<div className="p-6">
-						<DialogHeader className="pb-4">
-							<DialogTitle>
-								{selectedProduct
-									? t("admin.editProductTitle")
-									: t("admin.addNewProduct")}
-							</DialogTitle>
-							<DialogDescription>
-								{selectedProduct
-									? t("admin.editProductDescription")
-									: t("admin.addProductDescription")}
-							</DialogDescription>
-						</DialogHeader>
-
+			<DialogContent className="p-0 w-[100vw] sm:max-w-3xl">
+				<div className="p-6">
+					<DialogHeader className="pb-4 !text-center">
+						<DialogTitle>
+							{selectedProduct
+								? t("admin.editProductTitle")
+								: t("admin.addNewProduct")}
+						</DialogTitle>
+						<DialogDescription>
+							{selectedProduct
+								? t("admin.editProductDescription")
+								: t("admin.addProductDescription")}
+						</DialogDescription>
+					</DialogHeader>
+					<ScrollArea className="sm:h-[70dvh] h-[calc(100dvh-110px)] pe-3">
 						<ProductForm
 							selectedProduct={selectedProduct}
 							categories={categories}
 							onOpenChange={onOpenChange}
 						/>
-					</div>
-				</ScrollArea>
+					</ScrollArea>
+				</div>
 			</DialogContent>
 		</Dialog>
 	);

@@ -87,18 +87,17 @@ export const UserDetailsDialog = ({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="p-0 w-[95vw] sm:max-w-[525px]">
-				<ScrollArea className="h-[80vh]">
-					<div className="p-6">
-						<DialogHeader className="mb-4">
-							<DialogTitle className="text-2xl">
-								{t("admin.userDetails")}
-							</DialogTitle>
-							<DialogDescription>
-								{t("admin.userDetailsDesc")}
-							</DialogDescription>
-						</DialogHeader>
-
+			<DialogContent className="p-0 w-[100vw] sm:max-w-[525px]">
+				<div className="p-6">
+					<DialogHeader className="pb-4 !text-center">
+						<DialogTitle className="text-2xl">
+							{t("admin.userDetails")}
+						</DialogTitle>
+						<DialogDescription>
+							{t("admin.userDetailsDesc")}
+						</DialogDescription>
+					</DialogHeader>
+					<ScrollArea className="sm:h-[50dvh] h-[calc(100dvh-110px)] pe-3">
 						<div className="flex flex-col space-y-6">
 							<div className="flex items-start space-x-4">
 								<Avatar className="h-20 w-20 border-2 border-border">
@@ -250,8 +249,8 @@ export const UserDetailsDialog = ({
 								</Button>
 							</DialogFooter>
 						</div>
-					</div>
-				</ScrollArea>
+					</ScrollArea>
+				</div>
 			</DialogContent>
 		</Dialog>
 	);

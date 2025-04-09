@@ -30,17 +30,21 @@ interface StoreSettingsFormProps {
 }
 
 const storeSettingsSchema = z.object({
-	store_name: z.string().min(1, "Store name is required"),
+	store_name: z
+		.string()
+		.min(1, "validation.storeNameRequired"),
 	store_description: z.string().optional(),
 	contact_email: z
 		.string()
-		.email("Invalid email address")
-		.min(1, "Contact email is required"),
+		.email("validation.email")
+		.min(1, "validation.contactEmailRequired"),
 	contact_phone: z.string().optional(),
 	address: z.string().optional(),
 	logo_url: z.string().optional(),
 	favicon_url: z.string().optional(),
-	currency: z.string().min(1, "Currency is required"),
+	currency: z
+		.string()
+		.min(1, "validation.currencyRequired"),
 });
 
 export const StoreSettingsForm = ({
