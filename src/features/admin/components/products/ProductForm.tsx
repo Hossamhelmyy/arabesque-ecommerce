@@ -22,12 +22,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import {
-	Tabs,
-	TabsContent,
-	TabsList,
-	TabsTrigger,
-} from "@/components/ui/tabs";
 import { FileUpload } from "@/components/ui/file-upload";
 import { Loader2 } from "lucide-react";
 import { uploadMultipleFiles } from "@/utils/supabase-uploads";
@@ -54,7 +48,6 @@ export function ProductForm({
 	const { createProduct, updateProduct, isSubmitting } =
 		useProducts();
 	const [loading, setLoading] = useState(false);
-	const [activeTab, setActiveTab] = useState("english");
 
 	const form = useForm<ProductFormValues>({
 		resolver: zodResolver(productSchema),
@@ -96,14 +89,12 @@ export function ProductForm({
 					is_new: true,
 					is_on_sale: false,
 			  },
-		mode: "onChange", // Validate on change for better UX
+		mode: "onChange",
 	});
 
-	// Track if the form is valid
 	const isValid = form.formState.isValid;
 	const isDirty = form.formState.isDirty;
 
-	// Handle form submission
 	const handleSubmit = async (
 		values: ProductFormValues,
 	) => {
@@ -146,118 +137,55 @@ export function ProductForm({
 			<form
 				onSubmit={form.handleSubmit(handleSubmit)}
 				className="space-y-6">
-				<Tabs
-					value={activeTab}
-					onValueChange={setActiveTab}
-					className="w-full">
-					<TabsList className="grid w-full grid-cols-2">
-						<TabsTrigger value="english">
-							{t("admin.englishDetails")}
-						</TabsTrigger>
-						<TabsTrigger value="arabic">
-							{t("admin.arabicDetails")}
-						</TabsTrigger>
-					</TabsList>
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+					<div className="space-y-4">
+						<FormField
+							control={form.control}
+							name="name"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>
+										{t("admin.name")} ({t("common.english")}
+										)
+									</FormLabel>
+									<FormControl>
+										<Input
+											placeholder={t(
+												"admin.inputNamePlaceholder",
+											)}
+											{...field}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
-					<TabsContent
-						value="english"
-						className="space-y-4 pt-4">
-						<div className="space-y-4">
-							<FormField
-								control={form.control}
-								name="name"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>
-											{t("admin.name")} (
-											{t("common.english")})
-										</FormLabel>
-										<FormControl>
-											<Input
-												placeholder={t(
-													"admin.inputNamePlaceholder",
-												)}
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
+						<FormField
+							control={form.control}
+							name="description"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>
+										{t("admin.description")} (
+										{t("common.english")})
+									</FormLabel>
+									<FormControl>
+										<Textarea
+											placeholder={t(
+												"admin.inputDescriptionPlaceholder",
+											)}
+											{...field}
+											rows={5}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</div>
 
-							<FormField
-								control={form.control}
-								name="description"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>
-											{t("admin.description")} (
-											{t("common.english")})
-										</FormLabel>
-										<FormControl>
-											<Textarea
-												placeholder={t(
-													"admin.inputDescriptionPlaceholder",
-												)}
-												{...field}
-												rows={5}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-
-							<FormField
-								control={form.control}
-								name="images"
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>
-											{t("admin.productImages")}
-										</FormLabel>
-										<FormControl>
-											<FileUpload
-												value={[
-													form.watch("image"),
-													...(form.watch("images") || []),
-												].filter(Boolean)}
-												onChange={(urls) => {
-													if (typeof urls === "string") {
-														form.setValue("image", urls);
-														form.setValue("images", []);
-													} else if (urls.length > 0) {
-														form.setValue("image", urls[0]);
-														form.setValue(
-															"images",
-															urls.slice(1),
-														);
-													} else {
-														form.setValue("image", "");
-														form.setValue("images", []);
-													}
-												}}
-												onFilesAdded={async (files) => {
-													return await uploadMultipleFiles(
-														files,
-														"products",
-													);
-												}}
-												multiple={true}
-												maxFiles={6}
-											/>
-										</FormControl>
-
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-					</TabsContent>
-
-					<TabsContent
-						value="arabic"
-						className="space-y-4 pt-4">
+					<div className="space-y-4">
 						<FormField
 							control={form.control}
 							name="name_ar"
@@ -303,8 +231,52 @@ export function ProductForm({
 								</FormItem>
 							)}
 						/>
-					</TabsContent>
-				</Tabs>
+					</div>
+				</div>
+
+				<FormField
+					control={form.control}
+					name="images"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>
+								{t("admin.productImages")}
+							</FormLabel>
+							<FormControl>
+								<FileUpload
+									value={[
+										form.watch("image"),
+										...(form.watch("images") || []),
+									].filter(Boolean)}
+									onChange={(urls) => {
+										if (typeof urls === "string") {
+											form.setValue("image", urls);
+											form.setValue("images", []);
+										} else if (urls.length > 0) {
+											form.setValue("image", urls[0]);
+											form.setValue(
+												"images",
+												urls.slice(1),
+											);
+										} else {
+											form.setValue("image", "");
+											form.setValue("images", []);
+										}
+									}}
+									onFilesAdded={async (files) => {
+										return await uploadMultipleFiles(
+											files,
+											"products",
+										);
+									}}
+									multiple={true}
+									maxFiles={6}
+								/>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
 
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 					<div className="space-y-4">
@@ -430,7 +402,7 @@ export function ProductForm({
 									control={form.control}
 									name="is_featured"
 									render={({ field }) => (
-										<FormItem className="flex flex-row items-start  gap-3 space-y-0">
+										<FormItem className="flex flex-row items-start gap-3 space-y-0">
 											<FormControl>
 												<Checkbox
 													checked={field.value || false}
@@ -450,7 +422,7 @@ export function ProductForm({
 									control={form.control}
 									name="is_new"
 									render={({ field }) => (
-										<FormItem className="flex flex-row items-start  gap-3 space-y-0">
+										<FormItem className="flex flex-row items-start gap-3 space-y-0">
 											<FormControl>
 												<Checkbox
 													checked={field.value || false}
@@ -470,7 +442,7 @@ export function ProductForm({
 									control={form.control}
 									name="is_on_sale"
 									render={({ field }) => (
-										<FormItem className="flex flex-row items-start  gap-3 space-y-0">
+										<FormItem className="flex flex-row items-start gap-3 space-y-0">
 											<FormControl>
 												<Checkbox
 													checked={field.value || false}

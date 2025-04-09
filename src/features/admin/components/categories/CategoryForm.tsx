@@ -19,12 +19,6 @@ import { Category } from "@/features/admin/types";
 import { toast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import {
-	Tabs,
-	TabsContent,
-	TabsList,
-	TabsTrigger,
-} from "@/components/ui/tabs";
-import {
 	categorySchema,
 	CategoryFormValues,
 } from "./category-form-schema";
@@ -45,7 +39,6 @@ export function CategoryForm({
 	const { createCategory, updateCategory, isSubmitting } =
 		useCategories();
 	const [loading, setLoading] = useState(false);
-	const [activeTab, setActiveTab] = useState("english");
 	const [images, setImages] = useState<string[]>(
 		selectedCategory?.image ? [selectedCategory.image] : [],
 	);
@@ -68,14 +61,12 @@ export function CategoryForm({
 					description_ar: "",
 					image: "",
 			  },
-		mode: "onChange", // Validate on change for better UX
+		mode: "onChange",
 	});
 
-	// Track if the form is valid and dirty
 	const isValid = form.formState.isValid;
 	const isDirty = form.formState.isDirty;
 
-	// Handle image file uploads
 	const handleFilesAdded = async (
 		files: File[],
 	): Promise<string[]> => {
@@ -100,14 +91,12 @@ export function CategoryForm({
 		}
 	};
 
-	// Handle form submission
 	const handleSubmit = async (
 		values: CategoryFormValues,
 	) => {
 		try {
 			setLoading(true);
 
-			// Update the image from the current selected images
 			const imageUrl = images.length > 0 ? images[0] : "";
 			const formData: CategoryFormValues = {
 				...values,
@@ -145,22 +134,8 @@ export function CategoryForm({
 			<form
 				onSubmit={form.handleSubmit(handleSubmit)}
 				className="space-y-6">
-				<Tabs
-					value={activeTab}
-					onValueChange={setActiveTab}
-					className="w-full">
-					<TabsList className="grid w-full grid-cols-2">
-						<TabsTrigger value="english">
-							{t("admin.englishDetails")}
-						</TabsTrigger>
-						<TabsTrigger value="arabic">
-							{t("admin.arabicDetails")}
-						</TabsTrigger>
-					</TabsList>
-
-					<TabsContent
-						value="english"
-						className="space-y-4 pt-4">
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+					<div className="space-y-4">
 						<FormField
 							control={form.control}
 							name="name"
@@ -205,11 +180,9 @@ export function CategoryForm({
 								</FormItem>
 							)}
 						/>
-					</TabsContent>
+					</div>
 
-					<TabsContent
-						value="arabic"
-						className="space-y-4 pt-4">
+					<div className="space-y-4">
 						<FormField
 							control={form.control}
 							name="name_ar"
@@ -255,8 +228,8 @@ export function CategoryForm({
 								</FormItem>
 							)}
 						/>
-					</TabsContent>
-				</Tabs>
+					</div>
+				</div>
 
 				<FormField
 					control={form.control}

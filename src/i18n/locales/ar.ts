@@ -476,6 +476,7 @@ export default {
 		sale: "تخفيض",
 		new: "جديد",
 		off: "خصم",
+		added: "تمت إضافة المنتج",
 		addedToCart: "تمت الإضافة إلى السلة",
 		addedToCartDescription:
 			"تمت إضافة المنتج إلى سلة التسوق الخاصة بك",

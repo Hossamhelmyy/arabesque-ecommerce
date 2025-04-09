@@ -234,6 +234,8 @@ export default {
 		addCategory: "Add Category",
 		addCategoryDesc:
 			"Create a new category to organize your products",
+		originalPriceDescription: "For products on sale",
+		productImages: "Product Images",
 	},
 	auth: {
 		signIn: "Sign In",
@@ -372,6 +374,7 @@ export default {
 		saveAmount: "Save ${{amount}}",
 		previousImage: "Previous image",
 		nextImage: "Next image",
+		added: "Product Added",
 	},
 	cart: {
 		title: "Shopping Cart",
