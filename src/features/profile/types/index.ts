@@ -36,3 +36,31 @@ export type OrderItem = {
 		slug: string;
 	};
 };
+
+export type ProfileFormValues = {
+	firstName: string;
+	lastName: string;
+	firstName_ar?: string;
+	lastName_ar?: string;
+	phone?: string;
+};
+
+export type PasswordFormValues = {
+	currentPassword: string;
+	newPassword: string;
+	confirmPassword: string;
+};
+
+export type Address = {
+	id?: string;
+	user_id?: string;
+	full_name: string;
+	street_address: string;
+	city: string;
+	state: string;
+	postal_code: string;
+	country: string;
+	phone_number: string;
+	is_default?: boolean;
+	created_at?: string;
+};

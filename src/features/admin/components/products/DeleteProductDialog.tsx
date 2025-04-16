@@ -7,6 +7,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { useLanguage } from "@/context/LanguageContext";
 import { Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -24,19 +25,23 @@ export const DeleteProductDialog = ({
 	isSubmitting,
 }: DeleteProductDialogProps) => {
 	const { t } = useTranslation();
-
+	const { isRTL } = useLanguage();
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-w-md">
-				<DialogHeader>
-					<DialogTitle>
+			<DialogContent
+				dir={isRTL ? "rtl" : "ltr"}
+				className="max-w-md">
+				<DialogHeader dir={isRTL ? "rtl" : "ltr"}>
+					<DialogTitle
+						className="text-start"
+						dir={isRTL ? "rtl" : "ltr"}>
 						{t("admin.confirmDeleteTitle")}
 					</DialogTitle>
-					<DialogDescription>
+					<DialogDescription className="text-start">
 						{t("admin.confirmDeleteDescription")}
 					</DialogDescription>
 				</DialogHeader>
-				<DialogFooter>
+				<DialogFooter className="gap-2">
 					<Button
 						variant="outline"
 						onClick={() => onOpenChange(false)}>
@@ -44,6 +49,7 @@ export const DeleteProductDialog = ({
 					</Button>
 					<Button
 						variant="destructive"
+						className=""
 						onClick={onConfirm}
 						disabled={isSubmitting}>
 						{isSubmitting ? (

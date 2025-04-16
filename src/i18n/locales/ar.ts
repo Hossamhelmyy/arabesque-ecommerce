@@ -158,6 +158,7 @@ export default {
 		allProducts: "جميع المنتجات",
 		allCategories: "جميع الفئات",
 		category: "الفئة",
+		price: "السعر",
 		stock: "المخزون",
 		status: "الحالة",
 		created: "تاريخ الإنشاء",
@@ -395,6 +396,9 @@ export default {
 		organize: "تنظيم",
 		process: "معالجة",
 		storefront: "واجهة المتجر",
+		deleteCategoryTitle: "حذف الفئة",
+		deleteCategoryDescription:
+			"هل أنت متأكد من رغبتك في حذف هذه الفئة؟ ستصبح جميع المنتجات المرتبطة بها غير مصنفة.",
 	},
 	auth: {
 		email: "البريد الإلكتروني",
@@ -723,6 +727,15 @@ export default {
 		addresses: "العناوين",
 		addAddress: "إضافة عنوان",
 		defaultAddress: "العنوان الافتراضي",
+		setAsDefaultAddress: "تعيين كعنوان افتراضي",
+		addAddressDescription: "إضافة عنوان شحن جديد إلى حسابك",
+		editAddress: "تعديل العنوان",
+		editAddressDescription:
+			"تحديث معلومات عنوان الشحن الخاص بك",
+		setAsDefault: "تعيين كافتراضي",
+		confirmDeleteAddress: "تأكيد حذف العنوان",
+		confirmDeleteAddressDescription:
+			"هل أنت متأكد من رغبتك في حذف هذا العنوان؟ لا يمكن التراجع عن هذا الإجراء.",
 		wishlist: "المفضلة",
 		passwordSecurity: "كلمة المرور والأمان",
 		updatePasswordDesc: "تغيير كلمة المرور وإعدادات الأمان",

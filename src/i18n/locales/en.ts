@@ -239,6 +239,9 @@ export default {
 		firstImageMain:
 			"The first image will be used as the main product image",
 		imageRequired: "At least one image is required",
+		deleteCategoryTitle: "Delete Category",
+		deleteCategoryDescription:
+			"Are you sure you want to delete this category? All products in this category will become uncategorized.",
 	},
 	auth: {
 		signIn: "Sign In",
@@ -274,6 +277,7 @@ export default {
 			cta: "Shop Now",
 		},
 		featured: "Featured",
+		stayUpdated: "Stay Updated",
 		featuredDesc:
 			"Discover our handpicked selection of unique products",
 		categories: "Shop by Category",
@@ -289,6 +293,8 @@ export default {
 			"Read what our satisfied customers have to say about their experiences",
 		newsletter: {
 			title: "Stay Connected",
+			description:
+				"Subscribe to our newsletter and be the first to know about new products, special offers, and upcoming events.",
 			subtitle:
 				"Subscribe to our newsletter for exclusive offers and updates",
 			placeholder: "Your email",
@@ -596,6 +602,16 @@ export default {
 		noAddresses: "No Addresses",
 		addAddressMessage: "Add your first shipping address",
 		addAddress: "Add Address",
+		setAsDefaultAddress: "Set as default address",
+		addAddressDescription:
+			"Add a new shipping address to your account",
+		editAddress: "Edit Address",
+		editAddressDescription:
+			"Update your shipping address information",
+		setAsDefault: "Set as Default",
+		confirmDeleteAddress: "Confirm Delete Address",
+		confirmDeleteAddressDescription:
+			"Are you sure you want to delete this address? This action cannot be undone.",
 		settings: "Account Settings",
 		language: "Language Preference",
 		notifications: "Notification Settings",

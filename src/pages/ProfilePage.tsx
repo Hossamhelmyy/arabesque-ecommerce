@@ -19,6 +19,7 @@ import { ProfilePageSkeleton } from "@/features/profile/components/ProfilePageSk
 import {
 	fetchProfile,
 	fetchOrders,
+	fetchAddresses,
 	updateProfile,
 	updatePassword,
 } from "@/features/profile/api";
@@ -48,6 +49,13 @@ const ProfilePage = () => {
 			queryFn: () => (user ? fetchOrders(user.id) : []),
 			enabled: !!user,
 		});
+
+	// Fetch addresses
+	const { isLoading: addressesLoading } = useQuery({
+		queryKey: ["addresses", user?.id],
+		queryFn: () => (user ? fetchAddresses(user.id) : []),
+		enabled: !!user,
+	});
 
 	// Update profile mutation
 	const updateProfileMutation = useMutation({
@@ -144,7 +152,7 @@ const ProfilePage = () => {
 		<div className="container py-8 md:py-12">
 			<div className="flex flex-col md:flex-row gap-8">
 				{/* Sidebar */}
-				<div className="md:w-[45%]">
+				<div className="md:w-1/4">
 					<ProfileSidebar
 						profile={profile}
 						activeTab={activeTab}

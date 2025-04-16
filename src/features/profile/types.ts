@@ -38,3 +38,5 @@ export type PasswordFormValues = {
 	newPassword: string;
 	confirmPassword: string;
 };
+
+export type { Address } from "./types/index";

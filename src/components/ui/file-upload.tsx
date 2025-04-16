@@ -169,7 +169,7 @@ export function FileUpload({
 		},
 		[isUploading, disabled, valueArray, onChange],
 	);
-
+	console.log(valueArray, "valueArray");
 	return (
 		<div className={cn("space-y-4", className)}>
 			<div
@@ -295,10 +295,6 @@ export function FileUpload({
 											number: index + 1,
 										})}
 										className="h-full w-full object-cover transition-transform group-hover:scale-105"
-										onLoad={(e) => {
-											(e.target as HTMLImageElement).src =
-												"/placeholder.svg";
-										}}
 										onError={(e) => {
 											(e.target as HTMLImageElement).src =
 												"/placeholder.svg";

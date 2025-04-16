@@ -9,6 +9,7 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useLanguage } from "@/shared/utils/imports";
 
 interface DeleteCategoryDialogProps {
 	open: boolean;
@@ -24,19 +25,20 @@ export const DeleteCategoryDialog = ({
 	onConfirm,
 }: DeleteCategoryDialogProps) => {
 	const { t } = useTranslation();
+	const { isRTL } = useLanguage();
 
 	return (
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
-			<AlertDialogContent>
+			<AlertDialogContent dir={isRTL ? "rtl" : "ltr"}>
 				<AlertDialogHeader>
-					<AlertDialogTitle>
+					<AlertDialogTitle className="text-start">
 						{t("admin.deleteCategoryTitle")}
 					</AlertDialogTitle>
-					<AlertDialogDescription>
+					<AlertDialogDescription className="text-start">
 						{t("admin.deleteCategoryDescription")}
 					</AlertDialogDescription>
 				</AlertDialogHeader>
-				<AlertDialogFooter>
+				<AlertDialogFooter className="gap-2">
 					<AlertDialogCancel disabled={isSubmitting}>
 						{t("common.cancel")}
 					</AlertDialogCancel>

@@ -132,9 +132,9 @@ export const ProductList = ({
 									<TableCell className="min-w-[200px]">
 										<div className="flex items-center gap-3">
 											<div className="h-10 w-10 rounded-md overflow-hidden bg-background flex-shrink-0">
-												{product.image ? (
+												{product.images ? (
 													<img
-														src={product.image}
+														src={product.images[0]}
 														alt={product.name}
 														className="h-full w-full object-cover"
 														onError={(e) => {

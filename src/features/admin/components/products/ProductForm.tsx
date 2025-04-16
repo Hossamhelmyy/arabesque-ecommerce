@@ -96,7 +96,7 @@ export function ProductForm({
 
 	const isValid = form.formState.isValid;
 	const isDirty = form.formState.isDirty;
-
+	console.log(form.watch());
 	const handleSubmit = async (
 		values: ProductFormValues,
 	) => {
@@ -167,6 +167,7 @@ export function ProductForm({
 	return (
 		<Form {...form}>
 			<form
+				dir={isRTL ? "rtl" : "ltr"}
 				onSubmit={form.handleSubmit(handleSubmit)}
 				className="space-y-6">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -388,6 +389,7 @@ export function ProductForm({
 										{t("admin.category")}
 									</FormLabel>
 									<Select
+										dir={isRTL ? "rtl" : "ltr"}
 										onValueChange={field.onChange}
 										value={field.value || undefined}>
 										<FormControl>

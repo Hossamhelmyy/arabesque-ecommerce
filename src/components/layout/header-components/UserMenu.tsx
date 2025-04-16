@@ -11,6 +11,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface UserMenuProps {
 	isAdmin: boolean;
@@ -19,7 +20,7 @@ interface UserMenuProps {
 export const UserMenu = ({ isAdmin }: UserMenuProps) => {
 	const { t } = useTranslation();
 	const { user, signOut } = useAuth();
-
+	const { isRTL } = useLanguage();
 	if (!user) {
 		return (
 			<Link to="/auth">
@@ -44,42 +45,52 @@ export const UserMenu = ({ isAdmin }: UserMenuProps) => {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-56">
-				<DropdownMenuLabel>{user.email}</DropdownMenuLabel>
+				<DropdownMenuLabel className="truncate">
+					{user.email}
+				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				{isAdmin ? (
 					<>
-						<DropdownMenuItem asChild>
+						<DropdownMenuItem
+							dir={isRTL ? "rtl" : "ltr"}
+							asChild>
 							<Link
 								to="/admin/profile"
 								className="flex items-center">
-								<User className="h-4 w-4 mr-2" />
+								<User className="h-4 w-4 me-2" />
 								{t("admin.profile")}
 							</Link>
 						</DropdownMenuItem>
 					</>
 				) : (
 					<>
-						<DropdownMenuItem asChild>
+						<DropdownMenuItem
+							dir={isRTL ? "rtl" : "ltr"}
+							asChild>
 							<Link
 								to="/profile"
 								className="flex items-center">
-								<User className="h-4 w-4 mr-2" />
+								<User className="h-4 w-4 me-2" />
 								{t("common.profile")}
 							</Link>
 						</DropdownMenuItem>
-						<DropdownMenuItem asChild>
+						<DropdownMenuItem
+							dir={isRTL ? "rtl" : "ltr"}
+							asChild>
 							<Link
 								to="/cart"
 								className="flex items-center">
-								<ShoppingCart className="h-4 w-4 mr-2" />
+								<ShoppingCart className="h-4 w-4 me-2" />
 								{t("common.cart")}
 							</Link>
 						</DropdownMenuItem>
-						<DropdownMenuItem asChild>
+						<DropdownMenuItem
+							dir={isRTL ? "rtl" : "ltr"}
+							asChild>
 							<Link
 								to="/favorites"
 								className="flex items-center">
-								<Heart className="h-4 w-4 mr-2" />
+								<Heart className="h-4 w-4 me-2" />
 								{t("common.favorites")}
 							</Link>
 						</DropdownMenuItem>
@@ -87,6 +98,7 @@ export const UserMenu = ({ isAdmin }: UserMenuProps) => {
 				)}
 				<DropdownMenuSeparator />
 				<DropdownMenuItem
+					dir={isRTL ? "rtl" : "ltr"}
 					onClick={signOut}
 					className="text-destructive">
 					{t("common.signOut")}

@@ -23,6 +23,7 @@ import {
 	CategoryFormValues,
 } from "./category-form-schema";
 import { useCategories } from "@/features/admin/hooks/useCategories";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface CategoryFormProps {
 	selectedCategory?: Category;
@@ -38,6 +39,8 @@ export function CategoryForm({
 	const { t } = useTranslation();
 	const { createCategory, updateCategory, isSubmitting } =
 		useCategories();
+	const { isRTL } = useLanguage();
+
 	const [loading, setLoading] = useState(false);
 	const [images, setImages] = useState<string[]>(
 		selectedCategory?.image ? [selectedCategory.image] : [],
@@ -132,6 +135,7 @@ export function CategoryForm({
 	return (
 		<Form {...form}>
 			<form
+				dir={isRTL ? "rtl" : "ltr"}
 				onSubmit={form.handleSubmit(handleSubmit)}
 				className="space-y-6">
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -253,7 +257,7 @@ export function CategoryForm({
 					)}
 				/>
 
-				<div className="flex justify-end space-x-2">
+				<div className="flex justify-end gap-3">
 					{cancelButton}
 					<Button
 						type="submit"

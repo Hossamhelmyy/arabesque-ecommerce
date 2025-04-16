@@ -33,6 +33,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import type { User } from "../../types";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface UserDetailsDialogProps {
 	open: boolean;
@@ -52,6 +53,7 @@ export const UserDetailsDialog = ({
 	formatDate,
 }: UserDetailsDialogProps) => {
 	const { t } = useTranslation();
+	const { isRTL } = useLanguage();
 	const [selectedRole, setSelectedRole] = useState(
 		user.role || "customer",
 	);
@@ -99,7 +101,9 @@ export const UserDetailsDialog = ({
 					</DialogHeader>
 					<ScrollArea className="sm:h-[50dvh] h-[calc(100dvh-110px)] pe-3">
 						<div className="flex flex-col space-y-6">
-							<div className="flex items-start space-x-4">
+							<div
+								dir={isRTL ? "rtl" : "ltr"}
+								className="flex items-start space-x-4">
 								<Avatar className="h-20 w-20 border-2 border-border">
 									<AvatarImage
 										src={user.avatar}
@@ -118,6 +122,7 @@ export const UserDetailsDialog = ({
 										{user.email}
 									</p>
 									<Badge
+										dir={isRTL ? "rtl" : "ltr"}
 										variant={getRoleBadgeVariant(
 											user.role || "customer",
 										)}>
@@ -125,7 +130,9 @@ export const UserDetailsDialog = ({
 											? t(`admin.${user.role}Role`)
 											: t("admin.customerRole")}
 									</Badge>
-									<p className="text-sm text-muted-foreground pt-1">
+									<p
+										dir={isRTL ? "rtl" : "ltr"}
+										className="text-sm text-muted-foreground pt-1 w-max">
 										{t("admin.memberSince")}:{" "}
 										{formatDate(user.createdAt)}
 									</p>
@@ -135,6 +142,7 @@ export const UserDetailsDialog = ({
 							<Separator />
 
 							<Tabs
+								dir={isRTL ? "rtl" : "ltr"}
 								defaultValue="account"
 								className="w-full">
 								<TabsList className="grid w-full grid-cols-2 mb-4">
@@ -199,6 +207,7 @@ export const UserDetailsDialog = ({
 								</TabsContent>
 
 								<TabsContent
+									dir={isRTL ? "rtl" : "ltr"}
 									value="role"
 									className="space-y-6 mt-0">
 									<div className="space-y-4">
@@ -207,6 +216,7 @@ export const UserDetailsDialog = ({
 												{t("admin.selectRole")}
 											</Label>
 											<Select
+												dir={isRTL ? "rtl" : "ltr"}
 												value={selectedRole}
 												onValueChange={handleRoleChange}>
 												<SelectTrigger className="mt-1">
