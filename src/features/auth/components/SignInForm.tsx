@@ -1,7 +1,9 @@
+
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useLanguage } from "@/context/LanguageContext";
 import {
 	CardHeader,
 	CardContent,
@@ -27,6 +29,7 @@ import {
 
 const SignInForm: React.FC = () => {
 	const { t } = useTranslation();
+	const { isRTL } = useLanguage();
 	const { signIn, isLoading } = useAuthActions();
 
 	const form = useForm<SignInFormValues>({
@@ -47,10 +50,10 @@ const SignInForm: React.FC = () => {
 
 	return (
 		<Form {...form}>
-			<form onSubmit={form.handleSubmit(handleSubmit)}>
+			<form onSubmit={form.handleSubmit(handleSubmit)} dir={isRTL ? "rtl" : "ltr"}>
 				<CardHeader>
-					<CardTitle>{t("auth.signIn")}</CardTitle>
-					<CardDescription>
+					<CardTitle className="text-start">{t("auth.signIn")}</CardTitle>
+					<CardDescription className="text-start">
 						{t("auth.signInDescription")}
 					</CardDescription>
 				</CardHeader>
@@ -81,11 +84,6 @@ const SignInForm: React.FC = () => {
 									<FormLabel>
 										{t("auth.password")}
 									</FormLabel>
-									{/* <Button
-										variant="link"
-										className="p-0 h-auto text-xs">
-										{t("auth.forgotPassword")}
-									</Button> */}
 								</div>
 								<FormControl>
 									<Input type="password" {...field} />

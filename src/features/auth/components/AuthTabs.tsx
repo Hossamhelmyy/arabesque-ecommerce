@@ -1,5 +1,7 @@
+
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/context/LanguageContext";
 import { Card } from "@/components/ui/card";
 import {
 	Tabs,
@@ -12,10 +14,11 @@ import SignUpForm from "./SignUpForm";
 
 const AuthTabs: React.FC = () => {
 	const { t } = useTranslation();
+	const { isRTL } = useLanguage();
 
 	return (
 		<Card className="w-full max-w-md">
-			<Tabs defaultValue="signin">
+			<Tabs defaultValue="signin" dir={isRTL ? "rtl" : "ltr"}>
 				<TabsList className="grid w-full grid-cols-2">
 					<TabsTrigger value="signin">
 						{t("auth.signIn")}
