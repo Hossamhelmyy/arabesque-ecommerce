@@ -2,6 +2,7 @@ export default {
 	common: {
 		appName: "Arabesque",
 		loading: "Loading...",
+		loadingDescription: "Please wait while we prepare the content for you",
 		error: "Error",
 		errorDescription:
 			"Something went wrong. Please try again.",
@@ -289,6 +290,18 @@ export default {
 		sale: "Sale",
 		saleDesc: "Limited time deals and discounts",
 		testimonials: "What Our Customers Say",
+		testimonial1: {
+			text: "The quality of the furniture is absolutely stunning. It has transformed my living room into a beautiful arabesque sanctuary.",
+			author: "Sarah Johnson",
+		},
+		testimonial2: {
+			text: "I was amazed by the intricate details of the pottery. Each piece tells a story and feels so authentic.",
+			author: "Michael Chen",
+		},
+		testimonial3: {
+			text: "The customer service was exceptional, and the delivery was fast. I highly recommend Arabesque Oasis for unique home decor.",
+			author: "Emily Davis",
+		},
 		testimonialDesc:
 			"Read what our satisfied customers have to say about their experiences",
 		newsletter: {
@@ -298,6 +311,7 @@ export default {
 			subtitle:
 				"Subscribe to our newsletter for exclusive offers and updates",
 			placeholder: "Your email",
+			emailPlaceholder: "Your email address",
 			subscribe: "Subscribe",
 		},
 		featuredCollection: "Featured Collection",
@@ -367,6 +381,8 @@ export default {
 		itemsLeft: "items left",
 		decreaseQuantity: "Decrease quantity",
 		increaseQuantity: "Increase quantity",
+		uncategorized: "Uncategorized",
+		addToFavorites: "Add to Favorites",
 		availability: "Availability",
 		notFound: "Product Not Found",
 		notFoundDescription:
@@ -602,6 +618,7 @@ export default {
 		noAddresses: "No Addresses",
 		addAddressMessage: "Add your first shipping address",
 		addAddress: "Add Address",
+		defaultAddress: "Default Address",
 		setAsDefaultAddress: "Set as default address",
 		addAddressDescription:
 			"Add a new shipping address to your account",

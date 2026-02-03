@@ -1,15 +1,16 @@
 // This script populates the Supabase database with sample products
 // Run with: node src/scripts/seed-products.js
 
-const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Sample product image URLs (you can replace these with your actual image URLs)
-const imageBaseUrl = 'https://arabesque-ecommerce.s3.amazonaws.com/products/';
+// Sample product image URLs
+const imageBaseUrl = `${process.env.VITE_SUPABASE_URL}/storage/v1/object/public/arabesque-ecommerce/products/`;
 
 // Images for different categories
 const categoryImages = {

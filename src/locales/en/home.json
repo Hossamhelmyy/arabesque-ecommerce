@@ -5,5 +5,17 @@
 		"description": "Subscribe to our newsletter and be the first to know about new products, special offers, and upcoming events.",
 		"emailPlaceholder": "Your email address",
 		"subscribe": "Subscribe"
+	},
+	"testimonial1": {
+		"text": "The quality of the furniture is absolutely stunning. It has transformed my living room into a beautiful arabesque sanctuary.",
+		"author": "Sarah Johnson"
+	},
+	"testimonial2": {
+		"text": "I was amazed by the intricate details of the pottery. Each piece tells a story and feels so authentic.",
+		"author": "Michael Chen"
+	},
+	"testimonial3": {
+		"text": "The customer service was exceptional, and the delivery was fast. I highly recommend Arabesque Oasis for unique home decor.",
+		"author": "Emily Davis"
 	}
 }

@@ -1,15 +1,16 @@
 // This script populates the Supabase database with sample categories
 // Run with: node src/scripts/seed-categories.js
 
-const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
+import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Sample category image URLs (replace with your actual image URLs)
-const imageBaseUrl = 'https://arabesque-ecommerce.s3.amazonaws.com/categories/';
+// Sample category image URLs
+const imageBaseUrl = `${process.env.VITE_SUPABASE_URL}/storage/v1/object/public/arabesque-ecommerce/categories/`;
 
 // Categories to create
 const categories = [
@@ -225,18 +226,17 @@ async function seedCategories() {
         console.log('Starting category creation...');
 
         // First, clear existing categories if needed (uncomment if you want to clear existing data)
-        /*
+
         console.log('Clearing existing categories...');
         const { error: clearError } = await supabase
-          .from('categories')
-          .delete()
-          .gte('id', 0);
-    
+            .from('categories')
+            .delete()
+            .not('id', 'is', null); // Delete all rows
+
         if (clearError) {
-          console.error('Error clearing categories:', clearError);
-          return;
+            console.error('Error clearing categories:', clearError);
         }
-        */
+
 
         // Create main categories
         console.log('Creating main categories...');
