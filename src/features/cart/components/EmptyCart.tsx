@@ -16,10 +16,10 @@ const EmptyCart: React.FC = () => {
 
 			<div className="space-y-2 max-w-md">
 				<h2 className="text-2xl font-semibold">
-					{t("cart.emptyCartTitle")}
+					{t("cart.empty")}
 				</h2>
 				<p className="text-muted-foreground">
-					{t("cart.emptyCartDescription")}
+					{t("cart.emptyMessage")}
 				</p>
 			</div>
 
