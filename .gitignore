@@ -26,4 +26,5 @@ dist-ssr
 .env.local
 .env.*.local
 .gitignore
-src/scripts
+scripts
+package-lock.json
