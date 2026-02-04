@@ -32,6 +32,8 @@ const FeaturedCategories = () => {
 			const { data, error } = await supabase
 				.from("categories")
 				.select("*")
+				.is("parent_id", null)
+				.order("name", { ascending: true })
 				.limit(6);
 
 			if (error) {

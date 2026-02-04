@@ -22,9 +22,8 @@ const Hero = () => {
 			<div className="container relative px-4 py-12 sm:py-16 lg:py-24">
 				<div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
 					<div
-						className={`text-center lg:text-${
-							isRTL ? "right" : "left"
-						} animate-fade-in`}>
+						className={`text-center lg:text-${isRTL ? "right" : "left"
+							} animate-fade-in`}>
 						<h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 text-foreground">
 							{t("home.hero.title")}
 						</h1>
@@ -68,7 +67,7 @@ const Hero = () => {
 										</div>
 									)}
 									<img
-										src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?q=80&w=1600&auto=format&fit=crop"
+										src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&q=80&w=1200&fm=webp"
 										alt="Elegant Arabic-inspired home decor items"
 										className={cn(
 											"w-full h-full object-cover transition-opacity duration-300",
@@ -98,7 +97,7 @@ const Hero = () => {
 										</div>
 									)}
 									<img
-										src="https://images.unsplash.com/photo-1567016526105-22da7c13161a?q=80&w=1600&auto=format&fit=crop"
+										src="https://images.unsplash.com/photo-1574362848149-11496d93a7c7?auto=format&fit=crop&q=80&w=800&fm=webp"
 										alt="Traditional Arabic pottery"
 										className={cn(
 											"w-full h-full object-cover transition-opacity duration-300",

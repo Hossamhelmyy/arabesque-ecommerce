@@ -3,6 +3,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useSwipeable } from "react-swipeable";
+import { cn } from "@/lib/utils";
 import type { Product } from "@/features/products/types";
 
 interface ProductGalleryProps {
@@ -76,21 +77,28 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
 				<div
 					onClick={() => setIsZoomed(!isZoomed)}
 					onMouseMove={handleImageZoom}
-					className={`cursor-zoom-in transition-all duration-300 ${
-						isZoomed ? "scale-150" : ""
-					}`}
+					className={cn(
+						"relative w-full h-full cursor-zoom-in transition-all duration-500 ease-in-out",
+						isZoomed ? "scale-150" : "scale-100",
+					)}
 					style={
 						isZoomed
 							? {
-									transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
-							  }
+								transformOrigin: `${zoomPosition.x}% ${zoomPosition.y}%`,
+							}
 							: undefined
 					}>
 					<AspectRatio ratio={1}>
 						<img
+							key={selectedImage}
 							src={selectedImage}
 							alt={product.name}
-							className="object-cover w-full h-full"
+							className="object-cover w-full h-full transition-opacity duration-300"
+							onLoad={(e) => {
+								(e.target as HTMLImageElement).classList.remove(
+									"opacity-0",
+								);
+							}}
 							onError={(e) => {
 								(e.target as HTMLImageElement).src =
 									"/placeholder.svg";
@@ -125,11 +133,10 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
 						<div
 							key={idx}
 							onClick={() => setSelectedImageIndex(idx)}
-							className={`cursor-pointer rounded-md border-2 overflow-hidden flex-shrink-0 w-20 h-20 ${
-								selectedImageIndex === idx
-									? "border-primary"
-									: "border-transparent"
-							}`}>
+							className={`cursor-pointer rounded-md border-2 overflow-hidden flex-shrink-0 w-20 h-20 ${selectedImageIndex === idx
+								? "border-primary"
+								: "border-transparent"
+								}`}>
 							<img
 								src={image}
 								alt={`Product thumbnail ${idx + 1}`}

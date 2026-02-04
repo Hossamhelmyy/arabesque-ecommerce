@@ -58,26 +58,47 @@ export const AuthProvider: React.FC<{
 	useEffect(() => {
 		// Check active sessions and sets the user
 		const getUser = async () => {
-			setIsLoading(true);
-			const {
-				data: { session },
-			} = await supabase.auth.getSession();
+			try {
+				setIsLoading(true);
+				const {
+					data: { session },
+				} = await supabase.auth.getSession();
 
-			if (session?.user) {
-				const { data: profile } = await supabase
-					.from("profiles")
-					.select("*")
-					.eq("id", session.user.id)
-					.single();
+				if (session?.user) {
+					// Fetch profile but don't let it crash the whole app if table is missing
+					try {
+						const { data: profile, error: profileError } = await supabase
+							.from("profiles")
+							.select("*")
+							.eq("id", session.user.id)
+							.single();
 
-				setUser({
-					id: session.user.id,
-					email: session.user.email || "",
-					created_at: session.user.created_at,
-					...profile,
-				});
+						if (profileError) {
+							console.warn("Profile fetch error:", profileError.message);
+						}
+
+						setUser({
+							id: session.user.id,
+							email: session.user.email || "",
+							created_at: session.user.created_at,
+							...(profile || {}),
+						});
+					} catch (profileCatchError) {
+						console.error("Profile catch error:", profileCatchError);
+						setUser({
+							id: session.user.id,
+							email: session.user.email || "",
+							created_at: session.user.created_at,
+						});
+					}
+				} else {
+					setUser(null);
+				}
+			} catch (sessionError) {
+				console.error("Session error:", sessionError);
+			} finally {
+				setIsLoading(false);
 			}
-			setIsLoading(false);
 		};
 
 		getUser();
